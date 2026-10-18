@@ -80,11 +80,30 @@
       note: '撕口和墙上那张海图正好对得上。',
       icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 11 26 8l6 20-18 4z"/><path d="M14 15l10 12"/><path d="M25 12l3 9"/></svg>'
     },
+    wire: {
+      name: '细铜线',
+      note: '一小卷铜线，够绕一根保险丝。',
+      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="10"/><circle cx="20" cy="20" r="4"/><path d="M30 20h5"/></svg>'
+    },
+    brokenFuse: {
+      name: '烧断的保险丝',
+      note: '玻璃管发黑，金属丝断成两截。',
+      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="13" y="8" width="14" height="24" rx="3"/><path d="M20 12v6"/><path d="M20 23v5"/><path d="M13 15h14"/><path d="M13 26h14"/></svg>'
+    },
+    magnet: {
+      name: '系绳磁铁',
+      note: '马蹄形磁铁，拴着一截细绳。',
+      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M11 9v11a9 9 0 0 0 18 0V9"/><path d="M11 15h6"/><path d="M23 15h6"/><path d="M20 6v-3"/></svg>'
+    },
     ruler: {
       name: '平行尺',
       note: '铜边磨得发亮，刻度是海里。',
       icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 30 26 12l6 6L14 36z"/><path d="M13 27l4 4"/><path d="M18 22l2 2"/><path d="M23 17l2 2"/></svg>'
     }
+  };
+
+  var COMBOS = {
+    'brokenFuse+wire': { out: 'fuse', hint: '细铜丝绕回玻璃管里。保险丝接好了。' }
   };
 
   var Inv = {
@@ -99,7 +118,22 @@
       this.el.addEventListener('click', function (e) {
         var btn = e.target.closest ? e.target.closest('.inv-slot') : null;
         if (!btn) return;
-        self.select(btn.getAttribute('data-item'));
+        var id = btn.getAttribute('data-item');
+
+        if (self.selected && self.selected !== id) {
+          var combo = COMBOS[[self.selected, id].sort().join('+')];
+          if (combo) {
+            var a = self.selected;
+            self.items = self.items.filter(function (x) { return x !== a && x !== id; });
+            self.selected = null;
+            self.add(combo.out);
+            Audio.sfx('lock');
+            Sub.hint(combo.hint, 3200);
+            return;
+          }
+        }
+
+        self.select(id);
       });
     },
 
@@ -1034,6 +1068,7 @@
                   return {
                     dead: !Night1.powered,
                     hasFuse: Inv.has('fuse'),
+                    hasBroken: Inv.has('brokenFuse'),
                     onPower: function () { Night1.installFuse(); },
                     solved: Night1.tuned,
                     target: '964',
@@ -1068,10 +1103,18 @@
               }
             },
             {
-              id: 'plate', label: '收音机铭牌', x: 64.7, y: 70.1,
+              id: 'calib', label: '校准记录', x: 64.7, y: 70.1,
               closeup: {
-                title: '铭 牌', widget: 'note', art: 'assets/closeups/plate.svg', textBaked: true,
-                note: '“潮汐镇广播电台 · 夜班机”\n\n“本机刻度已按新标准下调 6.3MHz，旧频道请自行换算。”'
+                title: '校 准 记 录', widget: 'note', art: 'assets/closeups/calib.svg',
+                note: '一张机务卡片，压在收音机下面。\n\n旧频道 100.0 → 新刻度 93.7\n旧频道 101.5 → 新刻度 95.2\n\n下面没有写换算方法。'
+              }
+            },
+            {
+              id: 'magnet', label: '系绳磁铁', x: 77.5, y: 42.5,
+              visible: function () { return !Night1.magnetTaken; },
+              take: {
+                id: 'magnet', name: '系绳磁铁',
+                after: function () { Night1.magnetTaken = true; Night1.sync(); }
               }
             },
             {
@@ -1101,11 +1144,14 @@
           lights: [{ id: 'bulb', x: 52, y: 16 }],
           hotspots: [
             {
-              id: 'boots', label: '雨靴', x: 16, y: 80,
+              id: 'boots', label: '雨靴与铁栅', x: 16, y: 80,
               visible: function () { return !Night1.keyTaken; },
-              take: {
-                id: 'key', name: '铜钥匙',
-                after: function () { Night1.keyTaken = true; Night1.sync(); }
+              use: {
+                item: 'magnet',
+                then: function () { Night1.takeKey(); }
+              },
+              action: function () {
+                Sub.hint('靴底压着一道铁栅。下面有金属在反光，手够不着。', 3200);
               }
             },
             {
@@ -1130,10 +1176,12 @@
                 props: function () {
                   return {
                     fuseTaken: Night1.fuseTaken,
+                    wireTaken: Night1.wireTaken,
                     pieceTaken: Night1.pieceTaken,
                     logRead: Night1.logRead,
-                    logText: '夜班频率表（旧刻度）：气象台 105.2；鲸群观测 101.9；渔夫 102.7。\n下面一行被水泡开了，只剩“本机已改新刻度”。',
+                    logText: '夜班频率表（旧刻度）：F-7 102.7；W-2 105.2；T-4 101.9。\n附注：F 渔业协会，W 气象台，T 潮汐站。',
                     onFuse: function () { Night1.takeFuse(); },
+                    onWire: function () { Night1.takeWire(); },
                     onPiece: function () { Night1.takePiece(); },
                     onLog: function () { Night1.readLog(); }
                   };
@@ -1151,14 +1199,14 @@
               id: 'almanac', label: '航海年鉴', x: 27, y: 44,
               closeup: {
                 title: '航 海 年 鉴', widget: 'note', art: 'assets/closeups/almanac.svg',
-                note: '《潮汐镇航海年鉴》摘录：\n\n本地磁偏角 6°W。\n\n磁方位 = 真方位 + 6°。\n\n（真北在磁北以东，别把加减弄反。）'
+                note: '《潮汐镇航海年鉴》摘录：\n\n去年校正：真方位 190°，磁方位 196°。\n\n今年的磁差与去年相同。\n\n（真北在磁北以东。）'
               }
             },
             {
               id: 'logbook', label: '值班日志', x: 58, y: 74,
               closeup: {
                 title: '值 班 日 志', widget: 'note', art: 'assets/closeups/ledger.svg',
-                note: '夜班频率表（旧刻度）：\n\n气象台 …… 105.2\n鲸群观测 … 101.9\n渔夫 …… 102.7\n\n下面一行被水泡开了，只剩“本机已改新刻度”。'
+                note: '夜班频率表（旧刻度）：\n\nF-7 …… 102.7\nW-2 …… 105.2\nT-4 …… 101.9\n\n附注：F 渔业协会，W 气象台，T 潮汐站。\n\n下面一行被水泡开了，只剩“本机已改新刻度”。'
               }
             }
           ],
@@ -1439,8 +1487,10 @@
     area: 'studio',
 
     keyTaken: false,
+    magnetTaken: false,
     lockerOpen: false,
     fuseTaken: false,
+    wireTaken: false,
     pieceTaken: false,
     rulerTaken: false,
     logRead: false,
@@ -1465,8 +1515,10 @@
       this.area = 'studio';
 
       this.keyTaken = false;
+      this.magnetTaken = false;
       this.lockerOpen = false;
       this.fuseTaken = false;
+      this.wireTaken = false;
       this.pieceTaken = false;
       this.rulerTaken = false;
       this.logRead = false;
@@ -1489,8 +1541,10 @@
         fine: this.fine,
         area: this.area,
         keyTaken: this.keyTaken,
+        magnetTaken: this.magnetTaken,
         lockerOpen: this.lockerOpen,
         fuseTaken: this.fuseTaken,
+        wireTaken: this.wireTaken,
         pieceTaken: this.pieceTaken,
         rulerTaken: this.rulerTaken,
         logRead: this.logRead,
@@ -1515,8 +1569,10 @@
       this.area = data.area || 'studio';
 
       this.keyTaken = !!data.keyTaken;
+      this.magnetTaken = !!data.magnetTaken;
       this.lockerOpen = !!data.lockerOpen;
       this.fuseTaken = !!data.fuseTaken;
+      this.wireTaken = !!data.wireTaken;
       this.pieceTaken = !!data.pieceTaken;
       this.rulerTaken = !!data.rulerTaken;
       this.logRead = !!data.logRead;
@@ -1525,13 +1581,13 @@
     },
 
     objective: function () {
-      if (!this.powered) return '收音机没有电。先找一枚 2A 保险丝。';
-      if (!this.tuned) return '他知道一个旧频道。换算成本机刻度。';
-      if (!this.chartPiece) return '海图缺了一块。找找撕掉的那一角。';
-      if (!this.located) return '他在报坐标。把针插进海图的格子里。';
-      if (!this.measured) return '用平行尺量出海图上的真方位。';
-      if (!this.fixed) return '把天线转向他的方位。';
-      return '方向已发出。等他的回话。';
+      if (!this.powered) return '收音机是哑的。';
+      if (!this.tuned) return '雾里有人在等一个频道。';
+      if (!this.chartPiece) return '海图缺了一角。';
+      if (!this.located) return '他在报坐标。';
+      if (!this.measured) return '图上还没有方向。';
+      if (!this.fixed) return '天线还没转过去。';
+      return '方向已发出。';
     },
 
     sync: function () {
@@ -1584,9 +1640,27 @@
     takeFuse: function () {
       if (this.fuseTaken) return;
       this.fuseTaken = true;
-      Inv.add('fuse');
+      Inv.add('brokenFuse');
       Audio.sfx('paper');
       this.sync();
+    },
+
+    takeWire: function () {
+      if (this.wireTaken) return;
+      this.wireTaken = true;
+      Inv.add('wire');
+      Audio.sfx('paper');
+      this.sync();
+      if (this.fuseTaken) Sub.hint('铜线绕得进那根烧断的玻璃管。', 3400);
+    },
+
+    takeKey: function () {
+      if (this.keyTaken) return;
+      this.keyTaken = true;
+      Inv.add('key');
+      Audio.sfx('lock');
+      this.sync();
+      Sub.hint('磁铁吸上来一把铜钥匙，全是泥。', 3000);
     },
 
     takePiece: function () {
@@ -1612,6 +1686,7 @@
       Sub.play([
         { who: '渔夫', text: '……喂？喂！有人吗？', voice: 'n1_01' },
         { who: '渔夫', text: '我的罗盘坏了。雾太厚，我什么都看不见。', voice: 'n1_02' },
+        { who: '渔夫', text: '我是七号渔协的，船号零三。', voice: 'n1_06' },
         { who: '渔夫', text: '我在北纬三十四度十二分，东经一百二十九度零七分。', voice: 'n1_03' },
         { who: '渔夫', text: '船上还有人。求你，给我指个方向。', voice: 'n1_04' }
       ], function () {
@@ -1727,7 +1802,7 @@
         wrap.appendChild(powerBtn);
         wrap.appendChild(p('tool-note', props.hasFuse
           ? '玻璃管卡进槽里，发出一点凉意。'
-          : '保险丝座上刻着 2A。走廊的储物柜里也许有。'));
+          : (props.hasBroken ? '旧玻璃管塞得进去，可里面的丝是断的。' : '保险丝座是空的。')));
         root.appendChild(wrap);
         return { destroy: function () {} };
       }
@@ -2369,6 +2444,7 @@
     locker: function (root, props) {
       props = props || {};
       var fuseTaken = !!props.fuseTaken;
+      var wireTaken = !!props.wireTaken;
       var pieceTaken = !!props.pieceTaken;
       var logRead = !!props.logRead;
 
@@ -2402,9 +2478,14 @@
           list.appendChild(r);
         }
 
-        row('2A 保险丝', '玻璃管完好，金属丝没断。', fuseTaken, '拿走', function () {
+        row('烧断的保险丝', '玻璃管发黑，金属丝断成两截。', fuseTaken, '拿走', function () {
           fuseTaken = true;
           if (props.onFuse) props.onFuse();
+        });
+
+        row('一小卷铜线', '够绕一根保险丝。', wireTaken, '拿走', function () {
+          wireTaken = true;
+          if (props.onWire) props.onWire();
         });
 
         row('海图残片', '撕口很新，背面是潮汐镇的图例。', pieceTaken, '拿走', function () {

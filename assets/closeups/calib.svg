@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#0c1a26"/>
+      <stop offset="0.6" stop-color="#081119"/>
+      <stop offset="1" stop-color="#04080c"/>
+    </linearGradient>
+    <linearGradient id="desk" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#1b2a31"/>
+      <stop offset="0.4" stop-color="#111c24"/>
+      <stop offset="1" stop-color="#060c12"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#d6c9ae"/>
+      <stop offset="0.5" stop-color="#b9ab90"/>
+      <stop offset="1" stop-color="#8d8069"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#0a141c" stop-opacity="0.04"/>
+      <stop offset="0.6" stop-color="#0a141c" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#050a0f" stop-opacity="0.62"/>
+    </linearGradient>
+    <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffcf94" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vign" cx="0.5" cy="0.48" r="0.72">
+      <stop offset="0.4" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.84"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="20"/></filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <ellipse cx="420" cy="180" rx="600" ry="420" fill="url(#lamp)"/>
+
+  <!-- 桌面 -->
+  <rect x="0" y="640" width="1600" height="260" fill="url(#desk)"/>
+  <rect x="0" y="640" width="1600" height="3" fill="#2c4256" opacity="0.4"/>
+
+  <!-- 卡片投影 -->
+  <path d="M316 196 L1320 214 L1286 748 L344 774 Z" fill="#02060a" opacity="0.86" filter="url(#soft)"/>
+
+  <!-- 机务卡片 -->
+  <g transform="rotate(-1.6 810 480)">
+    <path d="M300 176 L1300 192 L1268 728 L330 752 Z" fill="#0a151f"/>
+    <path d="M318 194 L1282 210 L1252 710 L348 734 Z" fill="url(#card)"/>
+    <path d="M318 194 L1282 210 L1252 710 L348 734 Z" fill="url(#shade)"/>
+    <path d="M318 194 L1282 210 L1252 710 L348 734 Z" fill="#26313a" opacity="0.14"/>
+
+    <!-- 卡片压痕 -->
+    <g stroke="#efe6cf" stroke-width="1" opacity="0.12">
+      <path d="M360 300 Q700 292 980 306"/>
+      <path d="M358 382 Q720 374 1010 388"/>
+      <path d="M356 464 Q700 456 1000 470"/>
+      <path d="M354 546 Q710 538 1010 552"/>
+    </g>
+
+    <!-- 两列表格线 -->
+    <g stroke="#5a5342" stroke-width="1.8" opacity="0.5">
+      <line x1="366" y1="250" x2="1236" y2="266"/>
+      <line x1="366" y1="330" x2="1236" y2="346"/>
+      <line x1="366" y1="410" x2="1236" y2="426"/>
+      <line x1="366" y1="490" x2="1236" y2="506"/>
+      <line x1="366" y1="570" x2="1236" y2="586"/>
+      <line x1="786" y1="240" x2="792" y2="620"/>
+    </g>
+
+    <!-- 手写数字（不可读的笔画，模拟两行换算记录） -->
+    <g stroke="#3d382c" stroke-width="2.6" opacity="0.55">
+      <path d="M410 292 Q450 286 486 294"/>
+      <path d="M530 290 Q570 284 606 292"/>
+      <path d="M660 296 Q700 290 736 298"/>
+      <path d="M410 372 Q452 366 488 374"/>
+      <path d="M530 370 Q572 364 608 372"/>
+      <path d="M660 376 Q702 370 738 378"/>
+      <path d="M830 294 Q872 288 908 296"/>
+      <path d="M950 292 Q992 286 1028 294"/>
+      <path d="M830 374 Q874 368 910 376"/>
+      <path d="M950 372 Q994 366 1030 374"/>
+    </g>
+
+    <!-- 红铅笔划线 -->
+    <path d="M404 434 Q760 426 1180 442" stroke="#7d3f31" stroke-width="3" fill="none" opacity="0.6"/>
+    <path d="M404 448 Q700 442 1050 454" stroke="#7d3f31" stroke-width="1.6" fill="none" opacity="0.35"/>
+
+    <!-- 右下角缺角 -->
+    <path d="M1252 710 L1252 640 L1180 710 Z" fill="#0a141f"/>
+
+    <!-- 铜气眼 -->
+    <circle cx="356" cy="226" r="12" fill="#5a4630" stroke="#c9a06a" stroke-width="3"/>
+    <circle cx="356" cy="226" r="5" fill="#0a141f"/>
+  </g>
+
+  <!-- 镇纸 -->
+  <g transform="rotate(8 1180 690)">
+    <rect x="1040" y="666" width="280" height="34" rx="8" fill="#0d1a24" stroke="#2a4050" stroke-width="2"/>
+    <rect x="1040" y="666" width="280" height="9" rx="4" fill="#33505f" opacity="0.55"/>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#vign)"/>
+</svg>
