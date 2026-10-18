@@ -625,7 +625,9 @@
       call_02: 1, call_03: 1, call_04: 1, call_05: 1,
       beacon_03: 1, beacon_04: 1,
       music_01: 1, music_02: 1,
-      news_01: 1, news_02: 1
+      news_01: 1, news_02: 1,
+      n1_01: 1, n1_02: 1, n1_03: 1, n1_04: 1,
+      n1_05: 1, n1_06: 1, n1_07: 1, n1_08: 1
     },
 
     // 优先 mp3（当前生成的格式），没有 mp3 再退回 wav
@@ -1090,14 +1092,13 @@
                 title: '海 图', widget: 'chart', art: 'assets/closeups/chart.svg', textBaked: true,
                 props: function () {
                   return {
-                    brief: Night1.chartPiece ? '把度分换成小数，再把针插进格子里。' : '海图的右下角被撕掉了一块。',
-                    note: '1° = 60′。图上每格 0.05°。\n\n三号浮标外侧是暗礁。',
+                    brief: Night1.chartPiece ? '把度分换成小数，再点在海图上。' : '海图的右下角被撕掉了一块。',
+                    note: '1° = 60′。细格 0.01°，粗格 0.1°。\n\n三号浮标外侧是暗礁。',
                     torn: !Night1.chartPiece,
                     hasPiece: Inv.has('piece'),
                     onPiece: function () { Night1.placePiece(); },
                     solved: Night1.located,
                     answer: { lat: 34.20, lon: 129.12 },
-                    station: { x: 38.4, y: 30 },
                     hasRuler: Inv.has('ruler'),
                     measured: Night1.measured,
                     measureAt: Night1.TRUE_BEARING,
@@ -2104,13 +2105,11 @@
       var solved = !!props.solved;
       var torn = !!props.torn;
       var measuredOnce = !!props.measured;
-      var station = props.station || { x: 38.4, y: 30 };
       var answer = props.answer || { lat: 34.20, lon: 129.12 };
 
-      var LON_MIN = 129.00, LON_MAX = 129.60, COLS = 12;
-      var LAT_MAX = 34.50, LAT_MIN = 34.00, ROWS = 10;
-      var STEP_LON = (LON_MAX - LON_MIN) / COLS;
-      var STEP_LAT = (LAT_MAX - LAT_MIN) / ROWS;
+      var LON_MIN = 129.00, LON_MAX = 129.60;
+      var LAT_MAX = 34.50, LAT_MIN = 34.00;
+      var TOL = 0.006;
 
       var picked = null;
       var rulerAngle = 0;
@@ -2119,31 +2118,17 @@
       wrap.appendChild(p('tool-caption', props.caption || '海 图 · 潮汐镇外海'));
       var brief = p('chart-brief', props.brief || '按他报的坐标，在图上标出他的位置。');
       wrap.appendChild(brief);
-
       var body = div('chart-body');
       wrap.appendChild(body);
       root.appendChild(wrap);
 
-      function diffOf(a, b) {
-        return Math.abs(((a - b) % 360 + 540) % 360 - 180);
-      }
-
-      function cellAt(col, row) {
-        return {
-          col: col, row: row,
-          lonMin: LON_MIN + col * STEP_LON,
-          lonMax: LON_MIN + (col + 1) * STEP_LON,
-          latMax: LAT_MAX - row * STEP_LAT,
-          latMin: LAT_MAX - (row + 1) * STEP_LAT
-        };
-      }
-
-      function isAnswer(cell) {
-        return cell.latMin - 1e-6 <= answer.lat && cell.latMax + 1e-6 >= answer.lat &&
-          cell.lonMin - 1e-6 <= answer.lon && cell.lonMax + 1e-6 >= answer.lon;
-      }
-
-      function fmt(n) { return n.toFixed(2); }
+      function lonToPct(lon) { return (lon - LON_MIN) / (LON_MAX - LON_MIN) * 100; }
+      function latToPct(lat) { return (LAT_MAX - lat) / (LAT_MAX - LAT_MIN) * 100; }
+      function pctToLon(x) { return LON_MIN + x / 100 * (LON_MAX - LON_MIN); }
+      function pctToLat(y) { return LAT_MAX - y / 100 * (LAT_MAX - LAT_MIN); }
+      function fmt(n) { return n.toFixed(3); }
+      function coordText(c) { return '北纬 ' + fmt(c.lat) + '°N　东经 ' + fmt(c.lon) + '°E'; }
+      function diffOf(a, b) { return Math.abs(((a - b) % 360 + 540) % 360 - 180); }
 
       function render() {
         body.innerHTML = '';
@@ -2152,12 +2137,13 @@
         map.appendChild(div('chartmap-coast'));
 
         var plot = null;
-        var ruler = null;
-        var read = null;
+        var pin = null;
+        var crossX = null, crossY = null;
+        var stationEl = null;
+        var ruler = null, read = null;
+        var scaleBar = null;
         var dragMoved = false;
-        var readout = p('chart-readout', solved
-          ? '北纬 ' + fmt(answer.lat) + '°N　东经 ' + fmt(answer.lon) + '°E'
-          : '未标记');
+        var readout = p('chart-readout', solved ? coordText(answer) : '未标记');
 
         if (torn) {
           var mask = div('chartmap-torn');
@@ -2165,68 +2151,37 @@
           map.appendChild(mask);
         } else {
           plot = div('chartplot');
+          plot.appendChild(div('chartplot-fine'));
           plot.appendChild(div('chartplot-grid'));
 
-          var pin = div('chart-pin');
-          var cells = div('chartcells');
-          var buttons = [];
+          crossX = div('chart-cross chart-cross-x');
+          crossY = div('chart-cross chart-cross-y');
+          plot.appendChild(crossX);
+          plot.appendChild(crossY);
 
-          for (var r = 0; r < ROWS; r++) {
-            for (var c = 0; c < COLS; c++) {
-              (function (row, col) {
-                var cell = cellAt(col, row);
-                var b = document.createElement('button');
-                b.type = 'button';
-                b.className = 'chart-cell';
-                b.setAttribute('aria-label',
-                  '北纬 ' + fmt(cell.latMin) + ' 到 ' + fmt(cell.latMax) +
-                  '，东经 ' + fmt(cell.lonMin) + ' 到 ' + fmt(cell.lonMax));
-                if (solved && isAnswer(cell)) b.classList.add('is-picked');
-
-                b.addEventListener('click', function () {
-                  if (solved || dragMoved) return;
-                  picked = cell;
-                  buttons.forEach(function (x) { x.classList.toggle('is-picked', x === b); });
-                  pin.style.left = ((col + 0.5) / COLS * 100) + '%';
-                  pin.style.top = ((row + 0.5) / ROWS * 100) + '%';
-                  pin.classList.add('is-on');
-                  readout.textContent = '北纬 ' + fmt(cell.latMin) + ' — ' + fmt(cell.latMax) +
-                    '°N　东经 ' + fmt(cell.lonMin) + ' — ' + fmt(cell.lonMax) + '°E';
-                  Audio.sfx('knob');
-                });
-
-                buttons.push(b);
-                cells.appendChild(b);
-              })(r, c);
-            }
-          }
-
-          plot.appendChild(cells);
-
-          if (solved) {
-            pin.style.left = ((answer.lon - LON_MIN) / (LON_MAX - LON_MIN) * 100) + '%';
-            pin.style.top = ((LAT_MAX - answer.lat) / (LAT_MAX - LAT_MIN) * 100) + '%';
-            pin.classList.add('is-on');
-          }
+          pin = div('chart-pin');
           plot.appendChild(pin);
 
-          var st = div('chart-station');
-          st.style.left = station.x + '%';
-          st.style.top = station.y + '%';
-          st.appendChild(p('chart-station-label', '电台'));
-          plot.appendChild(st);
+          stationEl = div('chart-station');
+          stationEl.appendChild(p('chart-station-label', '电台'));
+          plot.appendChild(stationEl);
 
           if (solved && props.hasRuler) {
             ruler = div('chart-ruler');
-            ruler.style.left = station.x + '%';
-            ruler.style.top = station.y + '%';
             ruler.appendChild(div('chart-ruler-line'));
             plot.appendChild(ruler);
-
             read = div('chart-ruler-read');
             read.textContent = '读数 —';
             plot.appendChild(read);
           }
+
+          var scale = div('chart-scale');
+          scaleBar = div('chart-scale-bar');
+          scale.appendChild(scaleBar);
+          var scaleLabel = document.createElement('span');
+          scaleLabel.textContent = '5 海里';
+          scale.appendChild(scaleLabel);
+          plot.appendChild(scale);
 
           map.appendChild(plot);
 
@@ -2234,7 +2189,7 @@
           for (var i = 0; i <= 10; i++) {
             var ls = document.createElement('span');
             ls.style.top = (i * 10) + '%';
-            ls.textContent = (LAT_MAX - i * 0.1).toFixed(1);
+            ls.textContent = (LAT_MAX - i * 0.05).toFixed(2);
             latAxis.appendChild(ls);
           }
           map.appendChild(latAxis);
@@ -2243,15 +2198,126 @@
           for (var j = 0; j <= 6; j++) {
             var ns = document.createElement('span');
             ns.style.left = (j / 6 * 100) + '%';
-            ns.textContent = (LON_MIN + j * 0.1).toFixed(1);
+            ns.textContent = (LON_MIN + j * 0.1).toFixed(2);
             lonAxis.appendChild(ns);
           }
           map.appendChild(lonAxis);
+
+          var nMark = div('chart-dir chart-dir-n');
+          nMark.textContent = 'N';
+          map.appendChild(nMark);
+          var eMark = div('chart-dir chart-dir-e');
+          eMark.textContent = 'E';
+          map.appendChild(eMark);
+
+          function setPin(x, y, update) {
+            pin.style.left = x + '%';
+            pin.style.top = y + '%';
+            pin.classList.add('is-on');
+            crossX.style.top = y + '%';
+            crossX.classList.add('is-on');
+            crossY.style.left = x + '%';
+            crossY.classList.add('is-on');
+            if (update) {
+              readout.textContent = coordText({
+                lat: pctToLat(y),
+                lon: pctToLon(x)
+              });
+            }
+          }
+
+          if (solved) {
+            setPin(lonToPct(answer.lon), latToPct(answer.lat), false);
+          } else if (picked) {
+            setPin(lonToPct(picked.lon), latToPct(picked.lat), false);
+          }
+
+          plot.addEventListener('pointerdown', function (e) {
+            if (solved) return;
+            e.preventDefault();
+            var r = plot.getBoundingClientRect();
+            if (!r.width || !r.height) return;
+            var x = (e.clientX - r.left) / r.width * 100;
+            var y = (e.clientY - r.top) / r.height * 100;
+            x = Math.max(1, Math.min(99, x));
+            y = Math.max(1, Math.min(99, y));
+            picked = { lat: pctToLat(y), lon: pctToLon(x) };
+            setPin(x, y, true);
+            Audio.sfx('knob');
+          });
+
+          function layoutRuler() {
+            if (!ruler || !plot) return;
+            var r = plot.getBoundingClientRect();
+            if (!r.width || !r.height) return;
+            var tx = lonToPct(answer.lon) / 100 * r.width;
+            var ty = latToPct(answer.lat) / 100 * r.height;
+            var L = 0.33 * r.width;
+            var sx = tx + 0.6157 * L;
+            var sy = ty - 0.7880 * L;
+            stationEl.style.left = (sx / r.width * 100) + '%';
+            stationEl.style.top = (sy / r.height * 100) + '%';
+            ruler.style.left = (sx / r.width * 100) + '%';
+            ruler.style.top = (sy / r.height * 100) + '%';
+            if (scaleBar) {
+              scaleBar.style.width = ((5 / 60) / (LAT_MAX - LAT_MIN) * r.height).toFixed(1) + 'px';
+            }
+          }
+
+          function placeRuler(deg) {
+            rulerAngle = (deg + 360) % 360;
+            ruler.style.transform = 'translate(-50%, -50%) rotate(' + rulerAngle.toFixed(2) + 'deg)';
+            read.textContent = '读数 ' + rulerAngle.toFixed(1) + '°';
+            var aligned = diffOf(rulerAngle, props.measureAt) <= 1.5;
+            ruler.classList.toggle('is-align', aligned);
+            read.classList.toggle('is-align', aligned);
+          }
+
+          function angleAt(e) {
+            var sr = stationEl.getBoundingClientRect();
+            var sx = sr.left + sr.width / 2;
+            var sy = sr.top + sr.height / 2;
+            var a = Math.atan2(e.clientX - sx, sy - e.clientY) * 180 / Math.PI;
+            return (a + 360) % 360;
+          }
+
+          if (ruler) {
+            var dragging = false;
+
+            plot.addEventListener('pointerdown', function (e) {
+              dragging = true;
+              dragMoved = false;
+              try { plot.setPointerCapture(e.pointerId); } catch (err) {}
+              placeRuler(angleAt(e));
+            });
+
+            plot.addEventListener('pointermove', function (e) {
+              if (!dragging) return;
+              dragMoved = true;
+              placeRuler(angleAt(e));
+            });
+
+            plot.addEventListener('pointerup', function () {
+              if (!dragging) return;
+              dragging = false;
+              if (!dragMoved) return;
+              if (!measuredOnce && diffOf(rulerAngle, props.measureAt) <= 1.5) {
+                measuredOnce = true;
+                if (props.onMeasure) props.onMeasure(props.measureAt);
+              }
+            });
+
+            requestAnimationFrame(function () {
+              layoutRuler();
+              placeRuler(measuredOnce ? props.measureAt : 0);
+            });
+            setTimeout(layoutRuler, 450);
+            window.addEventListener('resize', layoutRuler);
+          }
         }
 
         body.appendChild(map);
 
-        /* 撕角状态：只有残片能继续 */
         if (torn) {
           var pieceBtn = document.createElement('button');
           pieceBtn.type = 'button';
@@ -2262,7 +2328,7 @@
             if (!props.hasPiece) return;
             if (props.onPiece) props.onPiece();
             torn = false;
-            brief.textContent = '把度分换成小数，再把针插进格子里。';
+            brief.textContent = '把度分换成小数，再点在海图上。';
             render();
           });
           body.appendChild(pieceBtn);
@@ -2288,60 +2354,17 @@
 
         btn.addEventListener('click', function () {
           if (solved) return;
-          if (!picked) { Sub.hint('先把针插进格子里。', 2200); return; }
-          if (isAnswer(picked)) {
+          if (!picked) { Sub.hint('先在图上点出他的位置。', 2200); return; }
+          if (Math.abs(picked.lat - answer.lat) <= TOL && Math.abs(picked.lon - answer.lon) <= TOL) {
             solved = true;
             Audio.sfx('lock');
             if (props.onSolved) props.onSolved();
             render();
           } else {
             Audio.sfx('switch');
-            Sub.hint('这一格没有浮标。再对一遍坐标。', 2800);
+            Sub.hint('这里没有浮标。再对一遍经纬度。', 2800);
           }
         });
-
-        if (!ruler) return;
-
-        /* 平行尺：拖动读数，对准浮标 */
-        function place(deg) {
-          rulerAngle = (deg + 360) % 360;
-          ruler.style.transform = 'translate(-50%, -50%) rotate(' + rulerAngle.toFixed(1) + 'deg)';
-          read.textContent = '读数 ' + Math.round(rulerAngle) + '°';
-          ruler.classList.toggle('is-align', diffOf(rulerAngle, props.measureAt) <= 1.5);
-          read.classList.toggle('is-align', diffOf(rulerAngle, props.measureAt) <= 1.5);
-        }
-
-        function angleAt(e) {
-          var r = plot.getBoundingClientRect();
-          var sx = r.left + station.x / 100 * r.width;
-          var sy = r.top + station.y / 100 * r.height;
-          var a = Math.atan2(e.clientX - sx, sy - e.clientY) * 180 / Math.PI;
-          return (a + 360) % 360;
-        }
-
-        var dragging = false;
-        plot.addEventListener('pointerdown', function (e) {
-          dragging = true;
-          dragMoved = false;
-          try { plot.setPointerCapture(e.pointerId); } catch (err) {}
-          place(angleAt(e));
-        });
-        plot.addEventListener('pointermove', function (e) {
-          if (!dragging) return;
-          dragMoved = true;
-          place(angleAt(e));
-        });
-        plot.addEventListener('pointerup', function () {
-          if (!dragging) return;
-          dragging = false;
-          if (!dragMoved) return;
-          if (!measuredOnce && diffOf(rulerAngle, props.measureAt) <= 1.5) {
-            measuredOnce = true;
-            if (props.onMeasure) props.onMeasure(props.measureAt);
-          }
-        });
-
-        place(measuredOnce ? props.measureAt : rulerAngle);
       }
 
       render();

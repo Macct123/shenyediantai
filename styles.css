@@ -1291,47 +1291,46 @@ button { -webkit-tap-highlight-color: transparent; }
 /* 海图绘图区：坐标格 + 轴标 */
 .chartplot {
   position: absolute;
-  left: 30px; right: 8px; top: 8px; bottom: 22px;
+  left: 36px; right: 8px; top: 8px; bottom: 24px;
+  border: 1px solid rgba(148, 178, 200, 0.2);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.chartplot-fine {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(148, 178, 200, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 178, 200, 0.06) 1px, transparent 1px);
+  background-size: calc(100% / 60) calc(100% / 50);
 }
 
 .chartplot-grid {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(148, 178, 200, 0.14) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 178, 200, 0.14) 1px, transparent 1px);
-  background-size: calc(100% / 12) calc(100% / 10);
+    linear-gradient(rgba(148, 178, 200, 0.17) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 178, 200, 0.17) 1px, transparent 1px);
+  background-size: calc(100% / 6) calc(100% / 5);
 }
 
-.chartcells {
+.chart-cross {
   position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: repeat(10, 1fr);
+  background: rgba(224, 164, 94, 0.32);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 2;
 }
-
-.chart-cell {
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: transparent;
-  cursor: crosshair;
-}
-.chart-cell:hover, .chart-cell:focus-visible {
-  background: rgba(224, 164, 94, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(224, 164, 94, 0.28);
-  outline: none;
-}
-.chart-cell.is-picked {
-  background: rgba(224, 164, 94, 0.14);
-  box-shadow: inset 0 0 0 1px rgba(224, 164, 94, 0.5);
-}
+.chart-cross-x { left: 0; right: 0; height: 1px; }
+.chart-cross-y { top: 0; bottom: 0; width: 1px; }
+.chart-cross.is-on { opacity: 1; }
 
 .chart-pin {
   position: absolute;
-  width: 14px; height: 14px;
-  margin: -7px 0 0 -7px;
+  width: 12px; height: 12px;
+  margin: -6px 0 0 -6px;
   border-radius: 50%;
   background: #ffd9a3;
   box-shadow: 0 0 14px rgba(255, 217, 163, 0.9), 0 0 0 2px rgba(10, 18, 26, 0.6);
@@ -1345,27 +1344,56 @@ button { -webkit-tap-highlight-color: transparent; }
 
 .chart-axis {
   position: absolute;
-  font-size: 9px;
-  letter-spacing: 0.04em;
+  font-size: 8.5px;
+  letter-spacing: 0.03em;
   color: #7d92a3;
   pointer-events: none;
 }
 .chart-axis span { position: absolute; white-space: nowrap; }
 .chart-axis-lat {
-  left: 2px; top: 8px; bottom: 22px;
-  width: 26px;
+  left: 2px; top: 8px; bottom: 24px;
+  width: 30px;
 }
 .chart-axis-lat span {
   right: 0;
   transform: translateY(-50%);
 }
 .chart-axis-lon {
-  left: 30px; right: 8px; bottom: 4px;
+  left: 36px; right: 8px; bottom: 4px;
   height: 14px;
 }
 .chart-axis-lon span {
   top: 0;
   transform: translateX(-50%);
+}
+.chart-axis-lon span:first-child { transform: translateX(0); }
+.chart-axis-lon span:last-child { transform: translateX(-100%); }
+
+.chart-dir {
+  position: absolute;
+  font-family: var(--serif);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: rgba(224, 164, 94, 0.65);
+  pointer-events: none;
+}
+.chart-dir-n { top: 3px; left: 4px; }
+.chart-dir-e { bottom: 22px; right: 6px; }
+
+.chart-scale {
+  position: absolute;
+  right: 6px; bottom: 4px;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
+  font-size: 8px;
+  color: #8ba0b2;
+  pointer-events: none;
+}
+.chart-scale-bar {
+  width: 58px;
+  height: 5px;
+  border-left: 1px solid #8ba0b2;
+  border-right: 1px solid #8ba0b2;
+  border-bottom: 1px solid #8ba0b2;
 }
 
 .chart-readout {
