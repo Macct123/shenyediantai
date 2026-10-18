@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+  <defs>
+    <linearGradient id="copper" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#ffd0a0"/>
+      <stop offset="0.35" stop-color="#d98b4f"/>
+      <stop offset="0.72" stop-color="#9a4f25"/>
+      <stop offset="1" stop-color="#5e2b12"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#000" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="80" cy="128" rx="44" ry="12" fill="url(#shadow)"/>
+  <g transform="rotate(-18 80 80)">
+    <ellipse cx="78" cy="88" rx="34" ry="17" fill="none" stroke="url(#copper)" stroke-width="7"/>
+    <ellipse cx="78" cy="78" rx="34" ry="17" fill="none" stroke="url(#copper)" stroke-width="7"/>
+    <ellipse cx="78" cy="68" rx="34" ry="17" fill="none" stroke="url(#copper)" stroke-width="7"/>
+    <ellipse cx="78" cy="58" rx="34" ry="17" fill="none" stroke="url(#copper)" stroke-width="7"/>
+    <path d="M44 58 Q38 50 44 44 Q50 38 58 42" fill="none" stroke="url(#copper)" stroke-width="5"/>
+    <path d="M112 88 Q124 92 126 102" fill="none" stroke="url(#copper)" stroke-width="5"/>
+    <path d="M50 52 Q60 46 72 50" fill="none" stroke="#ffe3c2" stroke-width="1.8" opacity="0.55"/>
+    <path d="M52 72 Q64 66 76 70" fill="none" stroke="#ffe3c2" stroke-width="1.4" opacity="0.35"/>
+  </g>
+</svg>

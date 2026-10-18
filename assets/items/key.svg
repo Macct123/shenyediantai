@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+  <defs>
+    <linearGradient id="brass" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#f0d49a"/>
+      <stop offset="0.35" stop-color="#c99a52"/>
+      <stop offset="0.72" stop-color="#8a5f28"/>
+      <stop offset="1" stop-color="#5a3a16"/>
+    </linearGradient>
+    <linearGradient id="brassLit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe9bd" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ffe9bd" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#000" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="80" cy="132" rx="46" ry="12" fill="url(#shadow)"/>
+  <g transform="rotate(-38 80 80)">
+    <circle cx="62" cy="62" r="20" fill="none" stroke="url(#brass)" stroke-width="11"/>
+    <circle cx="62" cy="62" r="20" fill="none" stroke="url(#brassLit)" stroke-width="4" opacity="0.7"/>
+    <path d="M80 58 L126 58 Q132 58 132 64 L132 70 Q132 76 126 76 L80 76 Z" fill="url(#brass)"/>
+    <path d="M124 74 L134 74 L134 96 Q134 100 130 100 L126 100 Q122 100 122 96 Z" fill="url(#brass)"/>
+    <path d="M104 74 L114 74 L114 90 Q114 94 110 94 L106 94 Q102 94 102 90 Z" fill="url(#brass)"/>
+    <path d="M84 60 L126 60" stroke="#fff2d0" stroke-width="2.4" opacity="0.55"/>
+    <path d="M84 73 L128 73" stroke="#3b250e" stroke-width="2" opacity="0.45"/>
+  </g>
+</svg>

@@ -67,38 +67,38 @@
   var ITEMS = {
     key: {
       name: '铜钥匙',
-      note: '从雨靴里倒出来的，齿口磨得很圆。',
-      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="13" cy="13" r="6"/><path d="M17.5 17.5 31 31"/><path d="M26 26l4-4"/><path d="M30 30l3.5-3.5"/></svg>'
+      note: '从铁栅下面吸上来的，齿口磨得很圆。',
+      img: 'assets/items/key.png'
     },
     fuse: {
-      name: '2A 保险丝',
-      note: '玻璃管里的金属丝还完好。',
-      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="13" y="8" width="14" height="24" rx="3"/><path d="M13 14h14"/><path d="M13 26h14"/><path d="M20 14v12"/></svg>'
+      name: '保险丝',
+      note: '2A。玻璃管里的金属丝接好了。',
+      img: 'assets/items/fuse.png'
     },
     piece: {
       name: '海图残片',
       note: '撕口和墙上那张海图正好对得上。',
-      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 11 26 8l6 20-18 4z"/><path d="M14 15l10 12"/><path d="M25 12l3 9"/></svg>'
+      img: 'assets/items/piece.png'
     },
     wire: {
       name: '细铜线',
       note: '一小卷铜线，够绕一根保险丝。',
-      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="10"/><circle cx="20" cy="20" r="4"/><path d="M30 20h5"/></svg>'
+      img: 'assets/items/wire.png'
     },
     brokenFuse: {
-      name: '烧断的保险丝',
+      name: '断保险丝',
       note: '玻璃管发黑，金属丝断成两截。',
-      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="13" y="8" width="14" height="24" rx="3"/><path d="M20 12v6"/><path d="M20 23v5"/><path d="M13 15h14"/><path d="M13 26h14"/></svg>'
+      img: 'assets/items/brokenFuse.png'
     },
     magnet: {
       name: '系绳磁铁',
       note: '马蹄形磁铁，拴着一截细绳。',
-      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M11 9v11a9 9 0 0 0 18 0V9"/><path d="M11 15h6"/><path d="M23 15h6"/><path d="M20 6v-3"/></svg>'
+      img: 'assets/items/magnet.png'
     },
     ruler: {
       name: '平行尺',
       note: '铜边磨得发亮，刻度是海里。',
-      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 30 26 12l6 6L14 36z"/><path d="M13 27l4 4"/><path d="M18 22l2 2"/><path d="M23 17l2 2"/></svg>'
+      img: 'assets/items/ruler.png'
     }
   };
 
@@ -189,10 +189,15 @@
         btn.setAttribute('data-item', id);
         btn.setAttribute('aria-label', item.name + (self.selected === id ? '，已选中' : '，点击拿起'));
         btn.title = item.note;
-        btn.innerHTML = '<span class="inv-icon">' + item.icon + '</span>' +
+        btn.innerHTML = '<img class="inv-img" src="' + item.img + '" alt="" draggable="false">' +
           '<span class="inv-name">' + item.name + '</span>';
         self.el.appendChild(btn);
       });
+
+      var note = p('inv-note', self.selected
+        ? ITEMS[self.selected].note
+        : '选中物品，再点场景里的东西。');
+      self.el.appendChild(note);
     }
   };
 

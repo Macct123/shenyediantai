@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+  <defs>
+    <linearGradient id="brass2" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#f2d79f"/>
+      <stop offset="0.4" stop-color="#c39550"/>
+      <stop offset="0.75" stop-color="#7f5626"/>
+      <stop offset="1" stop-color="#4d3214"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#000" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="80" cy="128" rx="56" ry="12" fill="url(#shadow)"/>
+  <g transform="rotate(-26 80 80)">
+    <rect x="18" y="66" width="124" height="14" rx="5" fill="url(#brass2)"/>
+    <rect x="18" y="90" width="124" height="14" rx="5" fill="url(#brass2)"/>
+    <rect x="46" y="76" width="16" height="18" rx="3" fill="#a87a3c"/>
+    <rect x="98" y="76" width="16" height="18" rx="3" fill="#a87a3c"/>
+    <g stroke="#3b250e" stroke-width="1.4" opacity="0.65">
+      <line x1="34" y1="68" x2="34" y2="78"/>
+      <line x1="46" y1="68" x2="46" y2="78"/>
+      <line x1="58" y1="68" x2="58" y2="78"/>
+      <line x1="70" y1="68" x2="70" y2="78"/>
+      <line x1="82" y1="68" x2="82" y2="78"/>
+      <line x1="94" y1="68" x2="94" y2="78"/>
+      <line x1="106" y1="68" x2="106" y2="78"/>
+      <line x1="118" y1="68" x2="118" y2="78"/>
+    </g>
+    <path d="M22 69 L138 69" stroke="#fff0ca" stroke-width="2" opacity="0.45"/>
+    <path d="M22 101 L138 101" stroke="#3b250e" stroke-width="2" opacity="0.35"/>
+  </g>
+</svg>
