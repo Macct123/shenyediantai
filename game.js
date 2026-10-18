@@ -696,7 +696,9 @@
       if (stage) {
         stage.addEventListener('click', function (e) {
           if (!self.box || self.box.hidden) return;
-          if (e.target.closest && (e.target.closest('#hotspots') || e.target.closest('.closeup') || e.target.closest('.inventory'))) return;
+          var t = e.target;
+          if (t.closest && (t.closest('#hotspots') || t.closest('.inventory'))) return;
+          if (t.closest && (t.closest('.closeup-tools') || t.closest('button') || t.closest('input'))) return;
           e.stopPropagation();
           e.preventDefault();
           self.advance();
@@ -1027,19 +1029,15 @@
             {
               id: 'radio', label: '收音机', x: 54.7, y: 68.8,
               closeup: {
-                title: '收 音 机', widget: 'tune', art: 'assets/closeups/radio.svg',
+                title: '收 音 机', widget: 'radioCode', art: 'assets/closeups/radio.svg',
                 props: function () {
                   return {
                     dead: !Night1.powered,
                     hasFuse: Inv.has('fuse'),
                     onPower: function () { Night1.installFuse(); },
-                    target: Night1.TARGET,
-                    sigma: 0.95,
-                    lock: 0.45,
-                    locked: Night1.tuned,
-                    start: Night1.tuned ? Night1.TARGET : 98.0,
-                    caption: '调 频 · 88 — 108 MHz',
-                    onLock: function () { Night1.onTuned(); }
+                    solved: Night1.tuned,
+                    target: '964',
+                    onSolved: function () { Night1.onTuned(); }
                   };
                 }
               }
@@ -1052,24 +1050,18 @@
                 title: '海 图', widget: 'chart', art: 'assets/closeups/chart.svg', textBaked: true,
                 props: function () {
                   return {
-                    brief: Night1.chartPiece ? '他报的是度分。图上印的是小数。' : '海图的右下角被撕掉了一块。',
-                    note: '1° = 60′。三号浮标外侧是暗礁。\n\n—— 值班手册',
+                    brief: Night1.chartPiece ? '把度分换成小数，再把针插进格子里。' : '海图的右下角被撕掉了一块。',
+                    note: '1° = 60′。图上每格 0.05°。\n\n三号浮标外侧是暗礁。',
                     torn: !Night1.chartPiece,
                     hasPiece: Inv.has('piece'),
                     onPiece: function () { Night1.placePiece(); },
-                    answer: 'A',
                     solved: Night1.located,
-                    solvedId: Night1.located ? 'A' : null,
-                    station: { x: 70, y: 32 },
+                    answer: { lat: 34.20, lon: 129.12 },
+                    station: { x: 38.4, y: 30 },
                     hasRuler: Inv.has('ruler'),
                     measured: Night1.measured,
                     measureAt: Night1.TRUE_BEARING,
                     onMeasure: function (deg) { Night1.onMeasured(deg); },
-                    candidates: [
-                      { id: 'A', name: '浮标 03', x: 46.6, y: 72, lat: 34.20, lon: 129.12 },
-                      { id: 'B', name: '浮标 07', x: 46.6, y: 48, lat: 34.35, lon: 129.12 },
-                      { id: 'C', name: '浮标 11', x: 62, y: 72, lat: 34.20, lon: 129.70 }
-                    ],
                     onSolved: function () { Night1.onLocated(); }
                   };
                 }
@@ -1183,15 +1175,15 @@
           hotspots: [
             {
               id: 'antenna', label: '天线旋转器', x: 46, y: 62,
-              gate: function () { return Night1.located; },
-              gateHint: '先在海图上确认他的位置。',
+              gate: function () { return Night1.measured; },
+              gateHint: '先在海图上量出真方位。',
               closeup: {
                 title: '天 线 旋 转 器', widget: 'rotator', art: 'assets/closeups/cabinet.svg',
                 props: function () {
                   return {
                     dead: !Night1.powered,
                     target: Night1.TARGET_BEARING,
-                    tol: 1,
+                    tol: 0,
                     solved: Night1.fixed,
                     coarse: Night1.coarse,
                     fine: Night1.fine,
@@ -1536,7 +1528,8 @@
       if (!this.powered) return '收音机没有电。先找一枚 2A 保险丝。';
       if (!this.tuned) return '他知道一个旧频道。换算成本机刻度。';
       if (!this.chartPiece) return '海图缺了一块。找找撕掉的那一角。';
-      if (!this.located) return '他在报坐标。到海图上把他标出来。';
+      if (!this.located) return '他在报坐标。把针插进海图的格子里。';
+      if (!this.measured) return '用平行尺量出海图上的真方位。';
       if (!this.fixed) return '把天线转向他的方位。';
       return '方向已发出。等他的回话。';
     },
@@ -1547,7 +1540,7 @@
       Scene.renderHotspots();
       Scene.setActive('radio', !this.tuned);
       Scene.setActive('chart', this.tuned && !this.located);
-      Scene.setActive('antenna', this.located && !this.fixed);
+      Scene.setActive('antenna', this.located && this.measured && !this.fixed);
       this.save();
     },
 
@@ -1698,6 +1691,121 @@
       var note = p('tool-note', props.note || '');
       note.style.textAlign = 'left';
       wrap.appendChild(note);
+      root.appendChild(wrap);
+      return { destroy: function () {} };
+    },
+
+    /* ---------- 收音机：三位频率预置（算对了才通） ---------- */
+    radioCode: function (root, props) {
+      props = props || {};
+      var solved = !!props.solved;
+      var code = solved ? String(props.target || '964') : '';
+
+      var wrap = div('tool-block');
+      wrap.appendChild(p('tool-caption', '频 率 预 置 · 本 机 刻 度'));
+      wrap.appendChild(p('chart-brief', props.dead ? '指示灯不亮。' : '按换算后的频率拨三位数字。'));
+
+      if (props.dead) {
+        var deadUnit = div('dead-unit');
+        deadUnit.appendChild(p('dead-line', '指示灯不亮。'));
+        var slot = div('fuse-slot');
+        slot.appendChild(p('fuse-slot-label', 'FUSE · 2A'));
+        if (props.hasFuse) slot.classList.add('is-ready');
+        deadUnit.appendChild(slot);
+        wrap.appendChild(deadUnit);
+
+        var powerBtn = document.createElement('button');
+        powerBtn.type = 'button';
+        powerBtn.className = 'btn-amber';
+        powerBtn.textContent = props.hasFuse ? '装入保险丝' : '缺少 2A 保险丝';
+        powerBtn.disabled = !props.hasFuse;
+        powerBtn.addEventListener('click', function () {
+          if (!props.hasFuse) return;
+          if (props.onPower) props.onPower();
+          Scene.close();
+        });
+        wrap.appendChild(powerBtn);
+        wrap.appendChild(p('tool-note', props.hasFuse
+          ? '玻璃管卡进槽里，发出一点凉意。'
+          : '保险丝座上刻着 2A。走廊的储物柜里也许有。'));
+        root.appendChild(wrap);
+        return { destroy: function () {} };
+      }
+
+      var display = div('code-display');
+      var digits = [];
+      for (var i = 0; i < 3; i++) {
+        var d = document.createElement('span');
+        d.className = 'code-digit';
+        d.textContent = '—';
+        display.appendChild(d);
+        digits.push(d);
+        if (i === 1) {
+          var dot = document.createElement('span');
+          dot.className = 'code-dot';
+          dot.textContent = '.';
+          display.appendChild(dot);
+        }
+      }
+      wrap.appendChild(display);
+
+      var pad = div('keypad');
+      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '清', '0', '←'].forEach(function (label) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'key-btn' + (label === '清' || label === '←' ? ' is-util' : '');
+        b.textContent = label;
+        b.addEventListener('click', function () {
+          if (solved) return;
+          if (label === '清') code = '';
+          else if (label === '←') code = code.slice(0, -1);
+          else if (code.length < 3) code += label;
+          Audio.sfx('knob');
+          render();
+        });
+        pad.appendChild(b);
+      });
+      wrap.appendChild(pad);
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn-amber';
+      btn.textContent = solved ? '已接通' : '接通频率';
+      if (solved) btn.disabled = true;
+      if (solved) btn.classList.add('is-done');
+      wrap.appendChild(btn);
+
+      var note = p('tool-note', solved ? '载波稳住了。' : '刻度盘上没有数字，只有这排按键。');
+      note.style.textAlign = 'left';
+      wrap.appendChild(note);
+
+      function render() {
+        for (var k = 0; k < 3; k++) {
+          digits[k].textContent = code.charAt(k) || '—';
+          digits[k].classList.toggle('is-set', !!code.charAt(k));
+        }
+        display.classList.remove('is-wrong');
+      }
+
+      btn.addEventListener('click', function () {
+        if (solved) return;
+        if (code.length < 3) { Sub.hint('三位都拨齐再接通。', 2200); return; }
+        if (code === String(props.target)) {
+          solved = true;
+          btn.disabled = true;
+          btn.textContent = '已接通';
+          btn.classList.add('is-done');
+          Audio.sfx('lock');
+          render();
+          if (props.onSolved) props.onSolved();
+        } else {
+          Audio.sfx('switch');
+          display.classList.add('is-wrong');
+          Sub.hint('只有静电。再算一遍。', 2600);
+        }
+      });
+
+      render();
       root.appendChild(wrap);
       return { destroy: function () {} };
     },
@@ -1913,12 +2021,18 @@
     /* ---------- 海图定位：度分 → 十进制度 ---------- */
     chart: function (root, props) {
       props = props || {};
-      var candidates = props.candidates || [];
       var solved = !!props.solved;
       var torn = !!props.torn;
-      var picked = null;
       var measuredOnce = !!props.measured;
-      var station = props.station || { x: 70, y: 32 };
+      var station = props.station || { x: 38.4, y: 30 };
+      var answer = props.answer || { lat: 34.20, lon: 129.12 };
+
+      var LON_MIN = 129.00, LON_MAX = 129.60, COLS = 12;
+      var LAT_MAX = 34.50, LAT_MIN = 34.00, ROWS = 10;
+      var STEP_LON = (LON_MAX - LON_MIN) / COLS;
+      var STEP_LAT = (LAT_MAX - LAT_MIN) / ROWS;
+
+      var picked = null;
       var rulerAngle = 0;
 
       var wrap = div('tool-block');
@@ -1934,70 +2048,125 @@
         return Math.abs(((a - b) % 360 + 540) % 360 - 180);
       }
 
+      function cellAt(col, row) {
+        return {
+          col: col, row: row,
+          lonMin: LON_MIN + col * STEP_LON,
+          lonMax: LON_MIN + (col + 1) * STEP_LON,
+          latMax: LAT_MAX - row * STEP_LAT,
+          latMin: LAT_MAX - (row + 1) * STEP_LAT
+        };
+      }
+
+      function isAnswer(cell) {
+        return cell.latMin - 1e-6 <= answer.lat && cell.latMax + 1e-6 >= answer.lat &&
+          cell.lonMin - 1e-6 <= answer.lon && cell.lonMax + 1e-6 >= answer.lon;
+      }
+
+      function fmt(n) { return n.toFixed(2); }
+
       function render() {
         body.innerHTML = '';
         var map = div('chartmap');
         map.appendChild(div('chartmap-grid'));
         map.appendChild(div('chartmap-coast'));
 
-        var buttons = [];
+        var plot = null;
         var ruler = null;
         var read = null;
         var dragMoved = false;
+        var readout = p('chart-readout', solved
+          ? '北纬 ' + fmt(answer.lat) + '°N　东经 ' + fmt(answer.lon) + '°E'
+          : '未标记');
 
         if (torn) {
           var mask = div('chartmap-torn');
           mask.appendChild(p('chartmap-torn-label', '缺'));
           map.appendChild(mask);
         } else {
+          plot = div('chartplot');
+          plot.appendChild(div('chartplot-grid'));
+
+          var pin = div('chart-pin');
+          var cells = div('chartcells');
+          var buttons = [];
+
+          for (var r = 0; r < ROWS; r++) {
+            for (var c = 0; c < COLS; c++) {
+              (function (row, col) {
+                var cell = cellAt(col, row);
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'chart-cell';
+                b.setAttribute('aria-label',
+                  '北纬 ' + fmt(cell.latMin) + ' 到 ' + fmt(cell.latMax) +
+                  '，东经 ' + fmt(cell.lonMin) + ' 到 ' + fmt(cell.lonMax));
+                if (solved && isAnswer(cell)) b.classList.add('is-picked');
+
+                b.addEventListener('click', function () {
+                  if (solved || dragMoved) return;
+                  picked = cell;
+                  buttons.forEach(function (x) { x.classList.toggle('is-picked', x === b); });
+                  pin.style.left = ((col + 0.5) / COLS * 100) + '%';
+                  pin.style.top = ((row + 0.5) / ROWS * 100) + '%';
+                  pin.classList.add('is-on');
+                  readout.textContent = '北纬 ' + fmt(cell.latMin) + ' — ' + fmt(cell.latMax) +
+                    '°N　东经 ' + fmt(cell.lonMin) + ' — ' + fmt(cell.lonMax) + '°E';
+                  Audio.sfx('knob');
+                });
+
+                buttons.push(b);
+                cells.appendChild(b);
+              })(r, c);
+            }
+          }
+
+          plot.appendChild(cells);
+
+          if (solved) {
+            pin.style.left = ((answer.lon - LON_MIN) / (LON_MAX - LON_MIN) * 100) + '%';
+            pin.style.top = ((LAT_MAX - answer.lat) / (LAT_MAX - LAT_MIN) * 100) + '%';
+            pin.classList.add('is-on');
+          }
+          plot.appendChild(pin);
+
           var st = div('chart-station');
           st.style.left = station.x + '%';
           st.style.top = station.y + '%';
           st.appendChild(p('chart-station-label', '电台'));
-          map.appendChild(st);
+          plot.appendChild(st);
 
-          candidates.forEach(function (c) {
-            var b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'buoy' + (props.solvedId === c.id ? ' is-picked' : '');
-            b.style.left = c.x + '%';
-            b.style.top = c.y + '%';
-
-            var dot = div('buoy-dot');
-            var name = document.createElement('span');
-            name.className = 'buoy-label';
-            name.textContent = c.name;
-            var coord = document.createElement('span');
-            coord.className = 'buoy-coord';
-            coord.textContent = c.lat.toFixed(2) + '°N  ' + c.lon.toFixed(2) + '°E';
-
-            b.appendChild(dot);
-            b.appendChild(name);
-            b.appendChild(coord);
-            b.setAttribute('aria-label', c.name + ' ' + coord.textContent);
-
-            b.addEventListener('click', function () {
-              if (solved || dragMoved) return;
-              picked = c.id;
-              buttons.forEach(function (x) { x.classList.toggle('is-picked', x === b); });
-              Audio.sfx('paper');
-            });
-
-            buttons.push(b);
-            map.appendChild(b);
-          });
-
-          if (props.hasRuler) {
+          if (solved && props.hasRuler) {
             ruler = div('chart-ruler');
             ruler.style.left = station.x + '%';
             ruler.style.top = station.y + '%';
             ruler.appendChild(div('chart-ruler-line'));
-            map.appendChild(ruler);
+            plot.appendChild(ruler);
 
             read = div('chart-ruler-read');
             read.textContent = '读数 —';
-            map.appendChild(read);
+            plot.appendChild(read);
           }
+
+          map.appendChild(plot);
+
+          var latAxis = div('chart-axis chart-axis-lat');
+          for (var i = 0; i <= 10; i++) {
+            var ls = document.createElement('span');
+            ls.style.top = (i * 10) + '%';
+            ls.textContent = (LAT_MAX - i * 0.1).toFixed(1);
+            latAxis.appendChild(ls);
+          }
+          map.appendChild(latAxis);
+
+          var lonAxis = div('chart-axis chart-axis-lon');
+          for (var j = 0; j <= 6; j++) {
+            var ns = document.createElement('span');
+            ns.style.left = (j / 6 * 100) + '%';
+            ns.textContent = (LON_MIN + j * 0.1).toFixed(1);
+            lonAxis.appendChild(ns);
+          }
+          map.appendChild(lonAxis);
         }
 
         body.appendChild(map);
@@ -2013,7 +2182,7 @@
             if (!props.hasPiece) return;
             if (props.onPiece) props.onPiece();
             torn = false;
-            brief.textContent = '他报的是度分。图上印的是小数。';
+            brief.textContent = '把度分换成小数，再把针插进格子里。';
             render();
           });
           body.appendChild(pieceBtn);
@@ -2023,6 +2192,8 @@
           body.appendChild(tornNote);
           return;
         }
+
+        body.appendChild(readout);
 
         var note = p('tool-note', props.note || '');
         note.style.textAlign = 'left';
@@ -2037,17 +2208,15 @@
 
         btn.addEventListener('click', function () {
           if (solved) return;
-          if (!picked) { Sub.hint('先在图上标一个位置。', 2200); return; }
-          if (picked === props.answer) {
+          if (!picked) { Sub.hint('先把针插进格子里。', 2200); return; }
+          if (isAnswer(picked)) {
             solved = true;
-            btn.disabled = true;
-            btn.textContent = '位置已确认';
-            btn.classList.add('is-done');
             Audio.sfx('lock');
             if (props.onSolved) props.onSolved();
+            render();
           } else {
             Audio.sfx('switch');
-            Sub.hint('不对。度数差一点，船就差了十几海里。', 3000);
+            Sub.hint('这一格没有浮标。再对一遍坐标。', 2800);
           }
         });
 
@@ -2063,7 +2232,7 @@
         }
 
         function angleAt(e) {
-          var r = map.getBoundingClientRect();
+          var r = plot.getBoundingClientRect();
           var sx = r.left + station.x / 100 * r.width;
           var sy = r.top + station.y / 100 * r.height;
           var a = Math.atan2(e.clientX - sx, sy - e.clientY) * 180 / Math.PI;
@@ -2071,18 +2240,18 @@
         }
 
         var dragging = false;
-        map.addEventListener('pointerdown', function (e) {
+        plot.addEventListener('pointerdown', function (e) {
           dragging = true;
           dragMoved = false;
-          try { map.setPointerCapture(e.pointerId); } catch (err) {}
+          try { plot.setPointerCapture(e.pointerId); } catch (err) {}
           place(angleAt(e));
         });
-        map.addEventListener('pointermove', function (e) {
+        plot.addEventListener('pointermove', function (e) {
           if (!dragging) return;
           dragMoved = true;
           place(angleAt(e));
         });
-        map.addEventListener('pointerup', function () {
+        plot.addEventListener('pointerup', function () {
           if (!dragging) return;
           dragging = false;
           if (!dragMoved) return;
@@ -2139,19 +2308,11 @@
       value.appendChild(unit);
       wrap.appendChild(value);
 
-      var meter = div('meter');
-      var fill = div('meter-fill');
-      meter.appendChild(fill);
-      wrap.appendChild(meter);
-
-      var meterLabel = div('meter-label');
-      var ml = document.createElement('span');
-      ml.textContent = '天线增益';
-      var mv = document.createElement('span');
-      mv.textContent = '——';
-      meterLabel.appendChild(ml);
-      meterLabel.appendChild(mv);
-      wrap.appendChild(meterLabel);
+      var tip = p('tool-note', props.dead
+        ? '没有电。表盘一动不动。'
+        : '表盘只报当前磁方位，不会告诉你对没对上。');
+      tip.style.textAlign = 'left';
+      wrap.appendChild(tip);
 
       var btn = document.createElement('button');
       btn.type = 'button';
@@ -2174,12 +2335,7 @@
       }
 
       function render() {
-        var b = bearing();
-        value.childNodes[0].nodeValue = Math.round(b);
-        var d = diffOf(b);
-        var s = Math.exp(-(d * d) / (2 * 6 * 6));
-        fill.style.width = (s * 100).toFixed(1) + '%';
-        mv.textContent = d <= tol ? '对准' : (d < 12 ? '有回波' : '偏了');
+        value.childNodes[0].nodeValue = Math.round(bearing());
       }
 
       function onInput() {
@@ -2194,7 +2350,7 @@
         if (busy) return;
         if (diffOf(bearing()) > tol) {
           Audio.sfx('switch');
-          Sub.hint('还没对上。差 ' + Math.round(diffOf(bearing())) + ' 度。', 2600);
+          Sub.hint('耳机里还是静电。天线没对上。', 2600);
           return;
         }
         busy = true;
