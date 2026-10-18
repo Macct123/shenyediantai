@@ -617,6 +617,7 @@
      ============================================================ */
   var Voice = {
     base: 'assets/voice/',
+    ver: '?v=20261018b',
     enabled: true,
     cache: {},
 
@@ -635,33 +636,60 @@
 
     init: function () {},
 
+    /* 进游戏时把有配音的句子先挂进文档，避免第一次播时才开始加载 */
+    preload: function () {
+      if (!this.enabled) return;
+      var self = this;
+      Object.keys(this.VOICED).forEach(function (id) {
+        if (!self.cache[id]) self.cache[id] = self.make(id);
+      });
+    },
+
     make: function (id) {
       var self = this;
       var a = new window.Audio();
       a.preload = 'auto';
+      a.volume = 1;
       a.__want = false;
+      a.setAttribute('playsinline', '');
       // 再压一点音高和速度，让老周更显年纪
       a.playbackRate = 0.95;
       if ('preservesPitch' in a) a.preservesPitch = false;
       else if ('mozPreservesPitch' in a) a.mozPreservesPitch = false;
+
+      // 挂在文档里，部分浏览器对游离的 Audio 对象不会真正加载
+      var bank = document.getElementById('voiceBank');
+      if (!bank) {
+        bank = document.createElement('div');
+        bank.id = 'voiceBank';
+        bank.style.display = 'none';
+        document.body.appendChild(bank);
+      }
+      bank.appendChild(a);
+
       var ei = 0;
+
+      function url(i) {
+        return self.base + id + '.' + self.EXTS[i] + self.ver;
+      }
 
       a.addEventListener('error', function () {
         if (ei >= self.EXTS.length - 1) return;
         ei += 1;
-        a.src = self.base + id + '.' + self.EXTS[ei];
+        a.src = url(ei);
         a.load();
       });
 
       // 换源/加载完成后，如果这句还等着播，就补一次 play
       a.addEventListener('canplay', function () {
         if (!a.__want || !a.paused) return;
+        try { a.currentTime = 0; } catch (e) {}
         var p = a.play();
         if (p && p.catch) p.catch(function () {});
       });
       a.addEventListener('playing', function () { a.__want = false; });
 
-      a.src = this.base + id + '.' + this.EXTS[0];
+      a.src = url(0);
       a.load();
       return a;
     },
@@ -678,7 +706,8 @@
 
       a.__want = true;
       try {
-        a.currentTime = 0;
+        // 元数据还没到就写 currentTime，部分浏览器会抛错并跳过 play
+        if (a.readyState > 0) a.currentTime = 0;
         var p = a.play();
         if (p && p.catch) p.catch(function () {});
       } catch (e) {}
@@ -4028,6 +4057,7 @@
     });
 
     Loop.start();
+    Voice.preload();
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
