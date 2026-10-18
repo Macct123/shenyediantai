@@ -16,7 +16,8 @@
     muted: 'mrs_muted',
     tapes: 'mrs_tapes',
     help: 'mrs_help',
-    ending: 'mrs_ending'
+    ending: 'mrs_ending',
+    log: 'mrs_call_log'
   };
 
   var Store = {
@@ -753,6 +754,7 @@
     hideTimer: 0,
     fullText: '',
     index: 0,
+    history: [],
 
     init: function () {
       this.box = $('#dialogue');
@@ -760,6 +762,9 @@
       this.textEl = $('#dlgText');
       this.nextEl = $('#dlgNext');
       if (!this.box) return;
+
+      var saved = Store.get(K.log, []);
+      this.history = Array.isArray(saved) ? saved : [];
 
       var self = this;
       var stage = $('#stage');
@@ -788,6 +793,11 @@
       this.done = done || null;
       clearTimeout(this.hintTimer);
       this.next();
+    },
+
+    /* 重听：走正常流程，缺少的记录会补上，已有的不重复 */
+    replay: function (lines) {
+      this.play(lines, null);
     },
 
     next: function () {
@@ -822,12 +832,29 @@
       this.typing = true;
       this.textEl.textContent = '';
       this.nextEl.classList.remove('is-ready');
+      this.record(line);
 
       if (line.voice) {
         Voice.cancel();
         Voice.play(line.voice);
       }
       this.type();
+    },
+
+    record: function (line) {
+      if (!line || !line.text) return;
+      var who = line.who || '';
+      var exists = this.history.some(function (e) {
+        return e.text === line.text && e.who === who;
+      });
+      if (exists) return;
+      this.history.push({
+        who: who,
+        text: line.text,
+        voice: line.voice || ''
+      });
+      if (this.history.length > 80) this.history.shift();
+      Store.set(K.log, this.history);
     },
 
     type: function () {
@@ -1108,6 +1135,7 @@
                     onPower: function () { Night1.installFuse(); },
                     solved: Night1.tuned,
                     target: '964',
+                    onReplay: function () { Night1.replayCall(); },
                     onSolved: function () { Night1.onTuned(); }
                   };
                 }
@@ -1729,6 +1757,38 @@
       });
     },
 
+    /* 按当前进度拼出可重听的通话（信息都在这里，不会因为点快而丢失） */
+    callLines: function () {
+      if (!this.tuned) return [];
+      if (this.fixed) {
+        return [
+          { who: '渔夫', text: '……有了。灯扫过来了。', voice: 'n1_07' },
+          { who: '渔夫', text: '我看见防波堤了。谢谢你，守夜的。', voice: 'n1_08' }
+        ];
+      }
+      if (this.located) {
+        return [
+          { who: '渔夫', text: '我在北纬三十四度十二分，东经一百二十九度零七分。', voice: 'n1_03' },
+          { who: '渔夫', text: '对，就是那儿。三号浮标，我看见了。', voice: 'n1_05' }
+        ];
+      }
+      return [
+        { who: '渔夫', text: '……喂？喂！有人吗？', voice: 'n1_01' },
+        { who: '渔夫', text: '我的罗盘坏了。雾太厚，我什么都看不见。', voice: 'n1_02' },
+        { who: '渔夫', text: '我是七号渔协的，船号零三。', voice: 'n1_06' },
+        { who: '渔夫', text: '我在北纬三十四度十二分，东经一百二十九度零七分。', voice: 'n1_03' },
+        { who: '渔夫', text: '船上还有人。求你，给我指个方向。', voice: 'n1_04' }
+      ];
+    },
+
+    replayCall: function () {
+      var lines = this.callLines();
+      if (!lines.length) return;
+      Audio.unlock();
+      Audio.sfx('click');
+      Sub.replay(lines);
+    },
+
     onLocated: function () {
       if (this.located) return;
       this.located = true;
@@ -1885,6 +1945,16 @@
       if (solved) btn.classList.add('is-done');
       wrap.appendChild(btn);
 
+      if (props.onReplay) {
+        var replayBtn = document.createElement('button');
+        replayBtn.type = 'button';
+        replayBtn.className = 'btn-ghost tool-replay';
+        replayBtn.textContent = '重听通话';
+        replayBtn.hidden = !solved;
+        replayBtn.addEventListener('click', function () { props.onReplay(); });
+        wrap.appendChild(replayBtn);
+      }
+
       var note = p('tool-note', solved ? '载波稳住了。' : '刻度盘上没有数字，只有这排按键。');
       note.style.textAlign = 'left';
       wrap.appendChild(note);
@@ -1906,6 +1976,7 @@
           btn.textContent = '已接通';
           btn.classList.add('is-done');
           Audio.sfx('lock');
+          if (replayBtn) replayBtn.hidden = false;
           render();
           if (props.onSolved) props.onSolved();
         } else {
@@ -3291,6 +3362,14 @@
         });
       }
 
+      var logBtn = $('#btnLog');
+      if (logBtn) {
+        logBtn.addEventListener('click', function () {
+          Audio.sfx('click');
+          UI.openLog();
+        });
+      }
+
       this.syncMute();
     },
 
@@ -3341,6 +3420,47 @@
       var set = $('#setMute');
       if (set) set.checked = Audio.muted;
       Sub.syncMuted();
+    },
+
+    openLog: function () {
+      var list = $('#callLog');
+      if (!list) return;
+      list.innerHTML = '';
+      var hist = Sub.history || [];
+      if (!hist.length) {
+        list.appendChild(p('call-log-empty', '还没有通话。'));
+      } else {
+        hist.forEach(function (entry) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'log-line' + (entry.voice ? '' : ' is-silent');
+
+          if (entry.who) {
+            var who = document.createElement('span');
+            who.className = 'log-who';
+            who.textContent = entry.who;
+            b.appendChild(who);
+          }
+
+          var txt = document.createElement('span');
+          txt.className = 'log-text';
+          txt.textContent = entry.text;
+          b.appendChild(txt);
+
+          if (entry.voice) {
+            b.addEventListener('click', function () {
+              Audio.unlock();
+              Voice.cancel();
+              Voice.play(entry.voice);
+            });
+          }
+
+          list.appendChild(b);
+        });
+      }
+
+      UI.openModal('modalLog');
+      requestAnimationFrame(function () { list.scrollTop = list.scrollHeight; });
     },
 
     renderTapes: function () {
@@ -3807,7 +3927,9 @@
           localStorage.removeItem(K.tapes);
           localStorage.removeItem(K.ending);
           localStorage.removeItem(K.help);
+          localStorage.removeItem(K.log);
         } catch (e) {}
+        Sub.history = [];
         Pro.reset();
         Night1.reset();
         Game.enter();

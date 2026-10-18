@@ -949,6 +949,49 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 .modal-close { display: block; width: 100%; margin-top: 20px; }
 
+/* 通话记录 */
+.modal-card-log { width: min(560px, 100%); }
+.call-log {
+  display: flex; flex-direction: column; gap: 8px;
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+  padding-right: 6px;
+  text-align: left;
+}
+.log-line {
+  display: block; width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(201, 214, 226, 0.12);
+  border-radius: 9px;
+  background: rgba(10, 20, 31, 0.62);
+  color: #d7c9b2;
+  font-family: var(--sans); font-size: 13px; line-height: 1.7;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.log-line:hover, .log-line:focus-visible {
+  border-color: rgba(224, 164, 94, 0.45);
+  background: rgba(224, 164, 94, 0.08);
+  outline: none;
+}
+.log-line.is-silent { cursor: default; }
+.log-line.is-silent:hover {
+  border-color: rgba(201, 214, 226, 0.12);
+  background: rgba(10, 20, 31, 0.62);
+}
+.log-who {
+  display: block; margin-bottom: 3px;
+  font-family: var(--serif); font-size: 10px; letter-spacing: 0.18em;
+  color: #d89a5c;
+}
+.log-text { display: block; color: #cfc2ad; }
+.call-log-empty {
+  margin: 0; padding: 16px 4px;
+  font-size: 12px; color: #7f93a3; text-align: center;
+}
+.tool-replay { width: 100%; margin-top: 8px; }
+
 .tape-list { display: flex; flex-direction: column; gap: 10px; }
 .tape-item {
   padding: 11px 14px;

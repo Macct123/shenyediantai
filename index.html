@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="theme-color" content="#05080c" />
 <title>深夜电台 · Midnight Signal</title>
-<link rel="stylesheet" href="styles.css?v=20261018b" />
+<link rel="stylesheet" href="styles.css?v=20261018c" />
 </head>
 <body>
 <noscript><p class="noscript">本作需要开启 JavaScript 才能守夜。</p></noscript>
@@ -85,6 +85,7 @@
       <span class="tb-sep" aria-hidden="true">·</span>
       <span class="tb-night" id="tbNight">序章 · 空频</span>
       <span class="tb-spacer"></span>
+      <button class="tb-btn" id="btnLog" title="通话记录">记录</button>
       <button class="tb-btn" id="btnMenu" title="返回菜单">菜单</button>
       <button class="tb-btn" id="btnMute" aria-pressed="false" title="静音开关">静音</button>
     </header>
@@ -159,6 +160,15 @@
     </div>
   </div>
 
+  <div class="modal" id="modalLog" hidden role="dialog" aria-modal="true" aria-label="通话记录">
+    <div class="modal-card modal-card-log">
+      <h2>通话记录</h2>
+      <p class="modal-note">点一句话可以重听。坐标、频道、方位都记在这里。</p>
+      <div class="call-log" id="callLog"></div>
+      <button class="btn-ghost modal-close" data-close="modalLog">收起记录</button>
+    </div>
+  </div>
+
   <div class="modal" id="modalSettings" hidden role="dialog" aria-modal="true" aria-label="设置">
     <div class="modal-card">
       <h2>设置</h2>
@@ -191,6 +201,6 @@
 
 </div>
 
-<script src="game.js?v=20261018b"></script>
+<script src="game.js?v=20261018c"></script>
 </body>
 </html>
