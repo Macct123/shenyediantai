@@ -1884,6 +1884,14 @@
         });
       }
 
+      var menuBtn = $('#btnMenu');
+      if (menuBtn) {
+        menuBtn.addEventListener('click', function () {
+          Audio.sfx('click');
+          Game.toMenu();
+        });
+      }
+
       this.syncMute();
     },
 
@@ -2504,21 +2512,26 @@
       Store.set(K.progress, progress);
     },
 
+    /* 回到主页（ESC / 顶栏「菜单」/ 移动端） */
+    toMenu: function () {
+      if (!Game.inGame) return;
+      Voice.cancel();
+      Pro.clearTimers();
+      if (Scene.isOpen()) Scene.close();
+      Game.save();
+      Game.inGame = false;
+      Game.fadeTo(function () {
+        $('#game').classList.remove('is-active');
+        $('#menu').classList.add('is-active');
+        Game.refreshEntry();
+      });
+    },
+
     onKey: function (e) {
       if (e.key === 'Escape') {
         if (UI.closeTopModal()) return;
         if (Scene.isOpen()) { Scene.close(); return; }
-        if (Game.inGame) {
-          Voice.cancel();
-          Pro.clearTimers();
-          Game.save();
-          Game.inGame = false;
-          Game.fadeTo(function () {
-            $('#game').classList.remove('is-active');
-            $('#menu').classList.add('is-active');
-            Game.refreshEntry();
-          });
-        }
+        Game.toMenu();
         return;
       }
 

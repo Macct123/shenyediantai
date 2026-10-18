@@ -282,6 +282,7 @@ button { -webkit-tap-highlight-color: transparent; }
 .tb-night {
   font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
   color: var(--amber); opacity: 0.82;
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .tb-spacer { flex: 1; }
 .tb-btn {
@@ -529,7 +530,7 @@ button { -webkit-tap-highlight-color: transparent; }
   text-align: left;
   scrollbar-width: none;
   border-left: 1px solid rgba(201, 214, 226, 0.08);
-  background: linear-gradient(90deg, rgba(4, 9, 14, 0.84), rgba(5, 11, 17, 0.98) 34%);
+  background: linear-gradient(90deg, rgba(4, 9, 14, 0.97), rgba(5, 11, 17, 0.995) 28%);
   box-shadow: -30px 0 80px rgba(0, 0, 0, 0.55);
 }
 .closeup-tools::-webkit-scrollbar { width: 0; }
@@ -891,7 +892,10 @@ button { -webkit-tap-highlight-color: transparent; }
 #viewport.is-compact .tool-value { font-size: 22px; }
 #viewport.is-compact .tool-slider { height: 36px; }
 #viewport.is-compact .tool-note { font-size: 12.5px; line-height: 1.85; margin-top: 10px; }
-#viewport.is-compact .closeup-tools { padding: 16px 18px 14px; width: min(520px, 92%); }
+#viewport.is-compact .closeup-tools { padding: 40px 20px 56px; width: min(480px, 44%); }
+#viewport.is-compact .closeup-shot,
+#viewport.is-compact .closeup-bg,
+#viewport.is-compact .closeup-text { inset: 0 44% 0 0; }
 #viewport.is-compact .closeup-title { top: 10px; font-size: 10.5px; }
 
 /* ============================================================
@@ -977,33 +981,6 @@ button { -webkit-tap-highlight-color: transparent; }
   .layer, .closeup, .closeup-art, .light, .hotspot::after { transition: none; }
 }
 
-@media (orientation: portrait), (max-width: 860px) {
-  .closeup-shot { inset: 0 0 52% 0; }
-  .closeup-stage {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  transition: transform 0.55s cubic-bezier(0.22, 0.7, 0.2, 1);
-  will-change: transform;
-}
-.closeup-stage.is-dragging { transition: none; }
-
-.closeup-bg { inset: 0 0 52% 0; }
-  .closeup-text { inset: 0 0 52% 0; }
-  .closeup-tools {
-    left: 0; right: 0; top: auto; bottom: 0;
-    width: 100%; height: 52%;
-    padding: 20px 18px 64px;
-    justify-content: flex-start;
-    border-left: none;
-    border-top: 1px solid rgba(201, 214, 226, 0.08);
-    background: linear-gradient(180deg, rgba(5, 11, 17, 0.94), rgba(4, 9, 14, 0.99));
-    box-shadow: 0 -24px 60px rgba(0, 0, 0, 0.5);
-  }
-  .closeup-title { left: 18px; top: 14px; }
-  .closeup-back { right: 18px; bottom: 14px; }
-}
-
 @media (orientation: portrait) and (max-width: 700px) {
   .menu-head { top: calc(var(--safe-t) + 8vh); }
   .menu-title { letter-spacing: 0.18em; }
@@ -1011,7 +988,6 @@ button { -webkit-tap-highlight-color: transparent; }
   .obj { font-size: 14.5px; padding: 4px 0; }
   .menu-hint { right: auto; left: 6%; bottom: calc(var(--safe-b) + 3vh); }
   .dial { height: 86px; }
-  .closeup-tools { width: 90%; padding: 20px 18px 18px; }
 }
 
 /* ============================================================
@@ -1230,4 +1206,42 @@ button { -webkit-tap-highlight-color: transparent; }
   .amb-lamp, .amb-rain, .amb-sweep, .amb-dust { animation: none; }
   .closeup-fg { transition: none; }
   .hotspot::before { transform: none; }
+}
+
+/* ============================================================
+   移动端特写：上图下操作，避免图片和控件互相压住
+   ============================================================ */
+#viewport.is-portrait .closeup-art { inset: 0 0 50% 0; }
+#viewport.is-portrait .closeup-bg,
+#viewport.is-portrait .closeup-shot,
+#viewport.is-portrait .closeup-text { inset: 0; }
+
+#viewport.is-portrait .closeup-tools {
+  left: 0; right: 0; top: auto; bottom: 0;
+  width: 100%; height: 50%;
+  padding: 44px 16px calc(var(--safe-b) + 64px);
+  justify-content: flex-start;
+  border-left: none;
+  border-top: 1px solid rgba(201, 214, 226, 0.1);
+  background: linear-gradient(180deg, rgba(4, 9, 14, 0.94), rgba(5, 11, 17, 0.99) 24%);
+  box-shadow: 0 -24px 60px rgba(0, 0, 0, 0.55);
+  -webkit-overflow-scrolling: touch;
+}
+#viewport.is-portrait .closeup-title { left: 16px; top: 14px; font-size: 11px; }
+#viewport.is-portrait .closeup-back {
+  right: 14px;
+  bottom: calc(var(--safe-b) + 12px);
+  min-height: 44px;
+  padding: 0 18px;
+}
+/* 竖屏时顶部按钮别挤在一起 */
+@media (max-width: 560px) {
+  .tb-title, .tb-sep { display: none; }
+  .tb-night {
+    font-size: 10.5px; letter-spacing: 0.12em;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+}
+@media (max-width: 560px), (max-height: 480px) {
+  .tb-btn { min-height: 32px; padding: 0 10px; font-size: 11px; }
 }
