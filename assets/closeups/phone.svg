@@ -1,0 +1,143 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#10222f"/>
+      <stop offset="0.55" stop-color="#081219"/>
+      <stop offset="1" stop-color="#04080c"/>
+    </linearGradient>
+    <linearGradient id="bakelite" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#3d3a36"/>
+      <stop offset="0.3" stop-color="#232120"/>
+      <stop offset="0.7" stop-color="#141312"/>
+      <stop offset="1" stop-color="#0a0909"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#9fb0bd"/>
+      <stop offset="0.35" stop-color="#5d7280"/>
+      <stop offset="0.7" stop-color="#2f4250"/>
+      <stop offset="1" stop-color="#16232d"/>
+    </linearGradient>
+    <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd6a0" stop-opacity="0.46"/>
+      <stop offset="0.5" stop-color="#e0a45e" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dial" cx="0.4" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#8ea0ae"/>
+      <stop offset="0.5" stop-color="#4d6270"/>
+      <stop offset="1" stop-color="#22313c"/>
+    </radialGradient>
+    <radialGradient id="vign" cx="0.5" cy="0.46" r="0.72">
+      <stop offset="0.4" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.82"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <ellipse cx="340" cy="140" rx="520" ry="420" fill="url(#lamp)"/>
+
+  <!-- 桌面 -->
+  <rect x="0" y="640" width="1600" height="260" fill="#0a131a"/>
+  <path d="M0 640 Q800 620 1600 646 L1600 900 L0 900 Z" fill="#060d12" opacity="0.7"/>
+  <ellipse cx="800" cy="812" rx="520" ry="90" fill="#02060a" opacity="0.85" filter="url(#soft)"/>
+
+  <!-- 电话主体（整体缩小，留出台面与呼吸空间） -->
+  <g transform="translate(800 470) scale(0.8) translate(-800 -470)">
+  <!-- 电话底座 -->
+  <g>
+    <path d="M420 660 Q420 470 800 452 Q1180 470 1180 660 Q1180 792 800 800 Q420 792 420 660 Z" fill="#05090d" opacity="0.75"/>
+    <path d="M424 656 Q424 476 800 458 Q1176 476 1176 656 Q1176 784 800 792 Q424 784 424 656 Z" fill="url(#bakelite)"/>
+    <path d="M424 656 Q424 476 800 458 Q1176 476 1176 656 Q1176 784 800 792 Q424 784 424 656 Z" fill="none" stroke="#6b7d8c" stroke-width="2" opacity="0.24"/>
+
+    <!-- 正面高光 -->
+    <path d="M470 520 Q800 472 1130 520" stroke="#b9c7d1" stroke-width="3" fill="none" opacity="0.14"/>
+    <path d="M480 700 Q800 748 1120 700" stroke="#000" stroke-width="6" fill="none" opacity="0.35"/>
+
+    <!-- 拨号盘 -->
+    <g transform="translate(800 646)">
+      <circle r="184" fill="#0a0f13" opacity="0.9"/>
+      <circle r="176" fill="url(#dial)"/>
+      <circle r="176" fill="none" stroke="#8ea0ae" stroke-width="1.6" opacity="0.22"/>
+      <circle r="140" fill="none" stroke="#1b2a35" stroke-width="2" opacity="0.55"/>
+      <circle r="56" fill="#121a21" stroke="#3d5468" stroke-width="2.5"/>
+      <circle r="56" fill="none" stroke="#8ea0ae" stroke-width="1" opacity="0.2"/>
+      <!-- 指孔 -->
+      <g>
+        <circle cx="0" cy="-136" r="18" fill="#080d12"/>
+        <circle cx="68" cy="-118" r="18" fill="#080d12"/>
+        <circle cx="118" cy="-68" r="18" fill="#080d12"/>
+        <circle cx="136" cy="0" r="18" fill="#080d12"/>
+        <circle cx="118" cy="68" r="18" fill="#080d12"/>
+        <circle cx="68" cy="118" r="18" fill="#080d12"/>
+        <circle cx="0" cy="136" r="18" fill="#080d12"/>
+        <circle cx="-68" cy="118" r="18" fill="#080d12"/>
+        <circle cx="-118" cy="68" r="18" fill="#080d12"/>
+        <circle cx="-136" cy="0" r="18" fill="#080d12"/>
+      </g>
+      <!-- 挡指 -->
+      <rect x="-11" y="-168" width="22" height="28" rx="5" fill="url(#metal)"/>
+      <!-- 极轻的反光 -->
+      <path d="M-160 -40 A165 165 0 0 1 -46 -158" stroke="#dfe9f0" stroke-width="7" fill="none" opacity="0.08"/>
+    </g>
+
+    <!-- 底座小铭牌 -->
+    <rect x="640" y="770" width="320" height="26" rx="3" fill="#0f1a22" stroke="#2c3d49" opacity="0.9"/>
+  </g>
+
+  <!-- 听筒托架 -->
+  <g>
+    <path d="M646 372 Q800 344 954 372 L954 404 Q800 382 646 404 Z" fill="#080e13"/>
+    <path d="M646 372 Q800 344 954 372 L954 382 Q800 354 646 382 Z" fill="#1b2f3d" opacity="0.85"/>
+    <path d="M654 378 Q800 352 946 378" stroke="#7f94a3" stroke-width="1.6" fill="none" opacity="0.22"/>
+  </g>
+
+  <!-- 听筒 -->
+  <g transform="translate(0 -26)">
+    <path d="M392 300 Q392 236 462 232 L1138 232 Q1208 236 1208 300 Q1208 352 1140 356 L1000 356 Q960 356 920 336 L680 336 Q640 356 600 356 L460 356 Q392 352 392 300 Z"
+          fill="#0a0f13" opacity="0.85" filter="url(#soft)" transform="translate(12 26)"/>
+    <path d="M392 300 Q392 236 462 232 L1138 232 Q1208 236 1208 300 Q1208 352 1140 356 L1000 356 Q960 356 920 336 L680 336 Q640 356 600 356 L460 356 Q392 352 392 300 Z"
+          fill="url(#bakelite)"/>
+    <path d="M392 300 Q392 236 462 232 L1138 232 Q1208 236 1208 300 Q1208 352 1140 356 L1000 356 Q960 356 920 336 L680 336 Q640 356 600 356 L460 356 Q392 352 392 300 Z"
+          fill="none" stroke="#6b7d8c" stroke-width="2" opacity="0.22"/>
+    <!-- 听筒两端凸起 -->
+    <ellipse cx="452" cy="292" rx="66" ry="72" fill="#1b1a19"/>
+    <ellipse cx="452" cy="292" rx="52" ry="56" fill="#0b0a0a"/>
+    <ellipse cx="1148" cy="292" rx="66" ry="72" fill="#1b1a19"/>
+    <ellipse cx="1148" cy="292" rx="52" ry="56" fill="#0b0a0a"/>
+    <g fill="#22303a" opacity="0.9">
+      <circle cx="432" cy="284" r="4"/><circle cx="452" cy="272" r="4"/>
+      <circle cx="472" cy="284" r="4"/><circle cx="452" cy="300" r="4"/>
+      <circle cx="1128" cy="284" r="4"/><circle cx="1148" cy="272" r="4"/>
+      <circle cx="1168" cy="284" r="4"/><circle cx="1148" cy="300" r="4"/>
+    </g>
+    <!-- 听筒高光 -->
+    <path d="M470 250 Q800 238 1120 250" stroke="#cfdae3" stroke-width="3" fill="none" opacity="0.16"/>
+  </g>
+
+  <!-- 电话线 -->
+  <g>
+    <path d="M1180 700 Q1290 690 1330 760 Q1356 806 1420 800"
+          stroke="#05090d" stroke-width="14" fill="none"/>
+    <path d="M1180 700 Q1290 690 1330 760 Q1356 806 1420 800"
+          stroke="#1f2f3a" stroke-width="9" fill="none"/>
+    <g stroke="#3c5464" stroke-width="3" opacity="0.55">
+      <path d="M1206 692 L1212 710"/>
+      <path d="M1240 688 L1246 706"/>
+      <path d="M1274 692 L1280 710"/>
+      <path d="M1306 706 L1318 720"/>
+      <path d="M1328 736 L1342 746"/>
+      <path d="M1340 770 L1356 776"/>
+      <path d="M1366 792 L1384 794"/>
+    </g>
+  </g>
+
+  </g>
+
+  <rect width="1600" height="900" fill="url(#vign)"/>
+  <rect width="1600" height="900" filter="url(#grain)" opacity="0.08" style="mix-blend-mode:overlay"/>
+</svg>

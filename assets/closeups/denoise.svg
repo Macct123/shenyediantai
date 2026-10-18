@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#0f2230"/>
+      <stop offset="0.55" stop-color="#08121a"/>
+      <stop offset="1" stop-color="#04080c"/>
+    </linearGradient>
+    <linearGradient id="case" x1="0.1" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#6d7f8d"/>
+      <stop offset="0.25" stop-color="#3b4f5e"/>
+      <stop offset="0.6" stop-color="#22323d"/>
+      <stop offset="1" stop-color="#111c24"/>
+    </linearGradient>
+    <linearGradient id="knob" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#8fa2b0"/>
+      <stop offset="0.45" stop-color="#415666"/>
+      <stop offset="1" stop-color="#15222c"/>
+    </linearGradient>
+    <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd6a0" stop-opacity="0.4"/>
+      <stop offset="0.5" stop-color="#e0a45e" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a1a1a"/>
+      <stop offset="0.6" stop-color="#071212"/>
+      <stop offset="1" stop-color="#040a0a"/>
+    </linearGradient>
+    <radialGradient id="vign" cx="0.5" cy="0.46" r="0.72">
+      <stop offset="0.4" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.82"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.84" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <ellipse cx="330" cy="140" rx="520" ry="420" fill="url(#lamp)"/>
+
+  <rect x="0" y="640" width="1600" height="260" fill="#0a131a"/>
+  <path d="M0 640 Q800 620 1600 646 L1600 900 L0 900 Z" fill="#060d12" opacity="0.7"/>
+  <ellipse cx="800" cy="816" rx="520" ry="88" fill="#02060a" opacity="0.85" filter="url(#soft)"/>
+
+  <!-- 机箱 -->
+  <g>
+    <rect x="200" y="300" width="1200" height="380" rx="12" fill="#05090d" opacity="0.9"/>
+    <rect x="208" y="308" width="1184" height="364" rx="10" fill="url(#case)"/>
+    <rect x="208" y="308" width="1184" height="364" rx="10" fill="none" stroke="#a9bccb" stroke-width="1.6" opacity="0.3"/>
+
+    <!-- 顶面高光 -->
+    <path d="M240 330 L1360 330" stroke="#dbe7ef" stroke-width="3" opacity="0.2"/>
+    <!-- 拉丝 -->
+    <g stroke="#cfe0ea" stroke-width="1" opacity="0.07">
+      <path d="M230 360 L1370 360"/><path d="M230 400 L1370 400"/>
+      <path d="M230 560 L1370 560"/><path d="M230 610 L1370 610"/>
+    </g>
+
+    <!-- 表头 -->
+    <rect x="270" y="356" width="520" height="216" rx="6" fill="#04090c"/>
+    <rect x="278" y="364" width="504" height="200" rx="4" fill="url(#screen)"/>
+    <rect x="278" y="364" width="504" height="200" rx="4" fill="none" stroke="#3a5468" stroke-width="2"/>
+    <g stroke="#6f9a86" stroke-width="1.4" opacity="0.35">
+      <path d="M300 520 L340 520 L360 470 L382 540 L404 500 L430 522 L470 522"/>
+      <path d="M480 522 L510 512 L540 524 L580 508 L620 524 L660 518 L700 524"/>
+      <path d="M300 500 L760 500"/>
+    </g>
+    <rect x="278" y="364" width="504" height="200" rx="4" fill="#5ef0c0" opacity="0.045"/>
+    <ellipse cx="530" cy="470" rx="230" ry="90" fill="#5ef0c0" opacity="0.05" filter="url(#glow)"/>
+
+    <!-- 指示灯 -->
+    <circle cx="1180" cy="392" r="13" fill="#2a1a12"/>
+    <circle cx="1180" cy="392" r="9" fill="#e0a45e" opacity="0.9"/>
+    <circle cx="1180" cy="392" r="20" fill="#ffcf94" opacity="0.28" filter="url(#glow)"/>
+    <circle cx="1180" cy="440" r="9" fill="#0b1620"/>
+    <circle cx="1180" cy="440" r="5" fill="#2f5468"/>
+
+    <!-- 两个大旋钮 -->
+    <g>
+      <circle cx="900" cy="480" r="82" fill="#05090d" opacity="0.8"/>
+      <circle cx="896" cy="476" r="78" fill="url(#knob)"/>
+      <circle cx="896" cy="476" r="78" fill="none" stroke="#c2d2de" stroke-width="1.4" opacity="0.3"/>
+      <circle cx="896" cy="476" r="52" fill="#101c24"/>
+      <rect x="892" y="406" width="8" height="26" rx="3" fill="#f2c58c"/>
+      <path d="M842 442 Q896 412 950 442" stroke="#e6f0f7" stroke-width="2" fill="none" opacity="0.16"/>
+    </g>
+    <g>
+      <circle cx="1116" cy="480" r="62" fill="#05090d" opacity="0.8"/>
+      <circle cx="1113" cy="477" r="59" fill="url(#knob)"/>
+      <circle cx="1113" cy="477" r="38" fill="#101c24"/>
+      <rect x="1110" y="428" width="6" height="20" rx="3" fill="#f2c58c"/>
+      <path d="M1074 452 Q1113 430 1152 452" stroke="#e6f0f7" stroke-width="1.6" fill="none" opacity="0.14"/>
+    </g>
+
+    <!-- 铭牌与散热孔 -->
+    <rect x="880" y="600" width="260" height="42" rx="3" fill="#0d1a22" stroke="#3a5468" stroke-width="1.4"/>
+    <g stroke="#0a141b" stroke-width="6">
+      <path d="M300 648 L560 648"/><path d="M300 664 L560 664"/>
+      <path d="M1230 620 L1330 620"/><path d="M1230 636 L1330 636"/>
+    </g>
+    <!-- 脚垫 -->
+    <rect x="250" y="672" width="60" height="16" rx="6" fill="#0a1015"/>
+    <rect x="1290" y="672" width="60" height="16" rx="6" fill="#0a1015"/>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#vign)"/>
+  <rect width="1600" height="900" filter="url(#grain)" opacity="0.08" style="mix-blend-mode:overlay"/>
+</svg>

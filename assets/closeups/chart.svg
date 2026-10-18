@@ -1,0 +1,130 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#0b1a26"/>
+      <stop offset="1" stop-color="#04080c"/>
+    </linearGradient>
+    <linearGradient id="paper" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#9c907a"/>
+      <stop offset="0.35" stop-color="#827660"/>
+      <stop offset="0.7" stop-color="#655c4b"/>
+      <stop offset="1" stop-color="#453f34"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1720" stop-opacity="0.05"/>
+      <stop offset="0.55" stop-color="#0b1720" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#050b11" stop-opacity="0.72"/>
+    </linearGradient>
+    <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffcf94" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vign" cx="0.5" cy="0.46" r="0.74">
+      <stop offset="0.4" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.8"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="16"/></filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <ellipse cx="360" cy="120" rx="520" ry="420" fill="url(#lamp)"/>
+
+  <!-- 纸张投影 -->
+  <path d="M186 148 L1456 110 L1506 820 L222 852 Z" fill="#02060a" opacity="0.8" filter="url(#soft)"/>
+
+  <!-- 图纸 -->
+  <g transform="rotate(-1.4 820 460)">
+    <path d="M176 128 L1442 96 L1486 798 L214 832 Z" fill="url(#paper)"/>
+    <!-- 纸面做旧 -->
+    <path d="M176 128 L1442 96 L1486 798 L214 832 Z" fill="#26323a" opacity="0.22"/>
+    <path d="M176 128 L1442 96 L1486 798 L214 832 Z" fill="url(#shade)"/>
+
+    <!-- 经纬网 -->
+    <g stroke="#3f4c50" stroke-width="1" opacity="0.38">
+      <line x1="240" y1="150" x2="262" y2="820"/>
+      <line x1="360" y1="146" x2="382" y2="818"/>
+      <line x1="480" y1="142" x2="502" y2="816"/>
+      <line x1="600" y1="138" x2="622" y2="812"/>
+      <line x1="720" y1="134" x2="742" y2="810"/>
+      <line x1="840" y1="130" x2="862" y2="806"/>
+      <line x1="960" y1="126" x2="982" y2="802"/>
+      <line x1="1080" y1="122" x2="1102" y2="800"/>
+      <line x1="1200" y1="118" x2="1222" y2="796"/>
+      <line x1="1320" y1="114" x2="1342" y2="794"/>
+      <line x1="1440" y1="110" x2="1462" y2="792"/>
+    </g>
+    <g stroke="#3f4c50" stroke-width="1" opacity="0.3">
+      <path d="M186 220 L1450 188"/>
+      <path d="M190 310 L1456 278"/>
+      <path d="M194 400 L1462 368"/>
+      <path d="M198 490 L1468 458"/>
+      <path d="M202 580 L1474 548"/>
+      <path d="M206 670 L1480 638"/>
+      <path d="M210 760 L1486 728"/>
+    </g>
+
+    <!-- 海岸线与等深线 -->
+    <g fill="none" stroke="#3b4a4e" stroke-width="2.4" opacity="0.62">
+      <path d="M250 250 Q380 214 470 262 Q540 300 610 274 Q700 242 760 300 Q812 350 900 330"/>
+      <path d="M250 286 Q380 250 470 298 Q540 336 610 310 Q700 278 760 336 Q812 386 900 366"/>
+      <path d="M250 322 Q380 286 470 334 Q540 372 610 346 Q700 314 760 372 Q812 422 900 402"/>
+    </g>
+    <g fill="none" stroke="#4a5a5e" stroke-width="1.4" opacity="0.35">
+      <path d="M980 380 Q1080 340 1180 386 Q1260 422 1360 396"/>
+      <path d="M980 424 Q1080 384 1180 430 Q1260 466 1360 440"/>
+      <path d="M980 468 Q1080 428 1180 474 Q1260 510 1360 484"/>
+    </g>
+    <!-- 礁石点阵 -->
+    <g fill="#3c4a4e" opacity="0.4">
+      <circle cx="700" cy="520" r="5"/><circle cx="726" cy="536" r="4"/>
+      <circle cx="746" cy="512" r="3.6"/><circle cx="768" cy="540" r="4.4"/>
+      <circle cx="790" cy="518" r="3"/><circle cx="812" cy="546" r="4"/>
+    </g>
+
+    <!-- 红铅笔圈 -->
+    <g fill="none" stroke="#a4412f" stroke-linecap="round">
+      <ellipse cx="760" cy="500" rx="112" ry="76" stroke-width="5" opacity="0.8" transform="rotate(-6 760 500)"/>
+      <ellipse cx="756" cy="504" rx="120" ry="82" stroke-width="2.2" opacity="0.42" transform="rotate(-4 756 504)"/>
+      <path d="M640 470 Q700 430 760 436" stroke-width="2" opacity="0.35"/>
+    </g>
+
+    <!-- 铅笔标注痕迹（只画线条，不写字） -->
+    <g stroke="#41403a" stroke-width="2" opacity="0.5" stroke-linecap="round">
+      <path d="M900 600 Q940 588 980 600"/>
+      <path d="M900 618 Q946 606 990 618"/>
+      <path d="M900 636 Q930 626 966 636"/>
+    </g>
+    <g stroke="#41403a" stroke-width="1.6" opacity="0.35">
+      <path d="M1040 250 L1180 246"/>
+      <path d="M1040 266 L1160 262"/>
+    </g>
+
+    <!-- 折痕 -->
+    <g stroke="#2c3538" stroke-width="3" opacity="0.35">
+      <path d="M700 108 Q712 460 706 826"/>
+      <path d="M196 470 Q820 452 1478 424"/>
+    </g>
+    <g stroke="#c7bda6" stroke-width="1.2" opacity="0.18">
+      <path d="M702 108 Q714 460 708 826"/>
+      <path d="M198 474 Q820 456 1478 428"/>
+    </g>
+
+    <!-- 图钉孔 -->
+    <g>
+      <circle cx="210" cy="152" r="8" fill="#1b2226" opacity="0.8"/>
+      <circle cx="210" cy="152" r="4" fill="#04080b"/>
+      <circle cx="1436" cy="120" r="8" fill="#1b2226" opacity="0.8"/>
+      <circle cx="1436" cy="120" r="4" fill="#04080b"/>
+    </g>
+
+    <!-- 纸张卷边 -->
+    <path d="M214 832 L1486 798 L1470 826 Q900 852 232 848 Z" fill="#2a2620" opacity="0.5"/>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#vign)"/>
+  <rect width="1600" height="900" filter="url(#grain)" opacity="0.1" style="mix-blend-mode:overlay"/>
+</svg>

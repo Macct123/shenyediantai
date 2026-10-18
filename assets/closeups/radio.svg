@@ -1,0 +1,181 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#0e1f2c"/>
+      <stop offset="0.55" stop-color="#0a1520"/>
+      <stop offset="1" stop-color="#050a10"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#3a2a22"/>
+      <stop offset="0.35" stop-color="#241a16"/>
+      <stop offset="0.75" stop-color="#16100e"/>
+      <stop offset="1" stop-color="#0d0908"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#54687a"/>
+      <stop offset="0.4" stop-color="#2e4152"/>
+      <stop offset="1" stop-color="#16232e"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1d2a2a"/>
+      <stop offset="0.45" stop-color="#0d1a1a"/>
+      <stop offset="1" stop-color="#060f10"/>
+    </linearGradient>
+    <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd6a0" stop-opacity="0.5"/>
+      <stop offset="0.45" stop-color="#e0a45e" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dialGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffcf94" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#ffcf94" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="knob" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#6b7d8c"/>
+      <stop offset="0.4" stop-color="#2f4150"/>
+      <stop offset="1" stop-color="#101a22"/>
+    </linearGradient>
+    <radialGradient id="vign" cx="0.5" cy="0.46" r="0.74">
+      <stop offset="0.4" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.78"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="14"/></filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <ellipse cx="300" cy="180" rx="420" ry="360" fill="url(#lamp)"/>
+  <ellipse cx="300" cy="180" rx="180" ry="150" fill="url(#lamp)"/>
+
+  <!-- 桌面与投影 -->
+  <rect x="0" y="640" width="1600" height="260" fill="#070f15"/>
+  <ellipse cx="820" cy="800" rx="620" ry="120" fill="#03070b" opacity="0.85" filter="url(#soft)"/>
+  <path d="M0 640 Q800 618 1600 644 L1600 900 L0 900 Z" fill="#0a1118" opacity="0.72"/>
+
+  <!-- 机身 -->
+  <g>
+    <rect x="150" y="250" width="1300" height="500" rx="16" fill="#05080b"/>
+    <rect x="160" y="258" width="1280" height="484" rx="13" fill="url(#body)"/>
+    <rect x="160" y="258" width="1280" height="484" rx="13" fill="none" stroke="#5a4232" stroke-width="2" opacity="0.5"/>
+
+    <!-- 木纹 -->
+    <g stroke="#3a2a20" stroke-width="1.6" opacity="0.35">
+      <path d="M180 330 Q560 316 920 332 Q1240 346 1420 328"/>
+      <path d="M180 398 Q520 386 900 402 Q1240 414 1420 396"/>
+      <path d="M180 470 Q600 456 980 474 Q1280 486 1420 470"/>
+      <path d="M180 552 Q540 540 940 556 Q1260 568 1420 550"/>
+      <path d="M180 626 Q580 614 1000 630 Q1300 640 1420 624"/>
+    </g>
+
+    <!-- 刻度窗 -->
+    <rect x="250" y="318" width="900" height="196" rx="8" fill="#050c10"/>
+    <rect x="258" y="326" width="884" height="180" rx="6" fill="url(#glass)"/>
+    <rect x="258" y="326" width="884" height="180" rx="6" fill="none" stroke="#334a55" stroke-width="2"/>
+    <ellipse cx="700" cy="416" rx="360" ry="72" fill="url(#dialGlow)" opacity="0.55"/>
+    <path d="M258 326 L1142 326" stroke="#000" stroke-width="10" opacity="0.35"/>
+    <path d="M258 506 L1142 506" stroke="#000" stroke-width="8" opacity="0.3"/>
+
+    <g stroke="#c79a5f" opacity="0.55">
+      <line x1="300" y1="340" x2="300" y2="366"/>
+      <line x1="378" y1="340" x2="378" y2="374"/>
+      <line x1="456" y1="340" x2="456" y2="366"/>
+      <line x1="534" y1="340" x2="534" y2="374"/>
+      <line x1="612" y1="340" x2="612" y2="366"/>
+      <line x1="690" y1="340" x2="690" y2="374"/>
+      <line x1="768" y1="340" x2="768" y2="366"/>
+      <line x1="846" y1="340" x2="846" y2="374"/>
+      <line x1="924" y1="340" x2="924" y2="366"/>
+      <line x1="1002" y1="340" x2="1002" y2="374"/>
+      <line x1="1080" y1="340" x2="1080" y2="366"/>
+    </g>
+    <g stroke="#8a6234" stroke-width="1" opacity="0.4">
+      <line x1="300" y1="474" x2="1080" y2="474"/>
+    </g>
+    <!-- 指针 -->
+    <rect x="632" y="344" width="3" height="150" fill="#ffd8a3" opacity="0.5"/>
+    <rect x="630" y="344" width="7" height="150" fill="#ffd8a3" opacity="0.22"/>
+    <path d="M633 336 L626 350 L640 350 Z" fill="#ffe6bd"/>
+
+    <!-- 喇叭网 -->
+    <rect x="250" y="540" width="700" height="176" rx="6" fill="#0a1218"/>
+    <g stroke="#22323e" stroke-width="3">
+      <line x1="262" y1="556" x2="938" y2="556"/>
+      <line x1="262" y1="572" x2="938" y2="572"/>
+      <line x1="262" y1="588" x2="938" y2="588"/>
+      <line x1="262" y1="604" x2="938" y2="604"/>
+      <line x1="262" y1="620" x2="938" y2="620"/>
+      <line x1="262" y1="636" x2="938" y2="636"/>
+      <line x1="262" y1="652" x2="938" y2="652"/>
+      <line x1="262" y1="668" x2="938" y2="668"/>
+      <line x1="262" y1="684" x2="938" y2="684"/>
+      <line x1="262" y1="700" x2="938" y2="700"/>
+    </g>
+
+    <!-- 旋钮 -->
+    <g>
+      <circle cx="1210" cy="600" r="88" fill="#05090d" opacity="0.8"/>
+      <circle cx="1206" cy="596" r="84" fill="url(#knob)"/>
+      <circle cx="1206" cy="596" r="84" fill="none" stroke="#7d8f9e" stroke-width="1.6" opacity="0.35"/>
+      <circle cx="1206" cy="596" r="58" fill="#0e1820"/>
+      <circle cx="1206" cy="596" r="58" fill="none" stroke="#41586b" stroke-width="1.4" opacity="0.6"/>
+      <rect x="1202" y="522" width="8" height="30" rx="3" fill="#e0a45e"/>
+      <circle cx="1206" cy="596" r="10" fill="#1b2a35"/>
+      <path d="M1150 560 Q1206 528 1262 560" stroke="#9fb3c4" stroke-width="2" fill="none" opacity="0.2"/>
+    </g>
+    <g>
+      <circle cx="1392" cy="640" r="58" fill="#05090d" opacity="0.8"/>
+      <circle cx="1389" cy="637" r="55" fill="url(#knob)"/>
+      <circle cx="1389" cy="637" r="36" fill="#0e1820"/>
+      <rect x="1386" y="588" width="6" height="24" rx="3" fill="#c79a5f"/>
+      <path d="M1352 612 Q1389 590 1426 612" stroke="#9fb3c4" stroke-width="1.6" fill="none" opacity="0.18"/>
+    </g>
+
+    <!-- 铭牌与螺丝 -->
+    <rect x="1080" y="560" width="118" height="46" rx="3" fill="#1a2a36" stroke="#3d5568" stroke-width="1.6"/>
+    <rect x="1084" y="564" width="110" height="38" rx="2" fill="none" stroke="#22384a"/>
+    <g fill="#5c7386" opacity="0.7">
+      <circle cx="182" cy="282" r="7"/>
+      <circle cx="1418" cy="282" r="7"/>
+      <circle cx="182" cy="718" r="7"/>
+      <circle cx="1418" cy="718" r="7"/>
+    </g>
+
+    <!-- 磨损与高光 -->
+    <path d="M200 700 Q420 716 620 706" stroke="#7b6a5a" stroke-width="2" fill="none" opacity="0.35"/>
+    <path d="M1000 276 Q1180 268 1360 282" stroke="#c9b39a" stroke-width="2.4" fill="none" opacity="0.18"/>
+    <ellipse cx="520" cy="300" rx="300" ry="40" fill="#ffd8a3" opacity="0.05"/>
+
+    <!-- 边缘高光、磨损与玻璃反光 -->
+    <path d="M172 300 Q500 272 1436 296" stroke="#e2cbb0" stroke-width="2" opacity="0.16" fill="none"/>
+    <path d="M180 714 Q700 734 1428 710" stroke="#000" stroke-width="5" opacity="0.4" fill="none"/>
+    <g stroke="#8d7660" stroke-width="1.2" opacity="0.22">
+      <path d="M250 276 Q700 264 1190 276"/>
+      <path d="M300 736 Q760 748 1200 738"/>
+      <path d="M240 452 Q600 442 940 452"/>
+    </g>
+    <path d="M300 336 L520 336 L400 500 L282 500 Z" fill="#cfe4f7" opacity="0.05"/>
+    <path d="M900 336 L1080 336 L980 500 L860 500 Z" fill="#cfe4f7" opacity="0.035"/>
+    <!-- 旋钮防滑纹 -->
+    <g stroke="#9fb3c4" stroke-width="2" opacity="0.2">
+      <line x1="1206" y1="516" x2="1206" y2="528"/>
+      <line x1="1246" y1="530" x2="1254" y2="538"/>
+      <line x1="1266" y1="570" x2="1278" y2="574"/>
+      <line x1="1262" y1="622" x2="1272" y2="630"/>
+      <line x1="1222" y1="660" x2="1228" y2="672"/>
+      <line x1="1170" y1="664" x2="1162" y2="674"/>
+      <line x1="1148" y1="622" x2="1136" y2="628"/>
+      <line x1="1156" y1="566" x2="1144" y2="570"/>
+    </g>
+    <!-- 底部散热孔 -->
+    <g stroke="#0a1219" stroke-width="5" opacity="0.7">
+      <line x1="300" y1="690" x2="560" y2="690"/>
+      <line x1="300" y1="702" x2="560" y2="702"/>
+    </g>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#vign)"/>
+  <rect width="1600" height="900" filter="url(#grain)" opacity="0.06" style="mix-blend-mode:overlay"/>
+</svg>

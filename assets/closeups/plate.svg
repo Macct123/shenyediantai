@@ -1,0 +1,111 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#12222e"/>
+      <stop offset="0.6" stop-color="#0a141d"/>
+      <stop offset="1" stop-color="#05090e"/>
+    </linearGradient>
+    <linearGradient id="plate" x1="0.1" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#b9c7d1"/>
+      <stop offset="0.18" stop-color="#8a9daa"/>
+      <stop offset="0.42" stop-color="#5d7280"/>
+      <stop offset="0.66" stop-color="#7f95a3"/>
+      <stop offset="0.86" stop-color="#4b5f6d"/>
+      <stop offset="1" stop-color="#2d3d49"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.34"/>
+      <stop offset="0.4" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd6a0" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="rivet" cx="0.35" cy="0.3" r="0.7">
+      <stop offset="0" stop-color="#e6eef4"/>
+      <stop offset="0.5" stop-color="#8fa3b1"/>
+      <stop offset="1" stop-color="#2b3b47"/>
+    </radialGradient>
+    <radialGradient id="vign" cx="0.5" cy="0.46" r="0.72">
+      <stop offset="0.42" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.8"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <ellipse cx="380" cy="150" rx="460" ry="380" fill="url(#lamp)"/>
+
+  <!-- 木机身边缘 -->
+  <path d="M0 120 Q420 96 900 118 L900 900 L0 900 Z" fill="#1a1512"/>
+  <path d="M0 120 Q420 96 900 118 L900 900 L0 900 Z" fill="#0b0907" opacity="0.5"/>
+  <g stroke="#241a14" stroke-width="2" opacity="0.6">
+    <path d="M0 300 Q420 284 900 302"/>
+    <path d="M0 520 Q420 504 900 522"/>
+    <path d="M0 740 Q420 724 900 742"/>
+  </g>
+
+  <!-- 铭牌本体 -->
+  <g transform="translate(760 470) rotate(-4)">
+    <rect x="-470" y="-220" width="940" height="440" rx="10" fill="#05080b" opacity="0.85" filter="url(#soft)" transform="translate(14 22)"/>
+    <rect x="-470" y="-220" width="940" height="440" rx="10" fill="url(#plate)"/>
+    <rect x="-470" y="-220" width="940" height="440" rx="10" fill="none" stroke="#cfdae3" stroke-width="2" opacity="0.35"/>
+    <rect x="-442" y="-192" width="884" height="384" rx="6" fill="none" stroke="#2c3d49" stroke-width="3" opacity="0.6"/>
+    <rect x="-442" y="-192" width="884" height="384" rx="6" fill="none" stroke="#c9d7e1" stroke-width="1" opacity="0.22"/>
+
+    <!-- 拉丝纹理 -->
+    <g stroke="#dfe9f0" stroke-width="1" opacity="0.1">
+      <line x1="-450" y1="-150" x2="450" y2="-150"/>
+      <line x1="-450" y1="-120" x2="450" y2="-120"/>
+      <line x1="-450" y1="-90" x2="450" y2="-90"/>
+      <line x1="-450" y1="-60" x2="450" y2="-60"/>
+      <line x1="-450" y1="-30" x2="450" y2="-30"/>
+      <line x1="-450" y1="0" x2="450" y2="0"/>
+      <line x1="-450" y1="30" x2="450" y2="30"/>
+      <line x1="-450" y1="60" x2="450" y2="60"/>
+      <line x1="-450" y1="90" x2="450" y2="90"/>
+      <line x1="-450" y1="120" x2="450" y2="120"/>
+      <line x1="-450" y1="150" x2="450" y2="150"/>
+    </g>
+
+    <!-- 反光条 -->
+    <path d="M-470 -150 L-140 -220 L60 -220 L-300 -80 Z" fill="url(#shine)"/>
+    <path d="M210 220 L470 96 L470 168 L300 220 Z" fill="#ffffff" opacity="0.06"/>
+
+    <!-- 划痕 -->
+    <g stroke="#e9f2f8" stroke-width="1.2" opacity="0.16">
+      <path d="M-360 -60 L-120 30"/>
+      <path d="M-300 90 L40 -30"/>
+      <path d="M120 -120 L330 60"/>
+      <path d="M180 130 L400 120"/>
+    </g>
+    <g stroke="#1b2a34" stroke-width="2" opacity="0.28">
+      <path d="M-220 40 L60 44"/>
+      <path d="M-150 92 L210 96"/>
+    </g>
+
+    <!-- 指甲刻痕 -->
+    <path d="M-380 150 Q-250 142 -120 156 Q-40 164 30 152" stroke="#1a2731" stroke-width="3" fill="none" opacity="0.55"/>
+    <path d="M-378 146 Q-250 138 -120 152" stroke="#e8f1f7" stroke-width="1" fill="none" opacity="0.25"/>
+
+    <!-- 铆钉 -->
+    <g>
+      <circle cx="-420" cy="-172" r="17" fill="#05090c" opacity="0.7"/>
+      <circle cx="-420" cy="-172" r="15" fill="url(#rivet)"/>
+      <circle cx="420" cy="-172" r="17" fill="#05090c" opacity="0.7"/>
+      <circle cx="420" cy="-172" r="15" fill="url(#rivet)"/>
+      <circle cx="-420" cy="172" r="17" fill="#05090c" opacity="0.7"/>
+      <circle cx="-420" cy="172" r="15" fill="url(#rivet)"/>
+      <circle cx="420" cy="172" r="17" fill="#05090c" opacity="0.7"/>
+      <circle cx="420" cy="172" r="15" fill="url(#rivet)"/>
+    </g>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#vign)"/>
+  <rect width="1600" height="900" filter="url(#grain)" opacity="0.07" style="mix-blend-mode:overlay"/>
+</svg>

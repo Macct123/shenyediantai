@@ -1,0 +1,227 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#050d16"/>
+      <stop offset="0.42" stop-color="#0a1b2a"/>
+      <stop offset="0.78" stop-color="#123049"/>
+      <stop offset="1" stop-color="#1b415c"/>
+    </linearGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#173a54"/>
+      <stop offset="0.3" stop-color="#0f273a"/>
+      <stop offset="0.72" stop-color="#081522"/>
+      <stop offset="1" stop-color="#040a11"/>
+    </linearGradient>
+    <linearGradient id="rock" x1="0.2" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#1a2833"/>
+      <stop offset="0.5" stop-color="#0d1720"/>
+      <stop offset="1" stop-color="#05090e"/>
+    </linearGradient>
+    <linearGradient id="wall" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#243746"/>
+      <stop offset="0.55" stop-color="#16283a"/>
+      <stop offset="1" stop-color="#0b1723"/>
+    </linearGradient>
+    <linearGradient id="roof" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#2a3a48"/>
+      <stop offset="1" stop-color="#0a141d"/>
+    </linearGradient>
+    <linearGradient id="tower" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0b1620"/>
+      <stop offset="0.45" stop-color="#1b2f3d"/>
+      <stop offset="1" stop-color="#070f16"/>
+    </linearGradient>
+    <radialGradient id="win" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe1b0"/>
+      <stop offset="0.6" stop-color="#e0a45e"/>
+      <stop offset="1" stop-color="#8a5a2a"/>
+    </radialGradient>
+    <radialGradient id="winGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd8a3" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="beacon" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff3d8" stop-opacity="0.95"/>
+      <stop offset="0.25" stop-color="#ffe1b0" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffe9c8" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#ffe9c8" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="vign" cx="0.5" cy="0.46" r="0.72">
+      <stop offset="0.42" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.78"/>
+    </radialGradient>
+    <pattern id="rain" width="150" height="300" patternUnits="userSpaceOnUse" patternTransform="rotate(11)">
+      <line x1="16" y1="0" x2="16" y2="58" stroke="#cfe4f7" stroke-opacity="0.1" stroke-width="2"/>
+      <line x1="64" y1="40" x2="64" y2="104" stroke="#cfe4f7" stroke-opacity="0.07" stroke-width="2"/>
+      <line x1="112" y1="126" x2="112" y2="188" stroke="#cfe4f7" stroke-opacity="0.08" stroke-width="2"/>
+      <line x1="40" y1="200" x2="40" y2="268" stroke="#cfe4f7" stroke-opacity="0.06" stroke-width="2"/>
+    </pattern>
+    <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="softS"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.84" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+
+  <!-- 夜空 -->
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <g fill="#14324a" opacity="0.5" filter="url(#soft)">
+    <ellipse cx="360" cy="150" rx="320" ry="70"/>
+    <ellipse cx="980" cy="100" rx="380" ry="80"/>
+    <ellipse cx="1360" cy="200" rx="300" ry="64"/>
+    <ellipse cx="700" cy="230" rx="420" ry="60"/>
+  </g>
+  <g fill="#1d4a68" opacity="0.18">
+    <ellipse cx="300" cy="300" rx="340" ry="26"/>
+    <ellipse cx="1120" cy="340" rx="380" ry="22"/>
+  </g>
+
+  <!-- 海 -->
+  <rect x="0" y="470" width="1600" height="430" fill="url(#sea)"/>
+  <rect x="0" y="468" width="1600" height="4" fill="#2a5372" opacity="0.5"/>
+  <path d="M0 470 Q120 462 240 470 Q360 478 480 470 Q600 462 720 470 Q840 478 960 470 Q1080 462 1200 470 Q1320 478 1440 470 Q1520 464 1600 470 L1600 520 L0 520 Z"
+        fill="#1b3d59" opacity="0.45"/>
+  <g stroke="#3f7397" stroke-width="2" opacity="0.18">
+    <path d="M80 540 Q240 534 400 542"/>
+    <path d="M520 578 Q700 570 880 580"/>
+    <path d="M1040 552 Q1220 544 1400 554"/>
+    <path d="M180 640 Q360 632 540 642"/>
+    <path d="M760 690 Q960 680 1160 692"/>
+    <path d="M1180 740 Q1340 732 1520 742"/>
+  </g>
+  <!-- 灯塔倒影 -->
+  <g opacity="0.16">
+    <rect x="1128" y="500" width="10" height="120" fill="#ffe1b0"/>
+    <rect x="1112" y="520" width="44" height="4" fill="#ffe1b0"/>
+    <rect x="1104" y="560" width="60" height="3" fill="#ffe1b0"/>
+    <rect x="1116" y="600" width="36" height="3" fill="#ffe1b0"/>
+  </g>
+
+  <!-- 礁石海岸 -->
+  <path d="M0 900 L0 640 Q120 606 260 636 Q380 662 470 640 Q560 620 640 654 Q700 678 760 700 L760 900 Z" fill="url(#rock)"/>
+  <path d="M1320 900 L1600 900 L1600 690 Q1480 656 1360 686 Q1300 702 1320 740 Z" fill="url(#rock)"/>
+  <g fill="#0a141d" opacity="0.8">
+    <path d="M120 700 Q200 662 290 694 Q240 722 150 726 Z"/>
+    <path d="M420 720 Q500 690 570 722 Q510 750 430 748 Z"/>
+  </g>
+  <g stroke="#7fa8c4" stroke-width="2" opacity="0.14">
+    <path d="M60 690 Q180 676 300 692"/>
+    <path d="M380 706 Q500 692 620 712"/>
+  </g>
+
+  <!-- 广播站主楼 -->
+  <g>
+    <!-- 地基 -->
+    <path d="M400 646 L980 646 L980 690 L400 690 Z" fill="#0a141d"/>
+    <!-- 楼体 -->
+    <path d="M430 646 L430 388 L950 388 L950 646 Z" fill="url(#wall)"/>
+    <path d="M430 388 L950 388 L930 350 L450 350 Z" fill="url(#roof)"/>
+    <path d="M430 388 L950 388 L950 396 L430 396 Z" fill="#2f4657" opacity="0.7"/>
+    <!-- 屋檐阴影 -->
+    <path d="M440 396 L940 396 L940 418 L440 418 Z" fill="#0a141d" opacity="0.5"/>
+    <!-- 墙面砖缝 -->
+    <g stroke="#0a141d" stroke-width="2" opacity="0.3">
+      <path d="M430 470 L950 470"/>
+      <path d="M430 548 L950 548"/>
+      <path d="M560 388 L560 646"/>
+      <path d="M820 388 L820 646"/>
+    </g>
+    <!-- 楼层挑檐 -->
+    <path d="M418 520 L962 520 L962 534 L418 534 Z" fill="#22394a"/>
+    <path d="M418 534 L962 534 L962 542 L418 542 Z" fill="#050b11" opacity="0.7"/>
+
+    <!-- 窗户 -->
+    <g>
+      <rect x="470" y="430" width="86" height="66" fill="#0a1622" stroke="#2f4657" stroke-width="3"/>
+      <rect x="480" y="440" width="66" height="46" fill="url(#win)"/>
+      <ellipse cx="513" cy="463" rx="96" ry="72" fill="url(#winGlow)"/>
+      <line x1="513" y1="430" x2="513" y2="496" stroke="#13202c" stroke-width="4"/>
+      <line x1="470" y1="463" x2="556" y2="463" stroke="#13202c" stroke-width="3"/>
+
+      <rect x="600" y="430" width="86" height="66" fill="#0a1622" stroke="#2f4657" stroke-width="3"/>
+      <rect x="610" y="440" width="66" height="46" fill="#12202c"/>
+      <line x1="643" y1="430" x2="643" y2="496" stroke="#13202c" stroke-width="4"/>
+
+      <rect x="730" y="430" width="86" height="66" fill="#0a1622" stroke="#2f4657" stroke-width="3"/>
+      <rect x="740" y="440" width="66" height="46" fill="url(#win)"/>
+      <ellipse cx="773" cy="463" rx="96" ry="72" fill="url(#winGlow)"/>
+      <line x1="773" y1="430" x2="773" y2="496" stroke="#13202c" stroke-width="4"/>
+
+      <rect x="856" y="430" width="70" height="66" fill="#0a1622" stroke="#2f4657" stroke-width="3"/>
+      <rect x="866" y="440" width="50" height="46" fill="#1a1410"/>
+      <ellipse cx="891" cy="463" rx="64" ry="60" fill="url(#winGlow)" opacity="0.6"/>
+
+      <!-- 二层窗 -->
+      <rect x="470" y="570" width="86" height="56" fill="#0a1622" stroke="#2f4657" stroke-width="3"/>
+      <rect x="480" y="580" width="66" height="36" fill="#132434"/>
+      <rect x="600" y="570" width="86" height="56" fill="#0a1622" stroke="#2f4657" stroke-width="3"/>
+      <rect x="610" y="580" width="66" height="36" fill="url(#win)"/>
+      <ellipse cx="643" cy="598" rx="86" ry="56" fill="url(#winGlow)" opacity="0.7"/>
+      <rect x="730" y="570" width="86" height="56" fill="#0a1622" stroke="#2f4657" stroke-width="3"/>
+      <rect x="740" y="580" width="66" height="36" fill="#101c26"/>
+      <rect x="856" y="570" width="70" height="56" fill="#0a1622" stroke="#2f4657" stroke-width="3"/>
+      <rect x="866" y="580" width="50" height="36" fill="#101c26"/>
+    </g>
+
+    <!-- 门与门灯 -->
+    <rect x="650" y="640" width="80" height="50" fill="#0b1724" stroke="#2f4657" stroke-width="3"/>
+    <rect x="690" y="660" width="6" height="18" fill="#3a5670"/>
+    <circle cx="734" cy="640" r="6" fill="#ffd8a3"/>
+    <ellipse cx="734" cy="642" rx="52" ry="40" fill="url(#winGlow)"/>
+
+    <!-- 天线与斜拉线 -->
+    <line x1="960" y1="350" x2="960" y2="96" stroke="#16283a" stroke-width="5"/>
+    <line x1="930" y1="170" x2="990" y2="170" stroke="#16283a" stroke-width="4"/>
+    <line x1="920" y1="220" x2="1000" y2="220" stroke="#16283a" stroke-width="3"/>
+    <circle cx="960" cy="96" r="4" fill="#b4543f"/>
+    <g stroke="#0f1c26" stroke-width="1.6" opacity="0.8">
+      <line x1="960" y1="120" x2="1060" y2="330"/>
+      <line x1="960" y1="120" x2="860" y2="330"/>
+    </g>
+
+    <!-- 招牌（无文字，只有灯管边框） -->
+    <rect x="600" y="616" width="220" height="18" rx="3" fill="#0a1622" stroke="#2f4657" stroke-width="2"/>
+    <rect x="606" y="620" width="208" height="10" fill="#e0a45e" opacity="0.22"/>
+  </g>
+
+  <!-- 灯塔 -->
+  <g>
+    <path d="M1092 900 L1112 250 L1168 250 L1188 900 Z" fill="url(#tower)"/>
+    <path d="M1092 900 L1104 250 L1120 250 L1110 900 Z" fill="#0f1f2b" opacity="0.7"/>
+    <g fill="#0a1620">
+      <path d="M1104 520 L1176 520 L1174 470 L1106 470 Z"/>
+      <path d="M1108 400 L1172 400 L1170 356 L1110 356 Z"/>
+      <path d="M1112 300 L1168 300 L1167 268 L1113 268 Z"/>
+    </g>
+    <!-- 平台 -->
+    <rect x="1088" y="238" width="104" height="14" rx="3" fill="#0d1a24"/>
+    <g stroke="#0d1a24" stroke-width="3">
+      <line x1="1096" y1="216" x2="1096" y2="238"/>
+      <line x1="1120" y1="216" x2="1120" y2="238"/>
+      <line x1="1144" y1="216" x2="1144" y2="238"/>
+      <line x1="1168" y1="216" x2="1168" y2="238"/>
+      <line x1="1184" y1="216" x2="1184" y2="238"/>
+      <line x1="1090" y1="216" x2="1190" y2="216"/>
+    </g>
+    <!-- 灯室 -->
+    <rect x="1108" y="176" width="64" height="42" rx="3" fill="#0a141c"/>
+    <rect x="1114" y="182" width="52" height="30" fill="#1d2f3c"/>
+    <path d="M1108 176 L1140 146 L1172 176 Z" fill="#0b1721"/>
+    <circle cx="1140" cy="192" r="9" fill="#fff3d8"/>
+    <circle cx="1140" cy="192" r="70" fill="url(#beacon)"/>
+    <!-- 光束 -->
+    <g opacity="0.9">
+      <path d="M1140 192 L-120 40 L-120 330 Z" fill="url(#beam)" opacity="0.5"/>
+      <path d="M1140 192 L1440 60 L1440 320 Z" fill="url(#beam)" opacity="0.42"/>
+    </g>
+  </g>
+
+  <!-- 雨与氛围 -->
+  <rect width="1600" height="900" fill="url(#rain)"/>
+  <rect width="1600" height="900" fill="url(#vign)"/>
+  <rect width="1600" height="900" filter="url(#grain)" opacity="0.07" style="mix-blend-mode:overlay"/>
+</svg>
