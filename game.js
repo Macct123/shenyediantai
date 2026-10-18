@@ -2714,14 +2714,9 @@
         var g = document.createElement('span');
         g.className = 'nav-glyph';
         g.setAttribute('aria-hidden', 'true');
-        g.textContent = ex.dir === 'left' ? '‹' : (ex.dir === 'down' ? '⌄' : '›');
-
-        var l = document.createElement('span');
-        l.className = 'nav-label';
-        l.textContent = ex.label;
+        g.textContent = ex.dir === 'left' ? '←' : (ex.dir === 'down' ? '↓' : '→');
 
         b.appendChild(g);
-        b.appendChild(l);
         b.addEventListener('click', function () { Scene.travel(ex.to, ex.dir); });
         self.el.hotspots.appendChild(b);
       });

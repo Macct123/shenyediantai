@@ -1341,38 +1341,36 @@ button { -webkit-tap-highlight-color: transparent; }
 
 .nav-arrow {
   position: absolute;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  width: 52px; height: 78px;
+  display: flex; align-items: center; justify-content: center;
+  width: 64px; height: 64px;
   padding: 0;
-  border: 1px solid rgba(201, 214, 226, 0.1);
-  border-radius: 26px;
-  background: linear-gradient(180deg, rgba(12, 22, 32, 0.5), rgba(6, 12, 18, 0.72));
-  color: rgba(214, 230, 243, 0.66);
+  border: none;
+  border-radius: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.78);
   cursor: pointer;
   z-index: 8;
-  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 .nav-arrow:hover, .nav-arrow:focus-visible {
-  color: #ffd9a3;
-  border-color: rgba(224, 164, 94, 0.45);
-  background: rgba(24, 40, 54, 0.82);
+  color: #fff;
   outline: none;
 }
-.nav-glyph { font-size: 28px; line-height: 1; }
-.nav-label {
-  font-family: var(--serif); font-size: 9.5px; letter-spacing: 0.16em;
-  writing-mode: vertical-rl;
+.nav-glyph {
+  font-family: var(--sans);
+  font-size: 40px;
+  font-weight: 300;
+  line-height: 1;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95), 0 0 22px rgba(0, 0, 0, 0.6);
 }
-.nav-left { left: 12px; top: 50%; transform: translateY(-50%); }
-.nav-right { right: 12px; top: 50%; transform: translateY(-50%); }
-.nav-down {
-  left: 50%; bottom: 14px;
-  transform: translateX(-50%);
-  width: 86px; height: 50px;
-  flex-direction: row;
-}
-.nav-down .nav-label { writing-mode: horizontal-tb; }
-.nav-down .nav-glyph { font-size: 20px; }
+.nav-left { left: 10px; top: 50%; transform: translateY(-50%); }
+.nav-right { right: 10px; top: 50%; transform: translateY(-50%); }
+.nav-down { left: 50%; bottom: 10px; transform: translateX(-50%); }
+.nav-left:hover { transform: translateY(-50%) translateX(-2px); }
+.nav-right:hover { transform: translateY(-50%) translateX(2px); }
+.nav-down:hover { transform: translateX(-50%) translateY(2px); }
 
 @keyframes walk-out-left {
   to { transform: translate(calc(-50% - 9%), -50%); opacity: 0.12; }
@@ -1608,11 +1606,11 @@ button { -webkit-tap-highlight-color: transparent; }
 
 @media (max-width: 560px) {
   .room-tag { left: 10px; top: 8px; font-size: 9.5px; }
-  .nav-arrow { width: 42px; height: 62px; }
-  .nav-left { left: 6px; }
-  .nav-right { right: 6px; }
-  .nav-down { width: 72px; height: 42px; bottom: 8px; }
-  .nav-glyph { font-size: 22px; }
+  .nav-arrow { width: 52px; height: 52px; }
+  .nav-left { left: 4px; }
+  .nav-right { right: 4px; }
+  .nav-down { width: 52px; height: 52px; bottom: 6px; }
+  .nav-glyph { font-size: 32px; }
   .inventory { left: 8px; bottom: 8px; gap: 6px; padding: 5px; }
   .inv-slot { width: 46px; min-height: 46px; }
   .inv-icon svg { width: 20px; height: 20px; }
