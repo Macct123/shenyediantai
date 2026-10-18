@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#0c1a26"/>
+      <stop offset="0.6" stop-color="#081119"/>
+      <stop offset="1" stop-color="#04080c"/>
+    </linearGradient>
+    <linearGradient id="desk" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#1b2a31"/>
+      <stop offset="0.4" stop-color="#111c24"/>
+      <stop offset="1" stop-color="#060c12"/>
+    </linearGradient>
+    <linearGradient id="pageL" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#d6c9ae"/>
+      <stop offset="0.55" stop-color="#b6a88e"/>
+      <stop offset="1" stop-color="#8c7f68"/>
+    </linearGradient>
+    <linearGradient id="pageR" x1="0.2" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#cbbda1"/>
+      <stop offset="0.55" stop-color="#a99b81"/>
+      <stop offset="1" stop-color="#7d705c"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#0a141c" stop-opacity="0.04"/>
+      <stop offset="0.6" stop-color="#0a141c" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#050a0f" stop-opacity="0.62"/>
+    </linearGradient>
+    <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffcf94" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vign" cx="0.5" cy="0.48" r="0.72">
+      <stop offset="0.4" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.84"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="20"/></filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <ellipse cx="440" cy="180" rx="600" ry="420" fill="url(#lamp)"/>
+
+  <!-- 桌面 -->
+  <rect x="0" y="640" width="1600" height="260" fill="url(#desk)"/>
+  <rect x="0" y="640" width="1600" height="3" fill="#2c4256" opacity="0.4"/>
+
+  <!-- 书投影 -->
+  <path d="M250 260 L1380 278 L1340 780 L290 802 Z" fill="#02060a" opacity="0.85" filter="url(#soft)"/>
+
+  <!-- 书 -->
+  <g transform="rotate(-1.2 800 520)">
+    <!-- 封皮 -->
+    <path d="M236 238 L810 256 L810 792 L262 772 Z" fill="#0a151f"/>
+    <path d="M810 256 L1364 238 L1338 772 L810 792 Z" fill="#08121a"/>
+    <!-- 左页 -->
+    <path d="M268 266 L790 282 L790 766 L292 748 Z" fill="url(#pageL)"/>
+    <path d="M268 266 L790 282 L790 766 L292 748 Z" fill="url(#shade)"/>
+    <path d="M268 266 L790 282 L790 766 L292 748 Z" fill="#26313a" opacity="0.16"/>
+    <!-- 右页 -->
+    <path d="M810 282 L1330 264 L1310 748 L810 766 Z" fill="url(#pageR)"/>
+    <path d="M810 282 L1330 264 L1310 748 L810 766 Z" fill="url(#shade)"/>
+    <path d="M810 282 L1330 264 L1310 748 L810 766 Z" fill="#26313a" opacity="0.14"/>
+
+    <!-- 书脊 -->
+    <rect x="790" y="270" width="24" height="502" fill="#0a151f" opacity="0.8"/>
+    <line x1="802" y1="272" x2="802" y2="770" stroke="#4c4436" stroke-width="2" opacity="0.5"/>
+
+    <!-- 左页表格 -->
+    <g stroke="#5a5342" stroke-width="1.6" opacity="0.5">
+      <line x1="312" y1="330" x2="748" y2="342"/>
+      <line x1="312" y1="386" x2="748" y2="398"/>
+      <line x1="312" y1="442" x2="748" y2="454"/>
+      <line x1="312" y1="498" x2="748" y2="510"/>
+      <line x1="312" y1="554" x2="748" y2="566"/>
+      <line x1="312" y1="610" x2="748" y2="622"/>
+      <line x1="312" y1="666" x2="748" y2="678"/>
+      <line x1="452" y1="306" x2="458" y2="704"/>
+      <line x1="614" y1="310" x2="620" y2="710"/>
+    </g>
+    <!-- 左页墨点与手写痕迹 -->
+    <g stroke="#3f3a2e" stroke-width="2" opacity="0.38">
+      <path d="M330 356 Q400 350 442 358"/>
+      <path d="M470 352 Q540 346 596 356"/>
+      <path d="M330 412 Q410 404 440 414"/>
+      <path d="M470 410 Q560 402 600 412"/>
+      <path d="M330 468 Q396 460 440 470"/>
+      <path d="M632 466 Q690 458 736 468"/>
+      <path d="M330 524 Q420 516 444 526"/>
+      <path d="M470 522 Q560 514 602 524"/>
+      <path d="M330 636 Q400 628 440 638"/>
+    </g>
+
+    <!-- 右页：罗盘玫瑰 -->
+    <g transform="translate(1058 430)">
+      <circle r="112" fill="none" stroke="#4b4536" stroke-width="2" opacity="0.55"/>
+      <circle r="92" fill="none" stroke="#4b4536" stroke-width="1.4" opacity="0.4"/>
+      <g stroke="#4b4536" stroke-width="1.6" opacity="0.5">
+        <line x1="0" y1="-86" x2="0" y2="86"/>
+        <line x1="-86" y1="0" x2="86" y2="0"/>
+        <line x1="-62" y1="-62" x2="62" y2="62"/>
+        <line x1="-62" y1="62" x2="62" y2="-62"/>
+      </g>
+      <path d="M0 -104 L16 -18 L0 0 L-16 -18 Z" fill="#7d3f31" opacity="0.75"/>
+      <path d="M0 104 L16 18 L0 0 L-16 18 Z" fill="#3e4b52" opacity="0.65"/>
+      <circle r="9" fill="#c9bda6" opacity="0.6"/>
+      <!-- 磁差偏角弧线 -->
+      <path d="M0 -86 A86 86 0 0 1 42 -75" fill="none" stroke="#7d3f31" stroke-width="2.4" opacity="0.75"/>
+      <line x1="0" y1="0" x2="46" y2="-74" stroke="#7d3f31" stroke-width="1.6" opacity="0.7" stroke-dasharray="5 5"/>
+    </g>
+
+    <!-- 右页潮汐曲线 -->
+    <g transform="translate(868 638)" opacity="0.55">
+      <path d="M0 60 Q40 8 84 40 Q128 72 170 28 Q212 -6 254 34 Q292 70 336 36"
+            fill="none" stroke="#4b4536" stroke-width="2"/>
+      <line x1="-6" y1="92" x2="350" y2="92" stroke="#4b4536" stroke-width="1.4"/>
+      <g stroke="#4b4536" stroke-width="1.2">
+        <line x1="0" y1="88" x2="0" y2="96"/>
+        <line x1="70" y1="88" x2="70" y2="96"/>
+        <line x1="140" y1="88" x2="140" y2="96"/>
+        <line x1="210" y1="88" x2="210" y2="96"/>
+        <line x1="280" y1="88" x2="280" y2="96"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- 书签 -->
+  <path d="M760 762 L796 758 L792 858 L774 838 L758 856 Z" fill="#7d3f31" opacity="0.75"/>
+
+  <rect width="1600" height="900" fill="url(#vign)"/>
+</svg>

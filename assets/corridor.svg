@@ -1,0 +1,248 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="cwall" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#101f2c"/>
+      <stop offset="0.48" stop-color="#0b1823"/>
+      <stop offset="1" stop-color="#060e16"/>
+    </linearGradient>
+    <linearGradient id="cwood" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#1b2a31"/>
+      <stop offset="0.3" stop-color="#131f26"/>
+      <stop offset="1" stop-color="#070d12"/>
+    </linearGradient>
+    <linearGradient id="cmetal" x1="0" y1="0" x2="0.25" y2="1">
+      <stop offset="0" stop-color="#243A4C"/>
+      <stop offset="0.5" stop-color="#172A3A"/>
+      <stop offset="1" stop-color="#0A151F"/>
+    </linearGradient>
+    <linearGradient id="cpaper" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#c9bda6"/>
+      <stop offset="1" stop-color="#8f8069"/>
+    </linearGradient>
+    <linearGradient id="cdoor" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#1a2b36"/>
+      <stop offset="0.6" stop-color="#0f1c25"/>
+      <stop offset="1" stop-color="#070e14"/>
+    </linearGradient>
+    <linearGradient id="csea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16334c"/>
+      <stop offset="0.5" stop-color="#0e2233"/>
+      <stop offset="1" stop-color="#081520"/>
+    </linearGradient>
+    <radialGradient id="cbulb" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe6bd" stop-opacity="0.95"/>
+      <stop offset="0.22" stop-color="#f0b877" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cpool" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#e0a45e" stop-opacity="0.22"/>
+      <stop offset="0.62" stop-color="#c98a4a" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#c98a4a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cvign" cx="0.5" cy="0.46" r="0.76">
+      <stop offset="0.4" stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.78" stop-color="#000" stop-opacity="0.36"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.82"/>
+    </radialGradient>
+    <filter id="cpaint" x="-4%" y="-4%" width="108%" height="108%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.008 0.018" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="15" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="cpaint2" x="-4%" y="-4%" width="108%" height="108%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.016 0.03" numOctaves="2" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="cblurS"><feGaussianBlur stdDeviation="4"/></filter>
+    <filter id="cblurL"><feGaussianBlur stdDeviation="22"/></filter>
+    <clipPath id="cwinClip"><rect x="1578" y="196" width="228" height="212" rx="3"/></clipPath>
+  </defs>
+
+  <!-- 墙 -->
+  <rect x="-40" y="-40" width="2000" height="1180" fill="url(#cwall)" filter="url(#cpaint)"/>
+  <rect x="-40" y="-40" width="2000" height="1180" fill="#1a3346" opacity="0.1" filter="url(#cpaint2)"/>
+
+  <!-- 护墙板 -->
+  <rect x="-20" y="640" width="1960" height="270" fill="#0a141d" opacity="0.55"/>
+  <rect x="-20" y="636" width="1960" height="10" fill="#22394d" opacity="0.45"/>
+  <g stroke="#050b11" stroke-width="3" opacity="0.6">
+    <line x1="330" y1="646" x2="330" y2="900"/>
+    <line x1="700" y1="646" x2="700" y2="900"/>
+    <line x1="1060" y1="646" x2="1060" y2="900"/>
+    <line x1="1420" y1="646" x2="1420" y2="900"/>
+  </g>
+
+  <!-- 地板 -->
+  <rect x="-20" y="892" width="1960" height="200" fill="url(#cwood)" filter="url(#cpaint)"/>
+  <rect x="0" y="892" width="1920" height="4" fill="#2a4054" opacity="0.5"/>
+  <g stroke="#050b11" stroke-width="2" opacity="0.55">
+    <path d="M0 940 Q480 934 960 944 Q1440 954 1920 938"/>
+    <path d="M0 1000 Q520 992 1040 1004 Q1500 1016 1920 996"/>
+    <path d="M0 1058 Q460 1050 920 1062 Q1400 1074 1920 1054"/>
+  </g>
+
+  <!-- 左门（回播音室） -->
+  <g>
+    <rect x="48" y="196" width="272" height="700" fill="#04090e"/>
+    <rect x="60" y="208" width="248" height="688" fill="url(#cdoor)"/>
+    <rect x="60" y="208" width="248" height="688" fill="none" stroke="#22394d" stroke-width="4"/>
+    <rect x="86" y="240" width="196" height="250" fill="#08131c" stroke="#1a2c3d" stroke-width="3"/>
+    <rect x="86" y="522" width="196" height="330" fill="#08131c" stroke="#1a2c3d" stroke-width="3"/>
+    <circle cx="274" cy="580" r="12" fill="#2a4055" stroke="#40607a" stroke-width="2"/>
+    <circle cx="274" cy="580" r="4" fill="#c79a5f" opacity="0.7"/>
+    <!-- 门缝下透出的光 -->
+    <rect x="70" y="884" width="228" height="5" fill="#e0a45e" opacity="0.28" filter="url(#cblurS)"/>
+    <ellipse cx="184" cy="892" rx="180" ry="34" fill="url(#cpool)" opacity="0.7"/>
+  </g>
+
+  <!-- 右侧楼梯（去天线平台） -->
+  <g>
+    <rect x="1494" y="180" width="386" height="716" fill="#04090e"/>
+    <rect x="1510" y="196" width="354" height="700" fill="#0a141d"/>
+    <path d="M1510 896 L1510 700 L1864 520 L1864 896 Z" fill="#0b1721"/>
+    <g fill="#0e1e2a" stroke="#1c3040" stroke-width="2">
+      <rect x="1518" y="846" width="338" height="34"/>
+      <rect x="1552" y="790" width="304" height="32"/>
+      <rect x="1586" y="736" width="270" height="30"/>
+      <rect x="1620" y="684" width="236" height="28"/>
+      <rect x="1654" y="634" width="202" height="26"/>
+      <rect x="1688" y="586" width="168" height="24"/>
+    </g>
+    <g stroke="#e0a45e" stroke-opacity="0.16" stroke-width="2">
+      <line x1="1518" y1="880" x2="1856" y2="880"/>
+      <line x1="1552" y1="822" x2="1856" y2="822"/>
+      <line x1="1586" y1="766" x2="1856" y2="766"/>
+    </g>
+    <path d="M1700 196 L1864 196 L1864 470 L1700 470 Z" fill="#061019"/>
+    <ellipse cx="1740" cy="900" rx="150" ry="30" fill="url(#cpool)" opacity="0.45"/>
+  </g>
+
+  <!-- 右侧小窗 -->
+  <g>
+    <rect x="1566" y="184" width="252" height="236" fill="#050a11"/>
+    <rect x="1572" y="190" width="240" height="224" fill="#0c1b28" stroke="#1a2c3d" stroke-width="5"/>
+    <g clip-path="url(#cwinClip)">
+      <rect x="1578" y="196" width="228" height="212" fill="url(#csea)"/>
+      <rect x="1578" y="300" width="228" height="2" fill="#2a5372" opacity="0.5"/>
+      <path d="M1600 306 Q1640 300 1680 304 Q1720 308 1760 302 L1806 306 L1806 408 L1578 408 Z" fill="#081420" opacity="0.9"/>
+      <rect x="1578" y="196" width="228" height="212" fill="#cfe4f7" opacity="0.04"/>
+      <g fill="#cfe4f7" opacity="0.12">
+        <rect x="1600" y="220" width="2" height="54" transform="rotate(10 1600 220)"/>
+        <rect x="1650" y="250" width="2" height="62" transform="rotate(10 1650 250)"/>
+        <rect x="1712" y="214" width="2" height="48" transform="rotate(10 1712 214)"/>
+        <rect x="1768" y="262" width="2" height="58" transform="rotate(10 1768 262)"/>
+      </g>
+    </g>
+    <line x1="1692" y1="196" x2="1692" y2="408" stroke="#16283a" stroke-width="8"/>
+    <line x1="1578" y1="302" x2="1806" y2="302" stroke="#16283a" stroke-width="7"/>
+  </g>
+
+  <!-- 航海年鉴 -->
+  <g transform="rotate(-1.4 522 476)">
+    <rect x="424" y="366" width="204" height="222" fill="#071019"/>
+    <rect x="432" y="374" width="188" height="206" fill="#1b3244"/>
+    <rect x="432" y="374" width="188" height="206" fill="url(#cpaper)" opacity="0.3"/>
+    <rect x="432" y="374" width="188" height="206" fill="#0f2231" opacity="0.42"/>
+    <g stroke="#8fb4c9" stroke-width="0.9" opacity="0.28">
+      <line x1="448" y1="404" x2="604" y2="404"/>
+      <line x1="448" y1="432" x2="604" y2="432"/>
+      <line x1="448" y1="460" x2="604" y2="460"/>
+      <line x1="448" y1="488" x2="604" y2="488"/>
+      <line x1="448" y1="516" x2="604" y2="516"/>
+      <line x1="448" y1="544" x2="604" y2="544"/>
+    </g>
+    <circle cx="566" cy="462" r="20" fill="none" stroke="#b4543f" stroke-width="2" opacity="0.5"/>
+    <circle cx="444" cy="382" r="4" fill="#c9a06a" opacity="0.7"/>
+    <circle cx="608" cy="382" r="4" fill="#c9a06a" opacity="0.7"/>
+  </g>
+
+  <!-- 保险丝盒 -->
+  <g>
+    <rect x="768" y="196" width="166" height="196" rx="4" fill="#050d14"/>
+    <rect x="774" y="202" width="154" height="184" rx="3" fill="url(#cmetal)"/>
+    <rect x="774" y="202" width="154" height="184" rx="3" fill="none" stroke="#2a4055" stroke-width="3"/>
+    <rect x="790" y="218" width="122" height="120" fill="#08131c" stroke="#1e3345" stroke-width="2"/>
+    <g fill="#0c1926" stroke="#2f4a5f" stroke-width="1.6">
+      <rect x="802" y="230" width="24" height="42" rx="2"/>
+      <rect x="838" y="230" width="24" height="42" rx="2"/>
+      <rect x="874" y="230" width="24" height="42" rx="2"/>
+      <rect x="802" y="284" width="24" height="42" rx="2" stroke-dasharray="3 4"/>
+      <rect x="838" y="284" width="24" height="42" rx="2"/>
+    </g>
+    <circle cx="842" cy="360" r="5" fill="#3a2a1a"/>
+    <path d="M851 196 L851 120 L820 120" stroke="#1b2c3a" stroke-width="6" fill="none"/>
+    <path d="M851 392 L851 470" stroke="#1b2c3a" stroke-width="6" fill="none"/>
+  </g>
+
+  <!-- 储物柜 -->
+  <g>
+    <rect x="1236" y="286" width="232" height="512" fill="#050c12"/>
+    <rect x="1244" y="294" width="216" height="496" fill="url(#cmetal)"/>
+    <rect x="1244" y="294" width="216" height="496" fill="none" stroke="#2a4055" stroke-width="3"/>
+    <path d="M1244 420 L1460 420 M1244 546 L1460 546 M1244 672 L1460 672" stroke="#0a151f" stroke-width="5"/>
+    <g stroke="#0a151f" stroke-width="3" opacity="0.7">
+      <line x1="1262" y1="322" x2="1442" y2="322"/>
+      <line x1="1262" y1="334" x2="1442" y2="334"/>
+      <line x1="1262" y1="346" x2="1442" y2="346"/>
+      <line x1="1262" y1="358" x2="1442" y2="358"/>
+      <line x1="1262" y1="370" x2="1442" y2="370"/>
+      <line x1="1262" y1="382" x2="1442" y2="382"/>
+    </g>
+    <rect x="1424" y="430" width="8" height="54" rx="4" fill="#2a4055"/>
+    <rect x="1424" y="556" width="8" height="54" rx="4" fill="#2a4055"/>
+    <!-- 锁 -->
+    <g>
+      <rect x="1394" y="640" width="34" height="30" rx="3" fill="#1b2c38" stroke="#40607a" stroke-width="2"/>
+      <path d="M1402 640 L1402 628 Q1411 616 1420 628 L1420 640" fill="none" stroke="#40607a" stroke-width="3"/>
+      <circle cx="1411" cy="655" r="3" fill="#0a151f"/>
+    </g>
+    <ellipse cx="1356" cy="812" rx="180" ry="26" fill="#04090e" opacity="0.55" filter="url(#cblurL)"/>
+  </g>
+
+  <!-- 小桌与值班日志 -->
+  <g>
+    <rect x="966" y="716" width="316" height="22" fill="#1b2b33"/>
+    <rect x="966" y="716" width="316" height="5" fill="#33505f" opacity="0.6"/>
+    <rect x="986" y="738" width="16" height="158" fill="#0a141c"/>
+    <rect x="1246" y="738" width="16" height="158" fill="#0a141c"/>
+    <rect x="1004" y="706" width="150" height="14" fill="#0b1721" transform="rotate(-3 1004 706)"/>
+    <rect x="1030" y="700" width="150" height="16" fill="#c9bda6" opacity="0.72" transform="rotate(2 1030 700)"/>
+    <g stroke="#3d4f5c" stroke-width="1.4" opacity="0.55" transform="rotate(2 1030 700)">
+      <line x1="1046" y1="706" x2="1164" y2="706"/>
+      <line x1="1046" y1="712" x2="1150" y2="712"/>
+    </g>
+    <ellipse cx="1124" cy="820" rx="220" ry="60" fill="url(#cpool)" opacity="0.75"/>
+  </g>
+
+  <!-- 雨靴 -->
+  <g>
+    <ellipse cx="307" cy="892" rx="76" ry="18" fill="#04090e" opacity="0.6"/>
+    <path d="M258 800 Q258 778 276 776 L296 776 Q310 776 312 792 L314 856 Q336 860 338 878 L338 890 L256 890 L256 846 Z" fill="#0d1a23" stroke="#243c4b" stroke-width="2"/>
+    <path d="M330 790 Q330 770 348 768 L368 768 Q382 768 384 784 L386 852 Q408 856 410 874 L410 888 L328 888 L328 838 Z" fill="#0f1d27" stroke="#243c4b" stroke-width="2"/>
+    <path d="M262 812 Q286 806 310 812" fill="none" stroke="#2a4050" stroke-width="2" opacity="0.7"/>
+    <path d="M334 802 Q358 796 382 802" fill="none" stroke="#2a4050" stroke-width="2" opacity="0.7"/>
+    <rect x="246" y="884" width="176" height="14" rx="4" fill="#101c24"/>
+    <!-- 靴筒里露出的钥匙环 -->
+    <circle cx="306" cy="772" r="5" fill="none" stroke="#c9a06a" stroke-width="2" opacity="0.85"/>
+  </g>
+
+  <!-- 吊灯 -->
+  <g>
+    <line x1="998" y1="0" x2="998" y2="132" stroke="#0a141c" stroke-width="4"/>
+    <path d="M944 132 L1052 132 L1036 176 L960 176 Z" fill="#12222e"/>
+    <path d="M960 176 L1036 176 L1036 182 L960 182 Z" fill="#2b4a66" opacity="0.7"/>
+    <ellipse cx="998" cy="182" rx="34" ry="7" fill="#ffd8a3" opacity="0.8"/>
+    <circle cx="998" cy="182" r="180" fill="url(#cbulb)" opacity="0.55"/>
+    <circle cx="998" cy="182" r="86" fill="url(#cbulb)" opacity="0.8"/>
+  </g>
+
+  <!-- 墙上的潮气与水渍 -->
+  <g opacity="0.16">
+    <path d="M700 300 Q730 420 706 560" stroke="#5c7b8c" stroke-width="3" fill="none"/>
+    <path d="M1540 500 Q1560 560 1546 630" stroke="#5c7b8c" stroke-width="2" fill="none"/>
+    <ellipse cx="1180" cy="250" rx="90" ry="44" fill="#080f16"/>
+    <ellipse cx="380" cy="520" rx="70" ry="36" fill="#080f16"/>
+  </g>
+
+  <!-- 暗角 -->
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#cvign)"/>
+</svg>

@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#0c1a26"/>
+      <stop offset="0.6" stop-color="#081119"/>
+      <stop offset="1" stop-color="#04080c"/>
+    </linearGradient>
+    <linearGradient id="desk" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#1b2a31"/>
+      <stop offset="0.4" stop-color="#111c24"/>
+      <stop offset="1" stop-color="#060c12"/>
+    </linearGradient>
+    <linearGradient id="page" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#cfc2a6"/>
+      <stop offset="0.5" stop-color="#ac9e84"/>
+      <stop offset="1" stop-color="#7f725d"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#0a141c" stop-opacity="0.03"/>
+      <stop offset="0.62" stop-color="#0a141c" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#050a0f" stop-opacity="0.66"/>
+    </linearGradient>
+    <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffcf94" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vign" cx="0.5" cy="0.48" r="0.72">
+      <stop offset="0.4" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.84"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="20"/></filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <ellipse cx="1180" cy="200" rx="620" ry="420" fill="url(#lamp)"/>
+
+  <!-- 桌面 -->
+  <rect x="0" y="660" width="1600" height="240" fill="url(#desk)"/>
+
+  <!-- 投影 -->
+  <path d="M196 224 L1420 240 L1392 792 L232 812 Z" fill="#02060a" opacity="0.86" filter="url(#soft)"/>
+
+  <!-- 摊开的日志 -->
+  <g transform="rotate(1.4 800 520)">
+    <path d="M180 200 L800 218 L800 806 L208 786 Z" fill="#0a151f"/>
+    <path d="M800 218 L1418 200 L1392 786 L800 806 Z" fill="#08121a"/>
+
+    <path d="M214 232 L782 246 L782 780 L240 764 Z" fill="url(#page)"/>
+    <path d="M214 232 L782 246 L782 780 L240 764 Z" fill="url(#shade)"/>
+    <path d="M818 246 L1384 230 L1360 764 L818 780 Z" fill="url(#page)"/>
+    <path d="M818 246 L1384 230 L1360 764 L818 780 Z" fill="url(#shade)"/>
+
+    <rect x="782" y="240" width="36" height="544" fill="#0a151f" opacity="0.85"/>
+    <line x1="800" y1="242" x2="800" y2="782" stroke="#4c4436" stroke-width="2" opacity="0.5"/>
+
+    <!-- 左页表格 -->
+    <g stroke="#5a5342" stroke-width="1.5" opacity="0.5">
+      <line x1="252" y1="300" x2="746" y2="312"/>
+      <line x1="252" y1="358" x2="746" y2="370"/>
+      <line x1="252" y1="416" x2="746" y2="428"/>
+      <line x1="252" y1="474" x2="746" y2="486"/>
+      <line x1="252" y1="532" x2="746" y2="544"/>
+      <line x1="252" y1="590" x2="746" y2="602"/>
+      <line x1="252" y1="648" x2="746" y2="660"/>
+      <line x1="252" y1="706" x2="746" y2="718"/>
+      <line x1="410" y1="278" x2="416" y2="742"/>
+      <line x1="600" y1="282" x2="606" y2="746"/>
+    </g>
+
+    <!-- 手写字迹（不可读的笔画） -->
+    <g stroke="#3d382c" stroke-width="2.2" opacity="0.42">
+      <path d="M272 322 Q330 316 372 324"/>
+      <path d="M432 320 Q510 312 566 322"/>
+      <path d="M624 326 Q680 318 726 328"/>
+      <path d="M272 380 Q344 372 380 382"/>
+      <path d="M432 378 Q500 370 560 380"/>
+      <path d="M272 438 Q336 432 378 440"/>
+      <path d="M432 436 Q520 428 568 438"/>
+      <path d="M624 442 Q690 434 724 444"/>
+      <path d="M272 554 Q350 546 386 556"/>
+      <path d="M432 552 Q506 544 566 554"/>
+      <path d="M272 612 Q340 604 382 614"/>
+      <path d="M432 610 Q528 602 574 612"/>
+      <path d="M624 616 Q684 608 724 618"/>
+      <path d="M272 670 Q352 662 390 672"/>
+      <path d="M432 668 Q504 660 564 670"/>
+    </g>
+
+    <!-- 折角与污渍 -->
+    <path d="M240 232 L300 238 L250 292 Z" fill="#e0d4bb" opacity="0.4"/>
+    <g opacity="0.16">
+      <ellipse cx="420" cy="520" rx="90" ry="44" fill="#5b4a32"/>
+      <ellipse cx="1180" cy="400" rx="70" ry="34" fill="#5b4a32"/>
+      <path d="M960 700 Q1040 660 1120 690" stroke="#5b4a32" stroke-width="6" fill="none"/>
+    </g>
+
+    <!-- 右页：夜班记录的大字与圈注 -->
+    <g stroke="#3d382c" stroke-width="2.4" opacity="0.4">
+      <path d="M860 310 Q960 300 1060 312"/>
+      <path d="M860 360 Q940 352 1010 360"/>
+      <path d="M860 410 Q980 402 1080 414"/>
+      <path d="M860 500 Q950 492 1040 502"/>
+      <path d="M860 550 Q960 542 1060 552"/>
+    </g>
+    <ellipse cx="1120" cy="462" rx="96" ry="58" fill="none" stroke="#7d3f31" stroke-width="3" opacity="0.55"/>
+    <ellipse cx="1120" cy="462" rx="112" ry="70" fill="none" stroke="#7d3f31" stroke-width="1.4" opacity="0.3"/>
+
+    <!-- 红铅笔箭头 -->
+    <g stroke="#7d3f31" stroke-width="2.4" opacity="0.6">
+      <path d="M900 610 Q1010 590 1120 616"/>
+      <path d="M1104 604 L1124 616 L1106 630"/>
+    </g>
+  </g>
+
+  <!-- 铅笔 -->
+  <g transform="rotate(-24 1290 760)">
+    <rect x="1140" y="744" width="300" height="20" rx="4" fill="#3a2f22"/>
+    <rect x="1140" y="744" width="300" height="7" rx="3" fill="#5a4630"/>
+    <path d="M1440 744 L1480 754 L1440 764 Z" fill="#c9bda6"/>
+    <path d="M1470 751 L1480 754 L1470 757 Z" fill="#1b1b1b"/>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#vign)"/>
+</svg>

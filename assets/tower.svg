@@ -1,0 +1,199 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="tsky" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#050c15"/>
+      <stop offset="0.45" stop-color="#0a1a29"/>
+      <stop offset="1" stop-color="#10293c"/>
+    </linearGradient>
+    <linearGradient id="tsea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a3b55"/>
+      <stop offset="0.4" stop-color="#122a3e"/>
+      <stop offset="1" stop-color="#081520"/>
+    </linearGradient>
+    <linearGradient id="tdeck" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#1a2831"/>
+      <stop offset="0.4" stop-color="#111c24"/>
+      <stop offset="1" stop-color="#060c12"/>
+    </linearGradient>
+    <linearGradient id="tmetal" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#2a4254"/>
+      <stop offset="0.5" stop-color="#182b3a"/>
+      <stop offset="1" stop-color="#0a151f"/>
+    </linearGradient>
+    <linearGradient id="tlattice" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0a151f"/>
+      <stop offset="0.5" stop-color="#22394b"/>
+      <stop offset="1" stop-color="#0a151f"/>
+    </linearGradient>
+    <radialGradient id="tlamp" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe6bd" stop-opacity="0.95"/>
+      <stop offset="0.26" stop-color="#f0b877" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="tmoon" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#cfe4f7" stop-opacity="0.5"/>
+      <stop offset="0.35" stop-color="#8fb4c9" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#8fb4c9" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="tvign" cx="0.5" cy="0.46" r="0.76">
+      <stop offset="0.4" stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.78" stop-color="#000" stop-opacity="0.36"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.84"/>
+    </radialGradient>
+    <pattern id="train" width="190" height="380" patternUnits="userSpaceOnUse" patternTransform="rotate(14)">
+      <line x1="18" y1="0" x2="18" y2="66" stroke="#cfe4f7" stroke-opacity="0.1" stroke-width="2"/>
+      <line x1="70" y1="48" x2="70" y2="118" stroke="#cfe4f7" stroke-opacity="0.07" stroke-width="2"/>
+      <line x1="126" y1="146" x2="126" y2="220" stroke="#cfe4f7" stroke-opacity="0.08" stroke-width="2"/>
+    </pattern>
+    <filter id="tpaint" x="-4%" y="-4%" width="108%" height="108%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.008 0.018" numOctaves="2" seed="5" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="15" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="tblurS"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="tblurL"><feGaussianBlur stdDeviation="24"/></filter>
+  </defs>
+
+  <!-- 夜空 -->
+  <rect x="-40" y="-40" width="2000" height="1180" fill="url(#tsky)"/>
+  <circle cx="360" cy="150" r="190" fill="url(#tmoon)"/>
+  <circle cx="360" cy="150" r="54" fill="#dfe9f0" opacity="0.14"/>
+  <circle cx="360" cy="150" r="46" fill="#dfe9f0" opacity="0.1"/>
+
+  <!-- 云层 -->
+  <g opacity="0.35" filter="url(#tblurL)">
+    <ellipse cx="240" cy="270" rx="420" ry="92" fill="#0a1724"/>
+    <ellipse cx="980" cy="200" rx="520" ry="86" fill="#0b1a28"/>
+    <ellipse cx="1620" cy="300" rx="460" ry="100" fill="#091520"/>
+    <ellipse cx="700" cy="430" rx="620" ry="90" fill="#0a1622"/>
+  </g>
+
+  <!-- 海 -->
+  <rect x="-20" y="500" width="1960" height="330" fill="url(#tsea)"/>
+  <rect x="-20" y="500" width="1960" height="3" fill="#2a5372" opacity="0.4"/>
+  <g fill="#4f86ab" opacity="0.13">
+    <rect x="120" y="560" width="120" height="2"/>
+    <rect x="420" y="600" width="180" height="2"/>
+    <rect x="900" y="572" width="140" height="2"/>
+    <rect x="1320" y="620" width="210" height="2"/>
+    <rect x="1640" y="570" width="120" height="2"/>
+    <rect x="260" y="680" width="240" height="2"/>
+    <rect x="1100" y="700" width="200" height="2"/>
+  </g>
+
+  <!-- 远处礁石与灯塔 -->
+  <g>
+    <path d="M1310 520 Q1380 470 1440 494 Q1500 462 1580 500 Q1660 486 1740 528 L1740 560 L1310 560 Z" fill="#071119"/>
+    <path d="M1440 500 L1466 348 L1530 348 L1556 500 Z" fill="#0d1d2b"/>
+    <path d="M1440 500 L1466 348 L1530 348 L1556 500 Z" fill="none" stroke="#1b3346" stroke-width="2"/>
+    <g stroke="#172e40" stroke-width="2" opacity="0.8">
+      <line x1="1462" y1="390" x2="1534" y2="390"/>
+      <line x1="1458" y1="434" x2="1538" y2="434"/>
+      <line x1="1454" y1="478" x2="1542" y2="478"/>
+    </g>
+    <rect x="1456" y="332" width="84" height="18" fill="#132a3c"/>
+    <rect x="1470" y="308" width="56" height="26" fill="#1b3446"/>
+    <rect x="1476" y="314" width="44" height="14" fill="#ffe6bd" opacity="0.22"/>
+    <circle cx="1498" cy="302" r="12" fill="#ffe6bd" opacity="0.85"/>
+    <circle cx="1498" cy="302" r="150" fill="url(#tlamp)" opacity="0.32"/>
+    <path d="M1498 302 L1860 240 L1860 372 Z" fill="#ffe6bd" opacity="0.05"/>
+    <path d="M1498 302 L1160 236 L1160 376 Z" fill="#ffe6bd" opacity="0.04"/>
+    <!-- 灯室栏杆 -->
+    <g stroke="#0a151f" stroke-width="3">
+      <line x1="1468" y1="308" x2="1468" y2="330"/>
+      <line x1="1498" y1="306" x2="1498" y2="330"/>
+      <line x1="1528" y1="308" x2="1528" y2="330"/>
+    </g>
+  </g>
+
+  <!-- 天线塔 -->
+  <g>
+    <path d="M846 760 L872 180 L906 180 L932 760 Z" fill="#0a141d" opacity="0.9"/>
+    <path d="M846 760 L872 180 L906 180 L932 760" fill="none" stroke="url(#tlattice)" stroke-width="7"/>
+    <g stroke="#22394b" stroke-width="3" opacity="0.85">
+      <line x1="860" y1="700" x2="918" y2="660"/>
+      <line x1="866" y1="620" x2="912" y2="580"/>
+      <line x1="872" y1="540" x2="906" y2="500"/>
+      <line x1="876" y1="460" x2="902" y2="420"/>
+      <line x1="878" y1="380" x2="900" y2="340"/>
+      <line x1="880" y1="300" x2="898" y2="260"/>
+    </g>
+    <line x1="889" y1="120" x2="889" y2="200" stroke="#2a4055" stroke-width="4"/>
+    <circle cx="889" cy="112" r="6" fill="#e0a45e" opacity="0.8"/>
+    <circle cx="889" cy="112" r="40" fill="url(#tlamp)" opacity="0.35"/>
+    <!-- 拉索 -->
+    <g stroke="#0d1a24" stroke-width="2" opacity="0.7">
+      <line x1="889" y1="200" x2="430" y2="760"/>
+      <line x1="889" y1="200" x2="1330" y2="760"/>
+    </g>
+  </g>
+
+  <!-- 平台地板 -->
+  <path d="M-20 812 L1940 812 L1940 1100 L-20 1100 Z" fill="url(#tdeck)" filter="url(#tpaint)"/>
+  <rect x="-20" y="812" width="1960" height="4" fill="#2c4256" opacity="0.5"/>
+  <g stroke="#050b11" stroke-width="2" opacity="0.6">
+    <path d="M0 870 Q480 862 960 872 Q1440 882 1920 866"/>
+    <path d="M0 936 Q520 928 1040 940 Q1500 952 1920 932"/>
+    <path d="M0 1004 Q460 996 920 1008 Q1400 1020 1920 1000"/>
+  </g>
+  <!-- 积水反光 -->
+  <ellipse cx="700" cy="900" rx="280" ry="46" fill="#16334c" opacity="0.22" filter="url(#tblurS)"/>
+  <ellipse cx="1450" cy="960" rx="240" ry="40" fill="#16334c" opacity="0.16" filter="url(#tblurS)"/>
+
+  <!-- 栏杆 -->
+  <g>
+    <rect x="-20" y="788" width="1960" height="9" fill="#1b2f3f"/>
+    <rect x="-20" y="797" width="1960" height="4" fill="#08131c"/>
+    <g stroke="#152836" stroke-width="5">
+      <line x1="80" y1="797" x2="80" y2="900"/>
+      <line x1="300" y1="797" x2="300" y2="896"/>
+      <line x1="520" y1="797" x2="520" y2="894"/>
+      <line x1="740" y1="797" x2="740" y2="892"/>
+      <line x1="1180" y1="797" x2="1180" y2="892"/>
+      <line x1="1400" y1="797" x2="1400" y2="894"/>
+      <line x1="1620" y1="797" x2="1620" y2="896"/>
+      <line x1="1840" y1="797" x2="1840" y2="900"/>
+    </g>
+    <line x1="0" y1="860" x2="1920" y2="860" stroke="#0f202c" stroke-width="4" opacity="0.8"/>
+  </g>
+
+  <!-- 天线旋转器（机柜） -->
+  <g>
+    <rect x="788" y="612" width="200" height="150" rx="4" fill="#050c12"/>
+    <rect x="794" y="618" width="188" height="138" rx="3" fill="url(#tmetal)"/>
+    <rect x="794" y="618" width="188" height="138" rx="3" fill="none" stroke="#2a4055" stroke-width="3"/>
+    <rect x="810" y="632" width="98" height="54" rx="2" fill="#08131c" stroke="#1e3345" stroke-width="2"/>
+    <g stroke="#2f5670" stroke-width="1" opacity="0.55">
+      <line x1="818" y1="648" x2="900" y2="648"/>
+      <line x1="818" y1="660" x2="884" y2="660"/>
+      <line x1="818" y1="672" x2="892" y2="672"/>
+    </g>
+    <circle cx="944" cy="660" r="16" fill="#0e1e2a" stroke="#2a4055" stroke-width="2"/>
+    <line x1="944" y1="660" x2="944" y2="646" stroke="#c79a5f" stroke-width="2"/>
+    <circle cx="944" cy="660" r="3" fill="#3a5670"/>
+    <rect x="810" y="700" width="150" height="14" rx="2" fill="#07111a" stroke="#1e3345"/>
+    <circle cx="930" cy="707" r="4" fill="#e0a45e" opacity="0.7"/>
+    <circle cx="948" cy="707" r="4" fill="#3a2a1a"/>
+    <rect x="872" y="762" width="40" height="50" fill="#0a141d"/>
+    <ellipse cx="888" cy="812" rx="90" ry="18" fill="#04090e" opacity="0.6" filter="url(#tblurS)"/>
+  </g>
+
+  <!-- 打开的舱口（下楼） -->
+  <g>
+    <rect x="820" y="964" width="280" height="116" fill="#03070b"/>
+    <rect x="826" y="970" width="268" height="110" fill="#061019"/>
+    <path d="M826 970 L1094 970 L1094 1000 L826 1000 Z" fill="#0b1a26"/>
+    <g fill="#0e202c" stroke="#1c3346" stroke-width="2">
+      <rect x="840" y="1002" width="240" height="18"/>
+      <rect x="860" y="1024" width="204" height="16"/>
+      <rect x="884" y="1044" width="164" height="14"/>
+    </g>
+    <path d="M826 970 L700 900 L742 884 L1094 970" fill="#08141d" opacity="0.8"/>
+    <ellipse cx="960" cy="962" rx="170" ry="24" fill="#04090e" opacity="0.55" filter="url(#tblurS)"/>
+  </g>
+
+  <!-- 雨 -->
+  <rect x="-20" y="-20" width="1960" height="1120" fill="url(#train)" opacity="0.9"/>
+
+  <!-- 暗角 -->
+  <rect x="0" y="0" width="1920" height="1080" fill="url(#tvign)"/>
+</svg>

@@ -62,6 +62,107 @@
   }
 
   /* ============================================================
+     随身物品
+     ============================================================ */
+  var ITEMS = {
+    key: {
+      name: '铜钥匙',
+      note: '从雨靴里倒出来的，齿口磨得很圆。',
+      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="13" cy="13" r="6"/><path d="M17.5 17.5 31 31"/><path d="M26 26l4-4"/><path d="M30 30l3.5-3.5"/></svg>'
+    },
+    fuse: {
+      name: '2A 保险丝',
+      note: '玻璃管里的金属丝还完好。',
+      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="13" y="8" width="14" height="24" rx="3"/><path d="M13 14h14"/><path d="M13 26h14"/><path d="M20 14v12"/></svg>'
+    },
+    piece: {
+      name: '海图残片',
+      note: '撕口和墙上那张海图正好对得上。',
+      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 11 26 8l6 20-18 4z"/><path d="M14 15l10 12"/><path d="M25 12l3 9"/></svg>'
+    },
+    ruler: {
+      name: '平行尺',
+      note: '铜边磨得发亮，刻度是海里。',
+      icon: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 30 26 12l6 6L14 36z"/><path d="M13 27l4 4"/><path d="M18 22l2 2"/><path d="M23 17l2 2"/></svg>'
+    }
+  };
+
+  var Inv = {
+    el: null,
+    items: [],
+    selected: null,
+
+    init: function () {
+      this.el = $('#inventory');
+      if (!this.el) return;
+      var self = this;
+      this.el.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('.inv-slot') : null;
+        if (!btn) return;
+        self.select(btn.getAttribute('data-item'));
+      });
+    },
+
+    has: function (id) { return this.items.indexOf(id) >= 0; },
+
+    add: function (id) {
+      if (!ITEMS[id] || this.has(id)) return;
+      this.items.push(id);
+      this.selected = id;
+      this.render();
+    },
+
+    consume: function (id) {
+      var i = this.items.indexOf(id);
+      if (i >= 0) this.items.splice(i, 1);
+      if (this.selected === id) this.selected = null;
+      this.render();
+    },
+
+    set: function (list) {
+      this.items = (list || []).filter(function (id) { return !!ITEMS[id]; });
+      this.selected = null;
+      this.render();
+    },
+
+    select: function (id) {
+      if (!id || !this.has(id)) { this.selected = null; this.render(); return; }
+      this.selected = this.selected === id ? null : id;
+      this.render();
+      if (this.selected) Audio.sfx('paper');
+    },
+
+    clear: function () {
+      this.items = [];
+      this.selected = null;
+      this.render();
+    },
+
+    render: function () {
+      if (!this.el) return;
+      this.el.innerHTML = '';
+      var self = this;
+      if (!this.items.length) {
+        this.el.hidden = true;
+        return;
+      }
+      this.el.hidden = false;
+      this.items.forEach(function (id) {
+        var item = ITEMS[id];
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'inv-slot' + (self.selected === id ? ' is-selected' : '');
+        btn.setAttribute('data-item', id);
+        btn.setAttribute('aria-label', item.name + (self.selected === id ? '，已选中' : '，点击拿起'));
+        btn.title = item.note;
+        btn.innerHTML = '<span class="inv-icon">' + item.icon + '</span>' +
+          '<span class="inv-name">' + item.name + '</span>';
+        self.el.appendChild(btn);
+      });
+    }
+  };
+
+  /* ============================================================
      音频引擎
      ============================================================ */
   var Audio = {
@@ -595,7 +696,7 @@
       if (stage) {
         stage.addEventListener('click', function (e) {
           if (!self.box || self.box.hidden) return;
-          if (e.target.closest && e.target.closest('.hotspot')) return;
+          if (e.target.closest && (e.target.closest('#hotspots') || e.target.closest('.closeup') || e.target.closest('.inventory'))) return;
           e.stopPropagation();
           e.preventDefault();
           self.advance();
@@ -633,6 +734,8 @@
       if (!this.box) return;
       clearTimeout(this.hideTimer);
       this.box.hidden = false;
+      var stage = document.getElementById('stage');
+      if (stage) stage.classList.add('has-dialogue');
       requestAnimationFrame(function () { Sub.box.classList.add('is-on'); });
 
       if (line.who) {
@@ -695,6 +798,8 @@
     hide: function () {
       if (!this.box) return;
       this.box.classList.remove('is-on');
+      var stage = document.getElementById('stage');
+      if (stage) stage.classList.remove('has-dialogue');
       var node = this.box;
       clearTimeout(this.hideTimer);
       this.hideTimer = setTimeout(function () {
@@ -909,81 +1014,204 @@
       ]
     },
 
-    /* 第 1 夜《信号》 */
+    /* 第 1 夜《信号》：三个可以来回走的房间 */
     night1: {
-      art: 'assets/studio.svg',
       night: '第 1 夜 · 信号',
-      placeholder: 'radial-gradient(120% 96% at 50% 40%, #17324a 0%, #0d2136 44%, #05080c 100%)',
-      lights: [
-        { id: 'beacon', x: 65.9, y: 33.7 }
-      ],
-      hotspots: [
-        {
-          id: 'radio', label: '收音机', x: 54.7, y: 68.8,
-          closeup: {
-            title: '收 音 机', widget: 'tune', art: 'assets/closeups/radio.svg',
-            props: function () {
-              return {
-                target: Night1.TARGET,
-                sigma: 1.15,
-                lock: 0.42,
-                locked: Night1.tuned,
-                start: Night1.tuned ? Night1.TARGET : 100,
-                caption: '调 频 · 88 — 108 MHz',
-                onLock: function () { Night1.onTuned(); }
-              };
+      start: 'studio',
+      areas: {
+        studio: {
+          room: '播 音 室',
+          art: 'assets/studio.svg',
+          lights: [{ id: 'beacon', x: 65.9, y: 33.7 }],
+          hotspots: [
+            {
+              id: 'radio', label: '收音机', x: 54.7, y: 68.8,
+              closeup: {
+                title: '收 音 机', widget: 'tune', art: 'assets/closeups/radio.svg',
+                props: function () {
+                  return {
+                    dead: !Night1.powered,
+                    hasFuse: Inv.has('fuse'),
+                    onPower: function () { Night1.installFuse(); },
+                    target: Night1.TARGET,
+                    sigma: 0.95,
+                    lock: 0.45,
+                    locked: Night1.tuned,
+                    start: Night1.tuned ? Night1.TARGET : 98.0,
+                    caption: '调 频 · 88 — 108 MHz',
+                    onLock: function () { Night1.onTuned(); }
+                  };
+                }
+              }
+            },
+            {
+              id: 'chart', label: '墙上海图', x: 25.0, y: 31.9,
+              gate: function () { return Night1.tuned; },
+              gateHint: '先调准他的频率，才知道他在哪。',
+              closeup: {
+                title: '海 图', widget: 'chart', art: 'assets/closeups/chart.svg', textBaked: true,
+                props: function () {
+                  return {
+                    brief: Night1.chartPiece ? '他报的是度分。图上印的是小数。' : '海图的右下角被撕掉了一块。',
+                    note: '1° = 60′。三号浮标外侧是暗礁。\n\n—— 值班手册',
+                    torn: !Night1.chartPiece,
+                    hasPiece: Inv.has('piece'),
+                    onPiece: function () { Night1.placePiece(); },
+                    answer: 'A',
+                    solved: Night1.located,
+                    solvedId: Night1.located ? 'A' : null,
+                    station: { x: 70, y: 32 },
+                    hasRuler: Inv.has('ruler'),
+                    measured: Night1.measured,
+                    measureAt: Night1.TRUE_BEARING,
+                    onMeasure: function (deg) { Night1.onMeasured(deg); },
+                    candidates: [
+                      { id: 'A', name: '浮标 03', x: 46.6, y: 72, lat: 34.20, lon: 129.12 },
+                      { id: 'B', name: '浮标 07', x: 46.6, y: 48, lat: 34.35, lon: 129.12 },
+                      { id: 'C', name: '浮标 11', x: 62, y: 72, lat: 34.20, lon: 129.70 }
+                    ],
+                    onSolved: function () { Night1.onLocated(); }
+                  };
+                }
+              }
+            },
+            {
+              id: 'plate', label: '收音机铭牌', x: 64.7, y: 70.1,
+              closeup: {
+                title: '铭 牌', widget: 'note', art: 'assets/closeups/plate.svg', textBaked: true,
+                note: '“潮汐镇广播电台 · 夜班机”\n\n“本机刻度已按新标准下调 6.3MHz，旧频道请自行换算。”'
+              }
+            },
+            {
+              id: 'notebook', label: '值班便条', x: 34.1, y: 54.8,
+              closeup: {
+                title: '便 条', widget: 'note', art: 'assets/closeups/note.svg', textBaked: true,
+                note: '“雾夜里，先把声音抓住，再谈方向。”\n\n“度分换小数：1° = 60′。”\n\n“海图右下角被撕走过一次，别信缺的那一块。”'
+              }
+            },
+            {
+              id: 'ruler', label: '平行尺', x: 45.5, y: 78.5,
+              visible: function () { return !Night1.rulerTaken; },
+              take: {
+                id: 'ruler', name: '平行尺',
+                after: function () { Night1.rulerTaken = true; Night1.sync(); }
+              }
             }
-          }
+          ],
+          exits: [
+            { to: 'corridor', dir: 'right', label: '走 廊' }
+          ]
         },
-        {
-          id: 'chart', label: '墙上海图', x: 25.0, y: 31.9,
-          gate: function () { return Night1.tuned; },
-          gateHint: '先调准他的频率，才知道他在哪。',
-          closeup: {
-            title: '海 图', widget: 'chart', art: 'assets/closeups/chart.svg', textBaked: true,
-            props: function () {
-              return {
-                brief: '他报的是度分。图上印的是小数。',
-                note: '1° = 60′。三号浮标外侧是暗礁。\n\n—— 值班手册',
-                answer: 'A',
-                solved: Night1.located,
-                solvedId: Night1.located ? 'A' : null,
-                candidates: [
-                  { id: 'A', name: '浮标 03', x: 57, y: 47, lat: 34.20, lon: 129.12 },
-                  { id: 'B', name: '浮标 07', x: 69, y: 29, lat: 34.35, lon: 129.12 },
-                  { id: 'C', name: '浮标 11', x: 44, y: 66, lat: 34.20, lon: 129.70 }
-                ],
-                onSolved: function () { Night1.onLocated(); }
-              };
+
+        corridor: {
+          room: '走 廊',
+          art: 'assets/corridor.svg',
+          lights: [{ id: 'bulb', x: 52, y: 16 }],
+          hotspots: [
+            {
+              id: 'boots', label: '雨靴', x: 16, y: 80,
+              visible: function () { return !Night1.keyTaken; },
+              take: {
+                id: 'key', name: '铜钥匙',
+                after: function () { Night1.keyTaken = true; Night1.sync(); }
+              }
+            },
+            {
+              id: 'locker', label: '储物柜', x: 70, y: 44,
+              use: {
+                item: 'key',
+                then: function (btn, hs) {
+                  Night1.unlockLocker();
+                  Scene.open(hs, btn);
+                }
+              },
+              action: function (btn, hs) {
+                if (!Night1.lockerOpen) {
+                  Audio.sfx('switch');
+                  Sub.hint('柜门锁着。锁孔里有锈。', 2400);
+                  return;
+                }
+                Scene.open(hs, btn);
+              },
+              closeup: {
+                title: '储 物 柜', widget: 'locker', art: 'assets/closeups/cabinet.svg',
+                props: function () {
+                  return {
+                    fuseTaken: Night1.fuseTaken,
+                    pieceTaken: Night1.pieceTaken,
+                    logRead: Night1.logRead,
+                    logText: '夜班频率表（旧刻度）：气象台 105.2；鲸群观测 101.9；渔夫 102.7。\n下面一行被水泡开了，只剩“本机已改新刻度”。',
+                    onFuse: function () { Night1.takeFuse(); },
+                    onPiece: function () { Night1.takePiece(); },
+                    onLog: function () { Night1.readLog(); }
+                  };
+                }
+              }
+            },
+            {
+              id: 'fusebox', label: '保险丝盒', x: 44, y: 26,
+              closeup: {
+                title: '保 险 丝 盒', widget: 'note', art: 'assets/closeups/fusebox.svg',
+                note: '四个槽位：总闸、照明、发射机、备用。\n\n备用槽是空的。槽底贴着一张小纸片：\n\n“2A。别拿 5A 顶。”'
+              }
+            },
+            {
+              id: 'almanac', label: '航海年鉴', x: 27, y: 44,
+              closeup: {
+                title: '航 海 年 鉴', widget: 'note', art: 'assets/closeups/almanac.svg',
+                note: '《潮汐镇航海年鉴》摘录：\n\n本地磁偏角 6°W。\n\n磁方位 = 真方位 + 6°。\n\n（真北在磁北以东，别把加减弄反。）'
+              }
+            },
+            {
+              id: 'logbook', label: '值班日志', x: 58, y: 74,
+              closeup: {
+                title: '值 班 日 志', widget: 'note', art: 'assets/closeups/ledger.svg',
+                note: '夜班频率表（旧刻度）：\n\n气象台 …… 105.2\n鲸群观测 … 101.9\n渔夫 …… 102.7\n\n下面一行被水泡开了，只剩“本机已改新刻度”。'
+              }
             }
-          }
+          ],
+          exits: [
+            { to: 'studio', dir: 'left', label: '播 音 室' },
+            { to: 'tower', dir: 'right', label: '天 线 梯' }
+          ]
         },
-        {
-          id: 'antenna', label: '天线控制', x: 82.0, y: 50.9,
-          gate: function () { return Night1.located; },
-          gateHint: '先在海图上确认他的位置。',
-          closeup: {
-            title: '天 线 控 制', widget: 'antenna', art: 'assets/closeups/cabinet.svg',
-            props: function () {
-              return {
-                brief: '手册：本地磁偏角 6°W，磁方位 = 真方位 + 6°。',
-                target: Night1.TARGET_BEARING,
-                tol: 3,
-                solved: Night1.fixed,
-                bearing: Night1.bearing,
-                onSolved: function (b) { Night1.onFixed(b); }
-              };
+
+        tower: {
+          room: '天 线 平 台',
+          art: 'assets/tower.svg',
+          lights: [{ id: 'beacon', x: 78, y: 28 }],
+          hotspots: [
+            {
+              id: 'antenna', label: '天线旋转器', x: 46, y: 62,
+              gate: function () { return Night1.located; },
+              gateHint: '先在海图上确认他的位置。',
+              closeup: {
+                title: '天 线 旋 转 器', widget: 'rotator', art: 'assets/closeups/cabinet.svg',
+                props: function () {
+                  return {
+                    dead: !Night1.powered,
+                    target: Night1.TARGET_BEARING,
+                    tol: 1,
+                    solved: Night1.fixed,
+                    coarse: Night1.coarse,
+                    fine: Night1.fine,
+                    onSolved: function (c, f) { Night1.onFixed(c + f, c, f); }
+                  };
+                }
+              }
+            },
+            {
+              id: 'beacon', label: '灯塔', x: 78, y: 28,
+              action: function () {
+                Sub.hint(Night1.fixed ? '灯已经扫过去了。' : '灯罩里是暗的。天线对上之前，它不会亮。', 3000);
+              }
             }
-          }
-        },
-        {
-          id: 'notebook', label: '值班便条', x: 34.1, y: 54.8,
-          closeup: {
-            title: '便 条', widget: 'note', art: 'assets/closeups/note.svg', textBaked: true,
-            note: '“雾夜里，先把声音抓住，再谈方向。”\n\n“度分换小数，别把 12 念成 21。”\n\n字迹很旧了，墨迹被潮气泡开。'
-          }
+          ],
+          exits: [
+            { to: 'corridor', dir: 'down', label: '下 楼' }
+          ]
         }
-      ]
+      }
     }
   };
 
@@ -1205,12 +1433,25 @@
      调频 → 海图定位 → 天线校准 → 收录
      ============================================================ */
   var Night1 = {
-    step: 'tune',          // tune | locate | antenna | done
+    step: 'power',          // power | tune | locate | antenna | done
+    powered: false,
     tuned: false,
+    chartPiece: false,
     located: false,
+    measured: false,
     fixed: false,
     finished: false,
     bearing: 180,
+    coarse: 180,
+    fine: 0,
+    area: 'studio',
+
+    keyTaken: false,
+    lockerOpen: false,
+    fuseTaken: false,
+    pieceTaken: false,
+    rulerTaken: false,
+    logRead: false,
 
     TARGET: 96.4,
     TRUE_BEARING: 218,
@@ -1218,45 +1459,92 @@
     TARGET_BEARING: 224,
 
     reset: function () {
-      this.step = 'tune';
+      this.step = 'power';
+      this.powered = false;
       this.tuned = false;
+      this.chartPiece = false;
       this.located = false;
+      this.measured = false;
       this.fixed = false;
       this.finished = false;
       this.bearing = 180;
+      this.coarse = 180;
+      this.fine = 0;
+      this.area = 'studio';
+
+      this.keyTaken = false;
+      this.lockerOpen = false;
+      this.fuseTaken = false;
+      this.pieceTaken = false;
+      this.rulerTaken = false;
+      this.logRead = false;
+
+      Inv.clear();
     },
 
     snapshot: function () {
       return {
         step: this.step,
+        powered: this.powered,
         tuned: this.tuned,
+        chartPiece: this.chartPiece,
         located: this.located,
+        measured: this.measured,
         fixed: this.fixed,
         finished: this.finished,
-        bearing: this.bearing
+        bearing: this.bearing,
+        coarse: this.coarse,
+        fine: this.fine,
+        area: this.area,
+        keyTaken: this.keyTaken,
+        lockerOpen: this.lockerOpen,
+        fuseTaken: this.fuseTaken,
+        pieceTaken: this.pieceTaken,
+        rulerTaken: this.rulerTaken,
+        logRead: this.logRead,
+        inv: Inv.items.slice()
       };
     },
 
     restore: function (data) {
       this.reset();
       if (!data) return;
-      this.step = data.step || 'tune';
+      this.step = data.step || 'power';
+      this.powered = !!data.powered;
       this.tuned = !!data.tuned;
+      this.chartPiece = !!data.chartPiece;
       this.located = !!data.located;
+      this.measured = !!data.measured;
       this.fixed = !!data.fixed;
       this.finished = !!data.finished;
       this.bearing = typeof data.bearing === 'number' ? data.bearing : 180;
+      this.coarse = typeof data.coarse === 'number' ? data.coarse : 180;
+      this.fine = typeof data.fine === 'number' ? data.fine : 0;
+      this.area = data.area || 'studio';
+
+      this.keyTaken = !!data.keyTaken;
+      this.lockerOpen = !!data.lockerOpen;
+      this.fuseTaken = !!data.fuseTaken;
+      this.pieceTaken = !!data.pieceTaken;
+      this.rulerTaken = !!data.rulerTaken;
+      this.logRead = !!data.logRead;
+
+      Inv.set(data.inv || []);
     },
 
     objective: function () {
-      if (!this.tuned) return '雾里有个声音。先把频率找出来。';
+      if (!this.powered) return '收音机没有电。先找一枚 2A 保险丝。';
+      if (!this.tuned) return '他知道一个旧频道。换算成本机刻度。';
+      if (!this.chartPiece) return '海图缺了一块。找找撕掉的那一角。';
       if (!this.located) return '他在报坐标。到海图上把他标出来。';
-      if (!this.fixed) return '方向有了。把天线转过去。';
+      if (!this.fixed) return '把天线转向他的方位。';
       return '方向已发出。等他的回话。';
     },
 
     sync: function () {
+      if (Scene.current && Scene.current.areas && Scene.area) this.area = Scene.area;
       Scene.setObjective(this.objective());
+      Scene.renderHotspots();
       Scene.setActive('radio', !this.tuned);
       Scene.setActive('chart', this.tuned && !this.located);
       Scene.setActive('antenna', this.located && !this.fixed);
@@ -1270,6 +1558,56 @@
       progress.night1 = this.snapshot();
       progress.at = Date.now();
       Store.set(K.progress, progress);
+    },
+
+    /* 收音机：先装保险丝，才通得上电 */
+    installFuse: function () {
+      if (this.powered) return;
+      this.powered = true;
+      this.step = 'tune';
+      Inv.consume('fuse');
+      Audio.sfx('lock');
+      this.sync();
+      Sub.hint('电流声回来了。旋钮有点涩。', 3000);
+    },
+
+    /* 海图：把撕掉的一角拼回去 */
+    placePiece: function () {
+      if (this.chartPiece) return;
+      this.chartPiece = true;
+      Inv.consume('piece');
+      Audio.sfx('paper');
+      this.sync();
+      Sub.hint('撕口对上了。右下角的浮标露了出来。', 3200);
+    },
+
+    unlockLocker: function () {
+      if (this.lockerOpen) return;
+      this.lockerOpen = true;
+      Audio.sfx('lock');
+      this.sync();
+    },
+
+    takeFuse: function () {
+      if (this.fuseTaken) return;
+      this.fuseTaken = true;
+      Inv.add('fuse');
+      Audio.sfx('paper');
+      this.sync();
+    },
+
+    takePiece: function () {
+      if (this.pieceTaken) return;
+      this.pieceTaken = true;
+      Inv.add('piece');
+      Audio.sfx('paper');
+      this.sync();
+    },
+
+    readLog: function () {
+      this.logRead = true;
+      Audio.sfx('paper');
+      this.sync();
     },
 
     onTuned: function () {
@@ -1294,19 +1632,32 @@
       this.step = 'antenna';
       this.sync();
 
+      var self = this;
       Sub.play([
         { who: '渔夫', text: '对，就是那儿。三号浮标，我看见了。', voice: 'n1_05' }
       ], function () {
-        Sub.hint('图上量出来：电台到三号浮标，真方位 218°。', 4600);
+        Sub.hint(self.measured ? '真方位 218°。别忘了磁差。' : '用桌上那把平行尺，量一下从电台到浮标的方位。', 4600);
       });
     },
 
-    onFixed: function (b) {
+    onMeasured: function (deg) {
+      if (this.measured) return;
+      this.measured = true;
+      this.bearing = deg;
+      this.sync();
+      Audio.sfx('lock');
+      Sub.hint('量出来是真方位 ' + Math.round(deg) + '°。磁差 6°W，自己换算。', 4400);
+    },
+
+    onFixed: function (b, c, f) {
       if (this.fixed) return;
       this.fixed = true;
       this.bearing = b;
+      this.coarse = c;
+      this.fine = f;
       this.step = 'done';
       this.sync();
+      Scene.setLight('beacon', true);
       Audio.setSignal(0.08);
 
       var self = this;
@@ -1362,6 +1713,36 @@
       var startFreq = props.start != null ? props.start : (locked ? TARGET : 100);
       var onLocked = props.onLock || function () { Pro.onTuned(); };
       var captionText = props.caption || '调 频 · 88 — 108 MHz';
+
+      /* 没通电：先装保险丝 */
+      if (props.dead) {
+        var deadWrap = div('tool-block');
+        deadWrap.appendChild(p('tool-caption', captionText));
+        var deadUnit = div('dead-unit');
+        deadUnit.appendChild(p('dead-line', '指示灯不亮。'));
+        var slot = div('fuse-slot');
+        slot.appendChild(p('fuse-slot-label', 'FUSE · 2A'));
+        if (props.hasFuse) slot.classList.add('is-ready');
+        deadUnit.appendChild(slot);
+        deadWrap.appendChild(deadUnit);
+
+        var powerBtn = document.createElement('button');
+        powerBtn.type = 'button';
+        powerBtn.className = 'btn-amber';
+        powerBtn.textContent = props.hasFuse ? '装入保险丝' : '缺少 2A 保险丝';
+        powerBtn.disabled = !props.hasFuse;
+        powerBtn.addEventListener('click', function () {
+          if (!props.hasFuse) return;
+          if (props.onPower) props.onPower();
+          Scene.close();
+        });
+        deadWrap.appendChild(powerBtn);
+        deadWrap.appendChild(p('tool-note', props.hasFuse
+          ? '玻璃管卡进槽里，发出一点凉意。'
+          : '保险丝座上刻着 2A。走廊的储物柜里也许有。'));
+        root.appendChild(deadWrap);
+        return { destroy: function () {} };
+      }
 
       var wrap = div('tool-block');
       var caption = p('tool-caption', captionText);
@@ -1534,105 +1915,223 @@
       props = props || {};
       var candidates = props.candidates || [];
       var solved = !!props.solved;
+      var torn = !!props.torn;
       var picked = null;
+      var measuredOnce = !!props.measured;
+      var station = props.station || { x: 70, y: 32 };
+      var rulerAngle = 0;
 
       var wrap = div('tool-block');
       wrap.appendChild(p('tool-caption', props.caption || '海 图 · 潮汐镇外海'));
-      wrap.appendChild(p('chart-brief', props.brief || '按他报的坐标，在图上标出他的位置。'));
+      var brief = p('chart-brief', props.brief || '按他报的坐标，在图上标出他的位置。');
+      wrap.appendChild(brief);
 
-      var map = div('chartmap');
-      map.appendChild(div('chartmap-grid'));
-      map.appendChild(div('chartmap-coast'));
+      var body = div('chart-body');
+      wrap.appendChild(body);
+      root.appendChild(wrap);
 
-      var buttons = [];
-      candidates.forEach(function (c) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'buoy' + (props.solvedId === c.id ? ' is-picked' : '');
-        b.style.left = c.x + '%';
-        b.style.top = c.y + '%';
+      function diffOf(a, b) {
+        return Math.abs(((a - b) % 360 + 540) % 360 - 180);
+      }
 
-        var dot = div('buoy-dot');
-        var name = document.createElement('span');
-        name.className = 'buoy-label';
-        name.textContent = c.name;
-        var coord = document.createElement('span');
-        coord.className = 'buoy-coord';
-        coord.textContent = c.lat.toFixed(2) + '°N  ' + c.lon.toFixed(2) + '°E';
+      function render() {
+        body.innerHTML = '';
+        var map = div('chartmap');
+        map.appendChild(div('chartmap-grid'));
+        map.appendChild(div('chartmap-coast'));
 
-        b.appendChild(dot);
-        b.appendChild(name);
-        b.appendChild(coord);
-        b.setAttribute('aria-label', c.name + ' ' + coord.textContent);
+        var buttons = [];
+        var ruler = null;
+        var read = null;
+        var dragMoved = false;
 
-        b.addEventListener('click', function () {
+        if (torn) {
+          var mask = div('chartmap-torn');
+          mask.appendChild(p('chartmap-torn-label', '缺'));
+          map.appendChild(mask);
+        } else {
+          var st = div('chart-station');
+          st.style.left = station.x + '%';
+          st.style.top = station.y + '%';
+          st.appendChild(p('chart-station-label', '电台'));
+          map.appendChild(st);
+
+          candidates.forEach(function (c) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'buoy' + (props.solvedId === c.id ? ' is-picked' : '');
+            b.style.left = c.x + '%';
+            b.style.top = c.y + '%';
+
+            var dot = div('buoy-dot');
+            var name = document.createElement('span');
+            name.className = 'buoy-label';
+            name.textContent = c.name;
+            var coord = document.createElement('span');
+            coord.className = 'buoy-coord';
+            coord.textContent = c.lat.toFixed(2) + '°N  ' + c.lon.toFixed(2) + '°E';
+
+            b.appendChild(dot);
+            b.appendChild(name);
+            b.appendChild(coord);
+            b.setAttribute('aria-label', c.name + ' ' + coord.textContent);
+
+            b.addEventListener('click', function () {
+              if (solved || dragMoved) return;
+              picked = c.id;
+              buttons.forEach(function (x) { x.classList.toggle('is-picked', x === b); });
+              Audio.sfx('paper');
+            });
+
+            buttons.push(b);
+            map.appendChild(b);
+          });
+
+          if (props.hasRuler) {
+            ruler = div('chart-ruler');
+            ruler.style.left = station.x + '%';
+            ruler.style.top = station.y + '%';
+            ruler.appendChild(div('chart-ruler-line'));
+            map.appendChild(ruler);
+
+            read = div('chart-ruler-read');
+            read.textContent = '读数 —';
+            map.appendChild(read);
+          }
+        }
+
+        body.appendChild(map);
+
+        /* 撕角状态：只有残片能继续 */
+        if (torn) {
+          var pieceBtn = document.createElement('button');
+          pieceBtn.type = 'button';
+          pieceBtn.className = 'btn-amber';
+          pieceBtn.textContent = props.hasPiece ? '把残片拼上去' : '缺一角 · 找找残片';
+          pieceBtn.disabled = !props.hasPiece;
+          pieceBtn.addEventListener('click', function () {
+            if (!props.hasPiece) return;
+            if (props.onPiece) props.onPiece();
+            torn = false;
+            brief.textContent = '他报的是度分。图上印的是小数。';
+            render();
+          });
+          body.appendChild(pieceBtn);
+
+          var tornNote = p('tool-note', '海图的右下角整块不见了。撕口很新。');
+          tornNote.style.textAlign = 'left';
+          body.appendChild(tornNote);
+          return;
+        }
+
+        var note = p('tool-note', props.note || '');
+        note.style.textAlign = 'left';
+        body.appendChild(note);
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-amber';
+        btn.textContent = solved ? '位置已确认' : '确认坐标';
+        if (solved) { btn.disabled = true; btn.classList.add('is-done'); }
+        body.appendChild(btn);
+
+        btn.addEventListener('click', function () {
           if (solved) return;
-          picked = c.id;
-          buttons.forEach(function (x) { x.classList.toggle('is-picked', x === b); });
-          Audio.sfx('paper');
+          if (!picked) { Sub.hint('先在图上标一个位置。', 2200); return; }
+          if (picked === props.answer) {
+            solved = true;
+            btn.disabled = true;
+            btn.textContent = '位置已确认';
+            btn.classList.add('is-done');
+            Audio.sfx('lock');
+            if (props.onSolved) props.onSolved();
+          } else {
+            Audio.sfx('switch');
+            Sub.hint('不对。度数差一点，船就差了十几海里。', 3000);
+          }
         });
 
-        buttons.push(b);
-        map.appendChild(b);
-      });
-      wrap.appendChild(map);
+        if (!ruler) return;
 
-      var note = p('tool-note', props.note || '');
-      note.style.textAlign = 'left';
-      wrap.appendChild(note);
-
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'btn-amber';
-      btn.textContent = solved ? '位置已确认' : '确认坐标';
-      if (solved) { btn.disabled = true; btn.classList.add('is-done'); }
-      wrap.appendChild(btn);
-
-      btn.addEventListener('click', function () {
-        if (solved) return;
-        if (!picked) { Sub.hint('先在图上标一个位置。', 2200); return; }
-        if (picked === props.answer) {
-          solved = true;
-          btn.disabled = true;
-          btn.textContent = '位置已确认';
-          btn.classList.add('is-done');
-          Audio.sfx('lock');
-          if (props.onSolved) props.onSolved();
-        } else {
-          Audio.sfx('switch');
-          Sub.hint('不对。度数差一点，船就差了十几海里。', 3000);
+        /* 平行尺：拖动读数，对准浮标 */
+        function place(deg) {
+          rulerAngle = (deg + 360) % 360;
+          ruler.style.transform = 'translate(-50%, -50%) rotate(' + rulerAngle.toFixed(1) + 'deg)';
+          read.textContent = '读数 ' + Math.round(rulerAngle) + '°';
+          ruler.classList.toggle('is-align', diffOf(rulerAngle, props.measureAt) <= 1.5);
+          read.classList.toggle('is-align', diffOf(rulerAngle, props.measureAt) <= 1.5);
         }
-      });
 
-      root.appendChild(wrap);
+        function angleAt(e) {
+          var r = map.getBoundingClientRect();
+          var sx = r.left + station.x / 100 * r.width;
+          var sy = r.top + station.y / 100 * r.height;
+          var a = Math.atan2(e.clientX - sx, sy - e.clientY) * 180 / Math.PI;
+          return (a + 360) % 360;
+        }
+
+        var dragging = false;
+        map.addEventListener('pointerdown', function (e) {
+          dragging = true;
+          dragMoved = false;
+          try { map.setPointerCapture(e.pointerId); } catch (err) {}
+          place(angleAt(e));
+        });
+        map.addEventListener('pointermove', function (e) {
+          if (!dragging) return;
+          dragMoved = true;
+          place(angleAt(e));
+        });
+        map.addEventListener('pointerup', function () {
+          if (!dragging) return;
+          dragging = false;
+          if (!dragMoved) return;
+          if (!measuredOnce && diffOf(rulerAngle, props.measureAt) <= 1.5) {
+            measuredOnce = true;
+            if (props.onMeasure) props.onMeasure(props.measureAt);
+          }
+        });
+
+        place(measuredOnce ? props.measureAt : rulerAngle);
+      }
+
+      render();
       return { destroy: function () {} };
     },
 
-    /* ---------- 天线方位校准 ---------- */
-    antenna: function (root, props) {
+    /* ---------- 天线旋转器：粗调 + 微调 ---------- */
+    rotator: function (root, props) {
       props = props || {};
       var target = props.target != null ? props.target : 224;
-      var tol = props.tol != null ? props.tol : 3;
+      var tol = props.tol != null ? props.tol : 1;
       var solved = !!props.solved;
-      var bearing = props.bearing != null ? props.bearing : 180;
-      var SIGMA = props.sigma != null ? props.sigma : 7;
+      var coarse = props.coarse != null ? props.coarse : 180;
+      var fine = props.fine != null ? props.fine : 0;
 
       var wrap = div('tool-block');
-      wrap.appendChild(p('tool-caption', props.caption || '天 线 · 方位校准'));
-      wrap.appendChild(p('chart-brief', props.brief || '把天线转向他所在的方位。'));
+      wrap.appendChild(p('tool-caption', '天 线 · 方 位 旋 转 器'));
+      wrap.appendChild(p('chart-brief', props.dead ? '没有电。表盘一动不动。' : '粗调每格 10°，微调每格 1°。'));
 
-      var compass = div('compass');
-      [['N', 'c-n'], ['E', 'c-e'], ['S', 'c-s'], ['W', 'c-w']].forEach(function (item) {
-        var c = document.createElement('span');
-        c.className = 'compass-dir ' + item[1];
-        c.textContent = item[0];
-        compass.appendChild(c);
-      });
-      var needle = div('compass-needle');
-      compass.appendChild(needle);
-      var hub = div('compass-hub');
-      compass.appendChild(hub);
-      wrap.appendChild(compass);
+      function row(label, min, max, step, value, aria) {
+        var r = div('rot-row');
+        var l = document.createElement('span');
+        l.textContent = label;
+        var input = document.createElement('input');
+        input.type = 'range';
+        input.className = 'tool-slider';
+        input.min = String(min);
+        input.max = String(max);
+        input.step = String(step);
+        input.value = String(value);
+        input.setAttribute('aria-label', aria);
+        r.appendChild(l);
+        r.appendChild(input);
+        wrap.appendChild(r);
+        return input;
+      }
+
+      var coarseEl = row('粗调', 0, 350, 10, coarse, '天线粗调，每格十度');
+      var fineEl = row('微调', 0, 9, 1, fine, '天线微调，每格一度');
 
       var value = p('tool-value', '0');
       var unit = document.createElement('small');
@@ -1643,9 +2142,6 @@
       var meter = div('meter');
       var fill = div('meter-fill');
       meter.appendChild(fill);
-      var mark = div('meter-mark');
-      mark.style.left = (100 - Math.abs(target - 180) / 180 * 100) + '%';
-      meter.appendChild(mark);
       wrap.appendChild(meter);
 
       var meterLabel = div('meter-label');
@@ -1661,9 +2157,16 @@
       btn.type = 'button';
       btn.className = 'btn-amber';
       btn.textContent = solved ? '方向已发出' : '固定天线';
-      if (solved) { btn.disabled = true; btn.classList.add('is-done'); }
+      if (solved || props.dead) {
+        btn.disabled = true;
+        if (solved) btn.classList.add('is-done');
+      }
       wrap.appendChild(btn);
       root.appendChild(wrap);
+
+      var busy = solved;
+
+      function bearing() { return parseFloat(coarseEl.value) + parseFloat(fineEl.value); }
 
       function diffOf(b) {
         var d = ((b - target) % 360 + 540) % 360 - 180;
@@ -1671,65 +2174,99 @@
       }
 
       function render() {
-        needle.style.transform = 'rotate(' + bearing.toFixed(1) + 'deg)';
-        value.childNodes[0].nodeValue = Math.round(bearing);
-        var d = diffOf(bearing);
-        var s = Math.exp(-(d * d) / (2 * SIGMA * SIGMA));
+        var b = bearing();
+        value.childNodes[0].nodeValue = Math.round(b);
+        var d = diffOf(b);
+        var s = Math.exp(-(d * d) / (2 * 6 * 6));
         fill.style.width = (s * 100).toFixed(1) + '%';
-        mv.textContent = d <= tol ? '对准' : (d < 18 ? '有回波' : '偏了');
-        if (!solved) btn.disabled = false;
+        mv.textContent = d <= tol ? '对准' : (d < 12 ? '有回波' : '偏了');
       }
 
-      var dragging = false;
-      function angleTo(e) {
-        var r = compass.getBoundingClientRect();
-        var cx = r.left + r.width / 2;
-        var cy = r.top + r.height / 2;
-        var a = Math.atan2(e.clientX - cx, cy - e.clientY) * 180 / Math.PI;
-        return (a + 360) % 360;
-      }
-      compass.addEventListener('pointerdown', function (e) {
-        if (solved) return;
-        dragging = true;
-        compass.classList.add('is-grabbing');
-        try { compass.setPointerCapture(e.pointerId); } catch (err) {}
-        bearing = angleTo(e);
+      function onInput() {
         render();
         Audio.sfx('knob');
-      });
-      compass.addEventListener('pointermove', function (e) {
-        if (!dragging) return;
-        bearing = angleTo(e);
-        render();
-      });
-      compass.addEventListener('pointerup', function () { dragging = false; compass.classList.remove('is-grabbing'); });
-      compass.addEventListener('pointercancel', function () { dragging = false; compass.classList.remove('is-grabbing'); });
-      compass.setAttribute('tabindex', '0');
-      compass.setAttribute('role', 'slider');
-      compass.setAttribute('aria-label', '天线方位，拖动旋转');
-      compass.addEventListener('keydown', function (e) {
-        if (solved) return;
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-          e.preventDefault();
-          bearing = (bearing + (e.key === 'ArrowRight' ? 2 : -2) + 360) % 360;
-          render();
-        }
-      });
+      }
+
+      coarseEl.addEventListener('input', onInput);
+      fineEl.addEventListener('input', onInput);
 
       btn.addEventListener('click', function () {
-        if (solved) return;
-        if (diffOf(bearing) > tol) {
+        if (busy) return;
+        if (diffOf(bearing()) > tol) {
           Audio.sfx('switch');
-          Sub.hint('还没对上。差 ' + Math.round(diffOf(bearing)) + ' 度。', 2600);
+          Sub.hint('还没对上。差 ' + Math.round(diffOf(bearing())) + ' 度。', 2600);
           return;
         }
-        solved = true;
+        busy = true;
         btn.disabled = true;
         btn.textContent = '方向已发出';
         btn.classList.add('is-done');
         Audio.sfx('lock');
-        if (props.onSolved) props.onSolved(bearing);
+        if (props.onSolved) props.onSolved(parseFloat(coarseEl.value), parseFloat(fineEl.value));
       });
+
+      render();
+      return { destroy: function () {} };
+    },
+
+    /* ---------- 储物柜 ---------- */
+    locker: function (root, props) {
+      props = props || {};
+      var fuseTaken = !!props.fuseTaken;
+      var pieceTaken = !!props.pieceTaken;
+      var logRead = !!props.logRead;
+
+      var wrap = div('tool-block');
+      wrap.appendChild(p('tool-caption', '储 物 柜 · 第 三 格'));
+      var list = div('locker-list');
+      wrap.appendChild(list);
+      root.appendChild(wrap);
+
+      function render() {
+        list.innerHTML = '';
+
+        function row(name, desc, taken, label, onTake) {
+          var r = div('locker-row' + (taken ? ' is-taken' : ''));
+          var info = div('locker-info');
+          info.appendChild(p('locker-name', name));
+          info.appendChild(p('locker-desc', desc));
+          r.appendChild(info);
+
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'locker-take';
+          b.textContent = taken ? '已拿走' : label;
+          b.disabled = taken;
+          b.addEventListener('click', function () {
+            if (taken) return;
+            onTake();
+            render();
+          });
+          r.appendChild(b);
+          list.appendChild(r);
+        }
+
+        row('2A 保险丝', '玻璃管完好，金属丝没断。', fuseTaken, '拿走', function () {
+          fuseTaken = true;
+          if (props.onFuse) props.onFuse();
+        });
+
+        row('海图残片', '撕口很新，背面是潮汐镇的图例。', pieceTaken, '拿走', function () {
+          pieceTaken = true;
+          if (props.onPiece) props.onPiece();
+        });
+
+        row('值班日志', logRead ? '翻到折角那一页。' : '摊在最上层，页角折着。', logRead, '翻开', function () {
+          logRead = true;
+          if (props.onLog) props.onLog();
+        });
+
+        if (logRead && props.logText) {
+          var log = p('tool-note', props.logText);
+          log.style.textAlign = 'left';
+          list.appendChild(log);
+        }
+      }
 
       render();
       return { destroy: function () {} };
@@ -2015,6 +2552,10 @@
   var Scene = {
     el: {},
     current: null,
+    sceneId: null,
+    area: null,
+    traveling: false,
+    onAreaChange: null,
     widget: null,
     opened: null,
     lastFocus: null,
@@ -2066,16 +2607,37 @@
       });
     },
 
-    load: function (id) {
+    load: function (id, areaKey) {
       var scene = SCENES[id];
       if (!scene) return;
       this.current = scene;
+      this.sceneId = id;
 
+      if (scene.areas) {
+        var key = (areaKey && scene.areas[areaKey]) ? areaKey : scene.start;
+        this.area = key;
+        this.renderArea(scene.areas[key]);
+      } else {
+        this.area = null;
+        this.renderArea(scene);
+      }
+      this.renderHotspots();
+    },
+
+    currentArea: function () {
+      if (!this.current) return null;
+      if (this.current.areas) return this.current.areas[this.area] || null;
+      return this.current;
+    },
+
+    renderArea: function (area) {
+      if (!area) return;
       this.el.art.style.backgroundColor = '#0a141f';
-      this.el.art.style.backgroundImage = 'url("assets/bg_studio.png"), url("assets/bg_studio.jpg"), url("' + scene.art + '")';
+      var jpg = (area.art || '').replace(/\.svg$/, '.jpg');
+      this.el.art.style.backgroundImage = 'url("' + jpg + '"), url("' + area.art + '")';
 
       this.el.lights.innerHTML = '';
-      (scene.lights || []).forEach(function (light) {
+      (area.lights || []).forEach(function (light) {
         var node = div('light');
         node.id = 'light-' + light.id;
         node.style.left = light.x + '%';
@@ -2083,15 +2645,26 @@
         Scene.el.lights.appendChild(node);
       });
 
+      var tag = $('#roomTag');
+      if (tag) tag.textContent = area.room || '';
+    },
+
+    renderHotspots: function () {
+      var area = this.currentArea();
+      if (!area) return;
+      var self = this;
       this.el.hotspots.innerHTML = '';
-      (scene.hotspots || []).forEach(function (hs) {
+
+      (area.hotspots || []).forEach(function (hs) {
+        if (hs.visible && !hs.visible()) return;
+
         var btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'hotspot';
+        btn.className = 'hotspot' + (hs.cls ? ' ' + hs.cls : '');
         btn.id = 'hs-' + hs.id;
         btn.style.left = hs.x + '%';
         btn.style.top = hs.y + '%';
-        btn.setAttribute('aria-label', hs.label + '，进入特写');
+        btn.setAttribute('aria-label', hs.label + (hs.take ? '，可以拿走' : '，进入特写'));
 
         var label = document.createElement('span');
         label.className = 'hotspot-label';
@@ -2099,12 +2672,98 @@
         btn.appendChild(label);
 
         btn.addEventListener('click', function () {
+          if (self.traveling) return;
+
+          if (hs.take) {
+            if (Inv.has(hs.take.id)) return;
+            Inv.add(hs.take.id);
+            Audio.sfx('paper');
+            Sub.hint('收进包里：' + hs.take.name + '。', 2600);
+            if (hs.take.after) hs.take.after();
+            return;
+          }
+
+          if (Inv.selected) {
+            if (hs.use && hs.use.item === Inv.selected) {
+              Inv.consume(hs.use.item);
+              hs.use.then(btn, hs);
+              return;
+            }
+            if (hs.use) {
+              Sub.hint('手里这东西，用不上。', 2200);
+              return;
+            }
+          }
+
+          if (hs.action) { hs.action(btn, hs); return; }
+
           var w = hs.closeup && hs.closeup.widget;
-          Audio.sfx(hs.id === 'cabinet' ? 'drawer' : (w === 'note' ? 'paper' : 'open'));
+          Audio.sfx(hs.id === 'cabinet' || hs.id === 'locker' ? 'drawer' : (w === 'note' ? 'paper' : 'open'));
           Scene.open(hs, btn);
         });
-        Scene.el.hotspots.appendChild(btn);
+
+        self.el.hotspots.appendChild(btn);
       });
+
+      (area.exits || []).forEach(function (ex) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'nav-arrow nav-' + (ex.dir || 'right');
+        b.setAttribute('aria-label', '前往' + ex.label);
+
+        var g = document.createElement('span');
+        g.className = 'nav-glyph';
+        g.setAttribute('aria-hidden', 'true');
+        g.textContent = ex.dir === 'left' ? '‹' : (ex.dir === 'down' ? '⌄' : '›');
+
+        var l = document.createElement('span');
+        l.className = 'nav-label';
+        l.textContent = ex.label;
+
+        b.appendChild(g);
+        b.appendChild(l);
+        b.addEventListener('click', function () { Scene.travel(ex.to, ex.dir); });
+        self.el.hotspots.appendChild(b);
+      });
+    },
+
+    findHotspot: function (id) {
+      var area = this.currentArea();
+      var list = (area && area.hotspots) || [];
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].id === id) return list[i];
+      }
+      return null;
+    },
+
+    /* 房间之间来回走：先滑出，换景，再滑入 */
+    travel: function (to, dir) {
+      if (this.traveling || !this.current || !this.current.areas) return;
+      if (!this.current.areas[to] || to === this.area) return;
+
+      if (this.isOpen()) this.close();
+
+      var scene = this.current;
+      var self = this;
+      var stage = $('#stage');
+      var cls = 'is-walk-' + (dir || 'right');
+
+      this.traveling = true;
+      stage.classList.add(cls);
+      Audio.sfx('step');
+
+      setTimeout(function () {
+        self.area = to;
+        self.renderArea(scene.areas[to]);
+        self.renderHotspots();
+        stage.classList.remove(cls);
+        stage.classList.add(cls + '-in');
+        if (self.onAreaChange) self.onAreaChange();
+        setTimeout(function () {
+          stage.classList.remove(cls + '-in');
+          self.traveling = false;
+        }, 420);
+      }, 300);
     },
 
     setObjective: function (text) {
@@ -2827,7 +3486,7 @@
         label.textContent = '重听这一夜';
         hint.textContent = '第 2 夜还在路上。';
       } else if (n1Ready) {
-        label.textContent = (n1 && n1.step !== 'tune') ? '继续第 1 夜' : '进入第 1 夜';
+        label.textContent = (n1 && n1.step !== 'power') ? '继续第 1 夜' : '进入第 1 夜';
         hint.textContent = '雾里有人在呼叫。';
       } else if (proDone) {
         label.textContent = '重听序章';
@@ -2914,7 +3573,7 @@
 
         setTimeout(function () {
           Layout.apply();
-          Scene.load('night1');
+          Scene.load('night1', Night1.area);
           Power.skip();
           Scene.setLight('beacon', Night1.finished);
           Night1.sync();
@@ -2922,8 +3581,10 @@
           Card.play('第 1 夜', '信号', 'MIDNIGHT SIGNAL · NIGHT ONE', function () {
             if (Night1.finished) {
               Sub.hint('信号已经断了。海面上只剩雾。', 3200);
+            } else if (!Night1.powered) {
+              Sub.hint('收音机是哑的。连指示灯都不亮。', 3600);
             } else if (!Night1.tuned) {
-              Sub.hint('雾把海面盖住了。只有静电。', 3600);
+              Sub.hint('只有静电。翻翻值班日志，他知道自己的频道。', 3600);
             } else {
               Sub.hint('他还在那片雾里。', 3000);
             }
@@ -3078,6 +3739,12 @@
     Voice.init();
     Sub.init();
     Scene.init();
+    Inv.init();
+    Scene.onAreaChange = function () {
+      if (Scene.sceneId !== 'night1') return;
+      Night1.area = Scene.area;
+      Night1.sync();
+    };
     Power.init();
     Card.init();
     Rotate.init();
