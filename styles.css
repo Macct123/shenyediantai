@@ -1245,3 +1245,136 @@ button { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 560px), (max-height: 480px) {
   .tb-btn { min-height: 32px; padding: 0 10px; font-size: 11px; }
 }
+
+/* ============================================================
+   第 1 夜：海图定位 / 天线罗盘
+   ============================================================ */
+.chart-brief {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #8ba0b2;
+  text-align: left;
+}
+
+.chartmap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  margin: 2px 0 10px;
+  overflow: hidden;
+  border: 1px solid rgba(201, 214, 226, 0.14);
+  background:
+    radial-gradient(60% 50% at 30% 18%, rgba(58, 96, 122, 0.2), transparent 70%),
+    linear-gradient(160deg, #0b1a25, #07121a 60%, #050c12);
+}
+
+.chartmap-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(148, 178, 200, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 178, 200, 0.12) 1px, transparent 1px);
+  background-size: 12.5% 12.5%;
+}
+
+.chartmap-coast {
+  position: absolute;
+  left: -12%;
+  top: -10%;
+  width: 48%;
+  height: 58%;
+  transform: rotate(-8deg);
+  background: radial-gradient(ellipse at 32% 32%, rgba(62, 86, 76, 0.5), rgba(30, 44, 42, 0.22) 58%, transparent 72%);
+}
+
+.buoy {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: block;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #b9c9d7;
+  text-align: left;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.buoy-dot {
+  width: 9px;
+  height: 9px;
+  margin-bottom: 3px;
+  border-radius: 50%;
+  background: #d89a5c;
+  box-shadow: 0 0 8px rgba(216, 154, 92, 0.6);
+}
+.buoy-label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+.buoy-coord {
+  display: block;
+  font-size: 10px;
+  color: #6f8494;
+  white-space: nowrap;
+}
+.buoy.is-picked .buoy-dot {
+  background: #ffd9a3;
+  box-shadow: 0 0 14px rgba(255, 200, 130, 0.9);
+}
+.buoy.is-picked .buoy-label { color: #ffd9a3; }
+
+.compass {
+  position: relative;
+  width: min(190px, 46vw);
+  aspect-ratio: 1;
+  margin: 4px auto 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 214, 226, 0.18);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(38, 62, 84, 0.55), rgba(6, 12, 18, 0.92) 72%),
+    repeating-conic-gradient(from 0deg, rgba(201, 214, 226, 0.1) 0deg 1deg, transparent 1deg 15deg);
+  touch-action: none;
+  cursor: grab;
+}
+.compass.is-grabbing { cursor: grabbing; }
+
+.compass-needle {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  width: 2px;
+  height: 38%;
+  margin-left: -1px;
+  transform-origin: 50% 100%;
+  background: linear-gradient(to top, rgba(255, 197, 128, 0.15), #ffc580);
+  box-shadow: 0 0 10px rgba(255, 197, 128, 0.45);
+  transition: transform 0.05s linear;
+}
+
+.compass-hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 197, 128, 0.65);
+  background: #16232e;
+}
+
+.compass-dir {
+  position: absolute;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #8ea3b4;
+}
+.compass-dir.c-n { left: 50%; top: 7px; transform: translateX(-50%); }
+.compass-dir.c-s { left: 50%; bottom: 7px; transform: translateX(-50%); }
+.compass-dir.c-e { right: 9px; top: 50%; transform: translateY(-50%); }
+.compass-dir.c-w { left: 9px; top: 50%; transform: translateY(-50%); }

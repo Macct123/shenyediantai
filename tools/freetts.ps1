@@ -4,6 +4,7 @@
   [string]$Voice = "zh-CN-YunjianNeural",
   [string]$Rate = "-20%",
   [string]$Pitch = "-20Hz",
+  [string]$Only = "",
   [int]$MaxTries = 14
 )
 
@@ -15,6 +16,7 @@ if (-not (Test-Path $OutDir)) { New-Item -ItemType Directory -Force -Path $OutDi
 
 foreach ($prop in $data.PSObject.Properties) {
   $id = $prop.Name
+  if ($Only -and $id -notmatch $Only) { continue }
   $text = [string]$prop.Value.text
   $reqFile = Join-Path $env:TEMP ("ft_" + $id + ".json")
   $tmpMp3 = Join-Path $env:TEMP ("ft_" + $id + ".mp3")
