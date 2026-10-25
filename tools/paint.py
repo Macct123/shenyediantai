@@ -292,8 +292,6 @@ def make_intro(seconds=8, fps=24):
 def main():
     ok = True
     # 背景
-    ok &= process('studio', 'assets/bg_studio.jpg', seed=11, texture=8.5,
-                  detail=0.5, bloom_amount=0.4, vig=0.58, grain_amount=4.0)
     ok &= process('exterior', 'assets/bg_menu.jpg', seed=13, texture=7.5,
                   detail=0.45, bloom_amount=0.42, vig=0.5, grain_amount=3.6)
     ok &= process('exterior', 'assets/bg_intro.jpg', seed=17, texture=7.0,
