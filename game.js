@@ -276,7 +276,7 @@
 
       var self = this;
       try {
-        var rainEl = new window.Audio('assets/audio/rain-loop.mp3');
+        var rainEl = new window.Audio('assets/audio/rain-loop.m4a?v=20261030d');
         rainEl.loop = true;
         rainEl.preload = 'auto';
         rainEl.volume = 0.4;
