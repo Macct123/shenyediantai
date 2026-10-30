@@ -166,6 +166,12 @@ button { -webkit-tap-highlight-color: transparent; }
    主页
    ============================================================ */
 #menu { overflow: hidden; }
+/* 标题与菜单用 flex 上下两端对齐：不再依赖 vh/env 计算，任何窗口比例都不会叠在一起 */
+#menu.is-active {
+  display: flex; flex-direction: column; justify-content: space-between;
+  gap: 20px;
+  padding: 10vh 7% 11vh;
+}
 
 .menu-art {
   position: absolute; inset: 0;
@@ -187,7 +193,8 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 
 .menu-head {
-  position: absolute; left: 7%; top: calc(var(--safe-t) + 10vh);
+  position: relative; left: auto; top: auto;
+  flex: none;
   pointer-events: none;
 }
 .menu-title {
@@ -216,8 +223,9 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 
 .menu-entries {
-  position: absolute; left: 7%; bottom: calc(var(--safe-b) + 13vh);
-  display: flex; flex-direction: column; gap: 12px;
+  position: relative; left: auto; bottom: auto;
+  flex: none;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 12px;
 }
 .obj {
   position: relative;
@@ -234,6 +242,7 @@ button { -webkit-tap-highlight-color: transparent; }
   cursor: pointer;
   transition: color 0.3s, transform 0.3s;
 }
+.obj[hidden] { display: none; }
 .obj::after {
   content: "";
   position: absolute; left: 18px; right: 100%; bottom: 4px;
@@ -258,9 +267,19 @@ button { -webkit-tap-highlight-color: transparent; }
 .obj:hover .obj-dot { opacity: 1; box-shadow: 0 0 16px rgba(255, 214, 160, 0.95); }
 
 .menu-hint {
-  position: absolute; right: calc(var(--safe-r) + 4%); bottom: calc(var(--safe-b) + 4vh);
+  position: absolute; right: 4%; bottom: 4vh;
   margin: 0; font-size: 12px; letter-spacing: 0.2em;
   color: var(--text-dim); opacity: 0.62;
+}
+
+@media (max-height: 560px) {
+  #menu.is-active { padding: 4vh 7% 5vh; }
+  .menu-title { font-size: clamp(26px, 8vh, 40px); }
+  .menu-sub { margin-top: 6px; }
+  .menu-status { margin-top: 6px; }
+  .menu-entries { gap: 4px; }
+  .obj { min-height: 34px; font-size: 13px; }
+  .menu-hint { bottom: 3vh; font-size: 11px; }
 }
 
 /* ============================================================
@@ -1025,11 +1044,11 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 
 @media (orientation: portrait) and (max-width: 700px) {
-  .menu-head { top: calc(var(--safe-t) + 8vh); }
+  #menu.is-active { padding: 8vh 6% 9vh; }
   .menu-title { letter-spacing: 0.18em; }
-  .menu-entries { left: 6%; bottom: calc(var(--safe-b) + 9vh); gap: 6px; }
+  .menu-entries { gap: 6px; }
   .obj { font-size: 14.5px; padding: 4px 0; }
-  .menu-hint { right: auto; left: 6%; bottom: calc(var(--safe-b) + 3vh); }
+  .menu-hint { right: auto; left: 6%; bottom: 3vh; }
   .dial { height: 86px; }
 }
 
