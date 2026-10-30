@@ -69,37 +69,37 @@
     key: {
       name: '铜钥匙',
       note: '从铁栅下面吸上来的，齿口磨得很圆。',
-      img: 'assets/items/key.png'
+      img: 'assets/items/key.svg'
     },
     fuse: {
       name: '保险丝',
       note: '2A。玻璃管里的金属丝接好了。',
-      img: 'assets/items/fuse.png'
+      img: 'assets/items/fuse.svg'
     },
     piece: {
       name: '海图残片',
       note: '撕口和墙上那张海图正好对得上。',
-      img: 'assets/items/piece.png'
+      img: 'assets/items/piece.svg'
     },
     wire: {
       name: '细铜线',
       note: '一小卷铜线，够绕一根保险丝。',
-      img: 'assets/items/wire.png'
+      img: 'assets/items/wire.svg'
     },
     brokenFuse: {
       name: '断保险丝',
       note: '玻璃管发黑，金属丝断成两截。',
-      img: 'assets/items/brokenFuse.png'
+      img: 'assets/items/brokenFuse.svg'
     },
     magnet: {
       name: '系绳磁铁',
       note: '马蹄形磁铁，拴着一截细绳。',
-      img: 'assets/items/magnet.png'
+      img: 'assets/items/magnet.svg'
     },
     ruler: {
       name: '平行尺',
       note: '铜边磨得发亮，刻度是海里。',
-      img: 'assets/items/ruler.png'
+      img: 'assets/items/ruler.svg'
     }
   };
 
@@ -1063,9 +1063,9 @@
         {
           id: 'chart', label: '墙上海图', x: 25.0, y: 31.9,
           closeup: {
-            title: '海 图', widget: 'note', art: 'assets/closeups/chart.svg', textBaked: true,
+            title: '海 图', widget: 'note', art: 'assets/closeups/chart.svg',
             overlays: [
-              { text: '旧频道  100.0', x: 55, y: 46, size: 26, rot: -4, cls: 'is-pencil' }
+              { text: '旧频道  100.0', x: 55, y: 46, size: 26, rot: -4, cls: 'is-red' }
             ],
             note: '潮汐镇的海图，边角被潮气泡得发白。\n\n有一处礁石被红铅笔圈了两圈，旁边是旧频道栏，写着“100.0”。\n\n那一栏的字迹和前几栏不一样，像是后来补上去的。'
           }
@@ -1073,7 +1073,7 @@
         {
           id: 'notebook', label: '前任主播的笔记', x: 34.1, y: 54.8,
           closeup: {
-            title: '笔 记', widget: 'note', art: 'assets/closeups/note.svg', textBaked: true,
+            title: '笔 记', widget: 'note', art: 'assets/closeups/note.svg',
             overlays: [
               { text: '别在雾里关灯。', x: 28, y: 28, size: 26, rot: -2, cls: 'is-pencil' },
               { text: '他们认灯，不认声音。', x: 28, y: 37, size: 24, rot: -2, cls: 'is-pencil' },
@@ -1085,7 +1085,7 @@
         {
           id: 'plate', label: '收音机铭牌', x: 64.7, y: 70.1,
           closeup: {
-            title: '铭 牌', widget: 'note', art: 'assets/closeups/plate.svg', textBaked: true,
+            title: '铭 牌', widget: 'note', art: 'assets/closeups/plate.svg',
             overlays: [
               { text: '潮汐镇广播电台 · 夜班机', x: 20, y: 34, size: 23, rot: -4, cls: 'is-engrave' },
               { text: '本机刻度已按新标准下调 6.3MHz', x: 20, y: 42, size: 17, rot: -4, cls: 'is-engrave' },
@@ -1097,7 +1097,7 @@
         {
           id: 'letter', label: '桌面信件', x: 62.0, y: 82.4,
           closeup: {
-            title: '信 件', widget: 'note', art: 'assets/closeups/letter.svg', textBaked: true,
+            title: '信 件', widget: 'note', art: 'assets/closeups/letter.svg',
             overlays: [
               { text: '潮汐镇广播电台 · 夜班', x: 30, y: 60, size: 18, rot: -2, cls: 'is-pencil' }
             ],
@@ -1146,7 +1146,10 @@
               gate: function () { return Night1.tuned; },
               gateHint: '先调准他的频率，才知道他在哪。',
               closeup: {
-                title: '海 图', widget: 'chart', art: 'assets/closeups/chart.svg', textBaked: true,
+                title: '海 图', widget: 'chart', art: 'assets/closeups/chart.svg',
+                overlays: [
+                  { text: '旧频道  100.0', x: 55, y: 46, size: 26, rot: -4, cls: 'is-red' }
+                ],
                 props: function () {
                   return {
                     brief: Night1.chartPiece ? '把度分换成小数，再点在海图上。' : '海图的右下角被撕掉了一块。',
@@ -1183,7 +1186,12 @@
             {
               id: 'notebook', label: '值班便条', x: 34.1, y: 54.8,
               closeup: {
-                title: '便 条', widget: 'note', art: 'assets/closeups/note.svg', textBaked: true,
+                title: '便 条', widget: 'note', art: 'assets/closeups/note.svg',
+                overlays: [
+                  { text: '别在雾里关灯。', x: 28, y: 28, size: 26, rot: -2, cls: 'is-pencil' },
+                  { text: '他们认灯，不认声音。', x: 28, y: 37, size: 24, rot: -2, cls: 'is-pencil' },
+                  { text: '—— 没有名字', x: 30, y: 52, size: 18, rot: -2, cls: 'is-pencil' }
+                ],
                 note: '“雾夜里，先把声音抓住，再谈方向。”\n\n“度分换小数：1° = 60′。”\n\n“海图右下角被撕走过一次，别信缺的那一块。”'
               }
             },
@@ -2998,8 +3006,7 @@
     renderArea: function (area) {
       if (!area) return;
       this.el.art.style.backgroundColor = '#0a141f';
-      var jpg = (area.art || '').replace(/\.svg$/, '.jpg');
-      this.el.art.style.backgroundImage = 'url("' + jpg + '"), url("' + area.art + '")';
+      this.el.art.style.backgroundImage = 'url("' + (area.art || '') + '")';
 
       this.el.lights.innerHTML = '';
       (area.lights || []).forEach(function (light) {
@@ -3173,21 +3180,19 @@
       var shot = document.getElementById('closeupShot');
       var artPath = def.art || (this.current ? this.current.art : '');
       if (shot && artPath) {
-        // 生成图优先（同名 .jpg），没有就回退手绘 SVG
-        var jpgPath = artPath.replace(/\.svg$/, '.jpg');
-        var pngPath = artPath.replace(/\.svg$/, '.png');
-        var stack = 'url("' + pngPath + '"), url("' + jpgPath + '"), url("' + artPath + '")';
-        shot.style.backgroundImage = stack;
-        shot.style.backgroundPosition = '50% 50%, 50% 50%';
-        shot.style.backgroundSize = 'contain, contain';
-        shot.style.backgroundRepeat = 'no-repeat, no-repeat';
+        // 特写图现在只有矢量 SVG，直接铺满
+        var artUrl = 'url("' + artPath + '")';
+        shot.style.backgroundImage = artUrl;
+        shot.style.backgroundPosition = '50% 50%';
+        shot.style.backgroundSize = 'contain';
+        shot.style.backgroundRepeat = 'no-repeat';
         var bg = document.getElementById('closeupBg');
-        if (bg) bg.style.backgroundImage = stack;
+        if (bg) bg.style.backgroundImage = artUrl;
       }
 
-      // 文字已经烧进特写图（见 tools/paint.py），不再叠 HTML 浮层
+      // 特写上的刻字 / 铅笔字，按百分比贴在图上
       var textLayer = document.getElementById('closeupText');
-      if (textLayer && !def.textBaked) {
+      if (textLayer) {
         textLayer.innerHTML = '';
         (def.overlays || []).forEach(function (o) {
           var n = document.createElement('div');

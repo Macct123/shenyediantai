@@ -99,7 +99,7 @@ button { -webkit-tap-highlight-color: transparent; }
 .intro-cam {
   position: absolute;
   inset: 0;
-  background: url("assets/bg_intro.png") center 58% / cover no-repeat, url("assets/bg_intro.jpg") center 58% / cover no-repeat, url("assets/exterior.svg") center 58% / cover no-repeat, #03060a;
+  background: url("assets/exterior.svg") center 58% / cover no-repeat, #03060a;
 }
 .intro-veil {
   position: absolute; inset: 0;
@@ -175,7 +175,7 @@ button { -webkit-tap-highlight-color: transparent; }
 
 .menu-art {
   position: absolute; inset: 0;
-  background: url("assets/bg_menu.png") center / cover no-repeat, url("assets/bg_menu.jpg") center / cover no-repeat, url("assets/exterior.svg") center / cover no-repeat, #05080c;
+  background: url("assets/exterior.svg") center / cover no-repeat, #05080c;
   filter: brightness(0.62) saturate(0.94) contrast(1.05);
   transform: scale(1.05);
   animation: menu-drift 30s ease-in-out infinite alternate;
@@ -595,6 +595,13 @@ button { -webkit-tap-highlight-color: transparent; }
 .ovl.is-pencil {
   color: rgba(58, 56, 48, 0.86);
   font-family: var(--font);
+}
+/* 红铅笔批注：深色海图上必须自己会亮（对应原先烧进图里的红字） */
+.ovl.is-red {
+  color: #b5563f;
+  font-family: var(--font);
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 220, 200, 0.18);
 }
 .ovl.is-stamp {
   color: rgba(122, 70, 62, 0.6);
