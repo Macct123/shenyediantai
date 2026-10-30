@@ -279,7 +279,7 @@
         var rainEl = new window.Audio('assets/audio/rain-loop.m4a?v=20261030d');
         rainEl.loop = true;
         rainEl.preload = 'auto';
-        rainEl.volume = 0.4;
+        rainEl.volume = 0.22;
         rainEl.muted = this.muted;
         self.rainEl = rainEl;
 
@@ -390,7 +390,7 @@
 
     /* 雨声电平：直接调 <audio> 的音量 */
     setRainLevel: function (level) {
-      if (this.rainEl) this.rainEl.volume = Math.max(0, Math.min(1, level * 1.6));
+      if (this.rainEl) this.rainEl.volume = Math.max(0, Math.min(1, level * 0.85));
       if (this.backupRain && this.ctx) {
         this.backupRain.gain.setTargetAtTime(level, this.ctx.currentTime, 0.8);
       }
