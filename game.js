@@ -1319,7 +1319,7 @@
             }
           ],
           exits: [
-            { to: 'corridor', dir: 'down', label: '下 楼' }
+            { to: 'corridor', dir: 'left', label: '下 楼' }
           ]
         }
       }
@@ -2936,6 +2936,7 @@
     init: function () {
       this.el.art = $('#sceneArt');
       this.el.hotspots = $('#hotspots');
+      this.el.nav = $('#navLayer');
       this.el.lights = $('#lights');
       this.el.closeup = $('#closeup');
       this.el.tools = $('#closeupTools');
@@ -3005,6 +3006,8 @@
 
     renderArea: function (area) {
       if (!area) return;
+      var stage = $('#stage');
+      if (stage) { stage.scrollLeft = 0; stage.scrollTop = 0; }
       this.el.art.style.backgroundColor = '#0a141f';
       this.el.art.style.backgroundImage = 'url("' + (area.art || '') + '")';
 
@@ -3026,6 +3029,7 @@
       if (!area) return;
       var self = this;
       this.el.hotspots.innerHTML = '';
+      if (this.el.nav) this.el.nav.innerHTML = '';
 
       (area.hotspots || []).forEach(function (hs) {
         if (hs.visible && !hs.visible()) return;
@@ -3086,11 +3090,10 @@
         var g = document.createElement('span');
         g.className = 'nav-glyph';
         g.setAttribute('aria-hidden', 'true');
-        g.textContent = ex.dir === 'left' ? '←' : (ex.dir === 'down' ? '↓' : '→');
 
         b.appendChild(g);
         b.addEventListener('click', function () { Scene.travel(ex.to, ex.dir); });
-        self.el.hotspots.appendChild(b);
+        (self.el.nav || self.el.hotspots).appendChild(b);
       });
     },
 

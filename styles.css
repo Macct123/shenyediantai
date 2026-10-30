@@ -327,6 +327,7 @@ button { -webkit-tap-highlight-color: transparent; }
 #stage {
   position: relative; flex: 1; min-width: 0; min-height: 0;
   overflow: hidden;
+  overflow: clip;   /* 场景比舞台宽，禁止被 focus 带着横向滚动 */
   background: radial-gradient(120% 100% at 50% 42%, #0b1a27 0%, #05080c 78%);
   touch-action: pan-y;
 }
@@ -1549,15 +1550,22 @@ button { -webkit-tap-highlight-color: transparent; }
   z-index: 6;
 }
 
+/* 换房间箭头层：贴在可视舞台上，不随场景 cover 缩放被裁掉 */
+.nav-layer {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 9;
+}
+
 .nav-arrow {
   position: absolute;
   display: flex; align-items: center; justify-content: center;
-  width: 64px; height: 64px;
+  width: 44px; height: 44px;
   padding: 0;
   border: none;
   border-radius: 0;
   background: none;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   z-index: 8;
   pointer-events: auto;
@@ -1568,16 +1576,22 @@ button { -webkit-tap-highlight-color: transparent; }
   color: #fff;
   outline: none;
 }
+/* 小巧的折角箭头：用两条边画，不带尾巴 */
 .nav-glyph {
-  font-family: var(--sans);
-  font-size: 40px;
-  font-weight: 300;
-  line-height: 1;
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95), 0 0 22px rgba(0, 0, 0, 0.6);
+  display: block;
+  width: 11px; height: 11px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  border-radius: 1px;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.9));
+  transition: opacity 0.2s ease;
 }
-.nav-left { left: 10px; top: 50%; transform: translateY(-50%); }
-.nav-right { right: 10px; top: 50%; transform: translateY(-50%); }
-.nav-down { left: 50%; bottom: 10px; transform: translateX(-50%); }
+.nav-left { left: 12px; top: 50%; transform: translateY(-50%); }
+.nav-right { right: 12px; top: 50%; transform: translateY(-50%); }
+.nav-down { left: 50%; bottom: 14px; transform: translateX(-50%); }
+.nav-right .nav-glyph { transform: rotate(45deg) translate(-2px, 2px); }
+.nav-left .nav-glyph { transform: rotate(-135deg) translate(-2px, 2px); }
+.nav-down .nav-glyph { transform: rotate(135deg) translate(-2px, 2px); }
 .nav-left:hover { transform: translateY(-50%) translateX(-2px); }
 .nav-right:hover { transform: translateY(-50%) translateX(2px); }
 .nav-down:hover { transform: translateX(-50%) translateY(2px); }
@@ -1864,11 +1878,11 @@ button { -webkit-tap-highlight-color: transparent; }
 
 @media (max-width: 560px) {
   .room-tag { left: 10px; top: 8px; font-size: 9.5px; }
-  .nav-arrow { width: 52px; height: 52px; }
+  .nav-arrow { width: 38px; height: 38px; }
   .nav-left { left: 4px; }
   .nav-right { right: 4px; }
-  .nav-down { width: 52px; height: 52px; bottom: 6px; }
-  .nav-glyph { font-size: 32px; }
+  .nav-down { width: 38px; height: 38px; bottom: 8px; }
+  .nav-glyph { width: 10px; height: 10px; }
   .inventory { left: 8px; bottom: 8px; gap: 6px; padding: 7px 8px 8px; }
   .inv-slot { width: 62px; min-height: 78px; padding: 5px 4px 6px; gap: 3px; }
   .inv-img { width: 40px; height: 40px; }
