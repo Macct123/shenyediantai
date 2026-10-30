@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    深夜电台 · Midnight Signal
    序章《空频》+ 基础引擎
    ============================================================ */
@@ -629,7 +629,9 @@
       music_01: 1, music_02: 1,
       news_01: 1, news_02: 1,
       n1_01: 1, n1_02: 1, n1_03: 1, n1_04: 1,
-      n1_05: 1, n1_06: 1, n1_07: 1, n1_08: 1
+      n1_05: 1, n1_06: 1, n1_07: 1, n1_08: 1,
+      n2_01: 1, n2_02: 1, n2_03: 1, n2_04: 1, n2_05: 1, n2_06: 1,
+      n2_07: 1, n2_08: 1, n2_09: 1, n2_10: 1, n2_11: 1, n2_12: 1
     },
 
     // 优先 mp3（当前生成的格式），没有 mp3 再退回 wav
@@ -1323,6 +1325,102 @@
           ]
         }
       }
+    },
+
+    /* 第 2 夜《磁带》：磁带间 + 走廊 */
+    night2: {
+      night: '第 2 夜 · 磁带',
+      start: 'taperoom',
+      areas: {
+        taperoom: {
+          room: '磁 带 间',
+          art: 'assets/tapes.svg',
+          lights: [{ id: 'bulb', x: 47, y: 20 }],
+          hotspots: [
+            {
+              id: 'letter', label: '桌上的信', x: 28, y: 74,
+              onOpen: function () { Night2.readLetterNow(); },
+              closeup: {
+                title: '来 信',
+                widget: 'note',
+                art: 'assets/closeups/letter.svg',
+                note: '守夜的：\n\n这盘带子是小满走那年录的。他走的时候，我说了句不该说的话。带子寄到我手上时已经断了，剪开的几截我也分不清先后。\n\n后来我又补录过一次，可那次录反了——有一截是倒着的，你别怪我。\n\n补录的时候，别提他父亲。他听了会走。\n\n还有，小满怕黑。别在他面前说关灯的话。\n\n—— 林慧'
+              }
+            },
+            {
+              id: 'case', label: '磁带盒', x: 53.5, y: 75,
+              action: function () { Night2.openCase(); }
+            },
+            {
+              id: 'splice', label: '剪接台', x: 40, y: 72,
+              gate: function () { return Night2.cutOpen; },
+              gateHint: '盒子还没开。先看看那盘带子。',
+              closeup: {
+                title: '剪 接 台',
+                widget: 'tapeSplice',
+                art: 'assets/closeups/splice.svg',
+                props: function () {
+                  return {
+                    frags: Night2.FRAGS,
+                    order: Night2.order,
+                    rev: Night2.rev,
+                    solved: Night2.spliced,
+                    brief: Night2.spliced
+                      ? '接好了。磁带在等开盘机。'
+                      : '五截带子，按句意接成一条。有一截是倒着录的。',
+                    onSubmit: function (order, rev) { return Night2.trySplice(order, rev); }
+                  };
+                }
+              }
+            },
+            {
+              id: 'deck', label: '开盘机', x: 65, y: 65,
+              closeup: {
+                title: '开 盘 机',
+                widget: 'tapeDeck',
+                art: 'assets/closeups/deck.svg',
+                props: function () {
+                  return {
+                    spliced: Night2.spliced,
+                    listened: Night2.listened,
+                    recorded: Night2.recorded,
+                    choices: Night2.CHOICES,
+                    brief: Night2.spliced
+                      ? (Night2.listened ? '空白还在等她一句话。' : '带子接好了，可以放了。')
+                      : '带子是断的。两个字都放不出来。',
+                    onPlay: function () { Night2.play(); },
+                    onPick: function (id) { Night2.pick(id); }
+                  };
+                }
+              }
+            },
+            {
+              id: 'shelf', label: '磁带柜', x: 16, y: 44,
+              action: function () {
+                Sub.hint('整柜都是潮汐镇的旧带子。最上面一格空着，标签是新的。', 3600);
+              }
+            }
+          ],
+          exits: [
+            { to: 'corridor', dir: 'left', label: '走 廊' }
+          ]
+        },
+
+        corridor: {
+          room: '走 廊',
+          art: 'assets/corridor.svg',
+          lights: [{ id: 'bulb', x: 52, y: 16 }],
+          hotspots: [
+            {
+              id: 'door', label: '磁带间的门', x: 26, y: 52,
+              action: function () { Sub.hint('门缝里飘出磁粉和旧纸的味道。', 2800); }
+            }
+          ],
+          exits: [
+            { to: 'taperoom', dir: 'right', label: '磁 带 间' }
+          ]
+        }
+      }
     }
   };
 
@@ -1536,6 +1634,12 @@
       Store.set(K.progress, progress);
 
       Game.refreshEntry();
+
+      // 不回主页：让黑场自己接上第 1 夜
+      setTimeout(function () {
+        var p = Store.get(K.progress, {}) || {};
+        if (Game.inGame && p.chapter === 'night1') Game.beginChapter('night1');
+      }, 3400);
     }
   };
 
@@ -1856,6 +1960,277 @@
       this.save();
       Game.refreshEntry();
       Sub.hint('信号断了。海面上只剩雾。', 3800);
+
+      // 不用回主页：下一夜自己接上来
+      setTimeout(function () {
+        var p = Store.get(K.progress, {}) || {};
+        if (Game.inGame && p.chapter === 'night1') Game.beginChapter('night2');
+      }, 4400);
+    }
+  };
+
+  /* ============================================================
+     第 2 夜《磁带》状态机
+     读信 → 拆带 → 剪接（含倒放）→ 播放 → 补录
+     ============================================================ */
+  var Night2 = {
+    step: 'letter',          // letter | cut | splice | listen | record | done
+    readLetter: false,
+    cutOpen: false,
+    spliced: false,
+    listened: false,
+    recorded: false,
+    choice: '',
+    finished: false,
+    area: 'taperoom',
+    order: [],
+    rev: { f3: true },
+
+    /* 托盘刻意打乱：要按句意自己排，不是照着顺序点 */
+    FRAGS: [
+      { id: 'f4', text: '我不该那么说。' },
+      { id: 'f1', text: '小满，妈这盘带子，录了七遍。' },
+      { id: 'f5', text: '灯我给你留着。' },
+      { id: 'f2', text: '那年冬天你走的时候，我说的是——' },
+      { id: 'f3', text: '“别再回来了”。' }
+    ],
+    ORDER: ['f1', 'f2', 'f3', 'f4', 'f5'],
+
+    /* 补录三选：只有一句不违来信里的两条禁忌 */
+    CHOICES: [
+      { id: 'lamp', text: '就算你不回来，灯也一直亮着。' },
+      { id: 'father', text: '你爸当年也是这么走的。' },
+      { id: 'dark', text: '夜里别开灯，省点电。' }
+    ],
+
+    reset: function () {
+      this.step = 'letter';
+      this.readLetter = false;
+      this.cutOpen = false;
+      this.spliced = false;
+      this.listened = false;
+      this.recorded = false;
+      this.choice = '';
+      this.finished = false;
+      this.area = 'taperoom';
+      this.order = [];
+      this.rev = { f3: true };
+      Inv.clear();
+    },
+
+    snapshot: function () {
+      return {
+        step: this.step,
+        readLetter: this.readLetter,
+        cutOpen: this.cutOpen,
+        spliced: this.spliced,
+        listened: this.listened,
+        recorded: this.recorded,
+        choice: this.choice,
+        finished: this.finished,
+        area: this.area,
+        order: this.order.slice(),
+        rev: { f3: !!this.rev.f3 }
+      };
+    },
+
+    restore: function (data) {
+      this.reset();
+      if (!data) return;
+      this.step = data.step || 'letter';
+      this.readLetter = !!data.readLetter;
+      this.cutOpen = !!data.cutOpen;
+      this.spliced = !!data.spliced;
+      this.listened = !!data.listened;
+      this.recorded = !!data.recorded;
+      this.choice = data.choice || '';
+      this.finished = !!data.finished;
+      this.area = data.area || 'taperoom';
+      this.order = Array.isArray(data.order) ? data.order.slice() : [];
+      this.rev = { f3: !(data.rev && data.rev.f3 === false) };
+    },
+
+    objective: function () {
+      if (this.finished) return '这一夜收进柜子了。';
+      if (!this.readLetter) return '桌上压着一封信。';
+      if (!this.cutOpen) return '磁带还没拆开。';
+      if (!this.spliced) return '带子断成五截。';
+      if (!this.listened) return '接好了，还没放。';
+      if (!this.recorded) return '空白还等着她一句话。';
+      return '这一夜收进柜子了。';
+    },
+
+    hintOnEnter: function () {
+      if (this.finished) {
+        Sub.hint('带子已经收进柜子了。', 3200);
+      } else if (!this.readLetter) {
+        Sub.hint('磁带间比播音室冷。桌上压着一封信，还有一盘带子。', 4600);
+      } else if (!this.cutOpen) {
+        Sub.hint('磁带盒上的封条是新的。', 3200);
+      } else if (!this.spliced) {
+        Sub.hint('五截带子摊在剪接台上。', 3800);
+      } else if (!this.listened) {
+        Sub.hint('带子接好了。开盘机在等。', 3400);
+      } else {
+        Sub.hint('空白还在等她一句话。', 3400);
+      }
+    },
+
+    sync: function () {
+      if (Scene.current && Scene.current.areas && Scene.area) this.area = Scene.area;
+      Scene.setObjective(this.objective());
+      Scene.renderHotspots();
+      Scene.setActive('deck', this.spliced && !this.listened);
+      Scene.setActive('splice', this.cutOpen && !this.spliced);
+      this.save();
+    },
+
+    save: function () {
+      var progress = Store.get(K.progress, {}) || {};
+      progress.chapter = 'night2';
+      progress.night = '第 2 夜 · 磁带';
+      progress.night2 = this.snapshot();
+      progress.at = Date.now();
+      Store.set(K.progress, progress);
+    },
+
+    readLetterNow: function () {
+      if (this.readLetter) return;
+      this.readLetter = true;
+      if (this.step === 'letter') this.step = 'cut';
+      Audio.sfx('paper');
+      this.sync();
+      Sub.hint('两条禁忌：别提他父亲；别说关灯的话。', 5200);
+    },
+
+    openCase: function () {
+      if (this.cutOpen) {
+        Sub.hint('盒子空了。碎段都在剪接台上。', 2600);
+        return;
+      }
+      if (!this.readLetter) {
+        Sub.hint('封条上写着“林慧”。先看看桌上那封信。', 4000);
+        return;
+      }
+      this.cutOpen = true;
+      this.step = 'splice';
+      Audio.sfx('drawer');
+      this.sync();
+
+      Sub.play([
+        { who: '', text: '盒子里不是整盘带子，是五截剪断的磁带。', voice: 'n2_01' },
+        { who: '', text: '断口很齐——是拿剪接刀切的，不是扯断的。', voice: 'n2_02' }
+      ], function () {
+        Sub.hint('把句子接起来，才知道她到底说了什么。', 4200);
+      });
+    },
+
+    /* 剪接台提交：先判顺序，再判有没有倒着录的 */
+    trySplice: function (order, rev) {
+      if (this.spliced) return true;
+
+      var target = this.ORDER.join(',');
+      if (order.join(',') !== target) {
+        Audio.sfx('switch');
+        Sub.hint('接不上。这句话的尾巴，对不上下一句的开头。', 3800);
+        return false;
+      }
+
+      var back = 0;
+      for (var id in rev) {
+        if (Object.prototype.hasOwnProperty.call(rev, id) && rev[id]) back++;
+      }
+      if (back) {
+        Audio.sfx('switch');
+        Sub.hint('顺序对了。可有一截是倒着录的，听不出字。', 4400);
+        return false;
+      }
+
+      this.order = order.slice();
+      this.onSpliced();
+      return true;
+    },
+
+    onSpliced: function () {
+      if (this.spliced) return;
+      this.spliced = true;
+      this.step = 'listen';
+      Audio.sfx('lock');
+      this.sync();
+      Sub.play([
+        { who: '', text: '接缝严丝合缝。磁带落回盘上。', voice: 'n2_03' }
+      ], function () {
+        Sub.hint('把带子挂上开盘机，按播放。', 3800);
+      });
+    },
+
+    play: function () {
+      if (!this.spliced || this.listened) return;
+      Audio.sfx('click');
+      if (Scene.isOpen()) Scene.close();
+
+      var self = this;
+      Sub.play([
+        { who: '林慧', text: '小满，妈这盘带子，录了七遍。', voice: 'n2_04' },
+        { who: '林慧', text: '那年冬天你走的时候，我说的是——“别再回来了”。', voice: 'n2_05' },
+        { who: '林慧', text: '我不该那么说。灯我给你留着。', voice: 'n2_06' }
+      ], function () {
+        self.listened = true;
+        self.step = 'record';
+        self.sync();
+        Sub.hint('后面还有一段空白，留给一句话。', 4600);
+      });
+    },
+
+    pick: function (id) {
+      if (this.recorded) return;
+
+      if (id === 'lamp') {
+        this.recorded = true;
+        this.choice = id;
+        this.step = 'done';
+        Audio.sfx('lock');
+        this.sync();
+        if (Scene.isOpen()) Scene.close();
+
+        var self = this;
+        Sub.play([
+          { who: '', text: '你把那句话录进空白里。', voice: 'n2_07' },
+          { who: '林慧', text: '……就这句。谢谢你，守夜的。', voice: 'n2_08' },
+          { who: '', text: '带子到头，咔哒一声弹了起来。', voice: 'n2_09' }
+        ], function () { self.finish(); });
+        return;
+      }
+
+      Audio.sfx('switch');
+      var wrong = id === 'father'
+        ? { who: '林慧', text: '……别提他父亲。', voice: 'n2_10' }
+        : { who: '林慧', text: '别说关灯的事。他怕黑。', voice: 'n2_11' };
+
+      Sub.play([
+        wrong,
+        { who: '', text: '她的声音停了一下，像在摇头。', voice: 'n2_12' }
+      ], function () {
+        Sub.hint('空白还在。换一句。', 3200);
+      });
+    },
+
+    finish: function () {
+      if (this.finished) return;
+      this.finished = true;
+      this.sync();
+
+      var tapes = Store.get(K.tapes, []);
+      var exists = tapes.some(function (t) { return t.id === 'night2'; });
+      if (!exists) {
+        tapes.push({ id: 'night2', title: '第 2 夜 · 磁带', night: '林慧 · 没说完的一句话' });
+        Store.set(K.tapes, tapes);
+      }
+
+      Audio.sfx('open');
+      this.save();
+      Game.refreshEntry();
+      Sub.hint('磁带收进柜子。标签上写着一个名字：小满。', 4800);
     }
   };
 
@@ -2814,6 +3189,176 @@
         '“刻度不是真相。信海图。”');
       note.style.textAlign = 'left';
       wrap.appendChild(note);
+      root.appendChild(wrap);
+      return { destroy: function () {} };
+    },
+
+    /* ---------- 第 2 夜：剪接台（排序 + 倒放） ---------- */
+    tapeSplice: function (root, props) {
+      props = props || {};
+      var frags = props.frags || [];
+      var rev = props.rev || {};
+      var order = (props.order || []).slice();
+      var solved = !!props.solved;
+
+      var wrap = div('tool-block');
+      wrap.appendChild(p('tool-caption', '剪 接 台'));
+      var brief = p('chart-brief', props.brief || '');
+      wrap.appendChild(brief);
+
+      var seq = div('tape-seq');
+      var tray = div('tape-tray');
+      var actions = div('tape-actions');
+      wrap.appendChild(seq);
+      wrap.appendChild(tray);
+
+      function find(id) {
+        for (var i = 0; i < frags.length; i++) {
+          if (frags[i].id === id) return frags[i];
+        }
+        return null;
+      }
+
+      /* 倒着录的那一截，正着放出来就是反的字 */
+      function shown(f) {
+        if (!rev[f.id]) return f.text;
+        return Array.from(f.text).reverse().join('');
+      }
+
+      function chip(f, placed, index) {
+        var card = div('tape-chip' + (placed ? ' is-placed' : '') + (rev[f.id] ? ' is-rev' : ''));
+
+        var no = document.createElement('span');
+        no.className = 'tape-no';
+        no.textContent = placed ? String(index + 1) : '·';
+
+        var txt = document.createElement('span');
+        txt.className = 'tape-text';
+        txt.textContent = shown(f);
+
+        var flip = document.createElement('button');
+        flip.type = 'button';
+        flip.className = 'tape-rev';
+        flip.textContent = '倒放';
+        flip.disabled = solved;
+        flip.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (solved) return;
+          rev[f.id] = !rev[f.id];
+          Audio.sfx('switch');
+          render();
+        });
+
+        card.appendChild(no);
+        card.appendChild(txt);
+        card.appendChild(flip);
+
+        card.addEventListener('click', function () {
+          if (solved) return;
+          if (placed) order.splice(index, 1);
+          else if (order.length < frags.length) order.push(f.id);
+          Audio.sfx('click');
+          render();
+        });
+        return card;
+      }
+
+      var listen = document.createElement('button');
+      listen.type = 'button';
+      listen.className = 'btn-amber';
+      listen.textContent = solved ? '已接好' : '试 听';
+      listen.addEventListener('click', function () {
+        if (solved || order.length !== frags.length) return;
+        if (!props.onSubmit) return;
+        if (props.onSubmit(order.slice(), rev)) {
+          solved = true;
+          listen.textContent = '已接好';
+          brief.textContent = '接好了。磁带在等开盘机。';
+          render();
+        }
+      });
+
+      function render() {
+        seq.innerHTML = '';
+        order.forEach(function (id, i) {
+          var f = find(id);
+          if (f) seq.appendChild(chip(f, true, i));
+        });
+        for (var k = order.length; k < frags.length; k++) {
+          seq.appendChild(div('tape-slot'));
+        }
+
+        tray.innerHTML = '';
+        frags.forEach(function (f) {
+          if (order.indexOf(f.id) >= 0) return;
+          tray.appendChild(chip(f, false, 0));
+        });
+
+        listen.disabled = solved || order.length !== frags.length;
+      }
+
+      actions.appendChild(listen);
+      wrap.appendChild(actions);
+      render();
+
+      root.appendChild(wrap);
+      return { destroy: function () {} };
+    },
+
+    /* ---------- 第 2 夜：开盘机（播放 / 补录） ---------- */
+    tapeDeck: function (root, props) {
+      props = props || {};
+      var wrap = div('tool-block');
+      wrap.appendChild(p('tool-caption', '开 盘 机'));
+      wrap.appendChild(p('chart-brief', props.brief || ''));
+
+      if (!props.spliced) {
+        var dead = div('dead-unit');
+        dead.appendChild(p('dead-line', '磁头压着空气。带子还没接上。'));
+        wrap.appendChild(dead);
+        root.appendChild(wrap);
+        return { destroy: function () {} };
+      }
+
+      if (!props.listened) {
+        var play = document.createElement('button');
+        play.type = 'button';
+        play.className = 'btn-amber';
+        play.textContent = '播 放';
+        play.addEventListener('click', function () {
+          play.disabled = true;
+          if (props.onPlay) props.onPlay();
+        });
+        wrap.appendChild(play);
+      } else if (!props.recorded) {
+        var list = div('choices');
+        (props.choices || []).forEach(function (opt, i) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'choice';
+
+          var idx = document.createElement('span');
+          idx.className = 'choice-index';
+          idx.textContent = '0' + (i + 1);
+
+          var body = div('choice-body');
+          var title = document.createElement('span');
+          title.className = 'choice-title';
+          title.textContent = opt.text;
+
+          body.appendChild(title);
+          btn.appendChild(idx);
+          btn.appendChild(body);
+          btn.addEventListener('click', function () {
+            if (props.onPick) props.onPick(opt.id);
+          });
+          list.appendChild(btn);
+        });
+        wrap.appendChild(list);
+      } else {
+        wrap.appendChild(p('dead-line', '带子录满了，卡在最后一格。'));
+      }
+
       root.appendChild(wrap);
       return { destroy: function () {} };
     }
@@ -3882,12 +4427,19 @@
       var n1 = progress && progress.night1;
       var n1Done = !!(n1 && n1.finished);
       var n1Ready = proDone && !n1Done;
+      var n2 = progress && progress.night2;
+      var n2Done = !!(n2 && n2.finished);
+      var n2Ready = n1Done && !n2Done;
 
       if (restart) restart.hidden = !hasSave;
 
       if (status) {
         if (!hasSave) {
           status.textContent = '序章 · 空频待命';
+        } else if (n2Done) {
+          status.textContent = '第 2 夜已完成 · 收录 ' + tapes.length + ' 盘';
+        } else if (n2Ready) {
+          status.textContent = '第 2 夜 · 磁带待命';
         } else if (n1Done) {
           status.textContent = '第 1 夜已完成 · 收录 ' + tapes.length + ' 盘';
         } else if (n1Ready) {
@@ -3899,9 +4451,15 @@
         }
       }
 
-      if (n1Done) {
-        label.textContent = '重听这一夜';
-        hint.textContent = '第 2 夜还在路上。';
+      if (n2Done) {
+        label.textContent = '重听第 2 夜';
+        hint.textContent = '第 3 夜还在路上。';
+      } else if (n2Ready) {
+        label.textContent = (n2 && n2.step !== 'letter') ? '继续第 2 夜' : '进入第 2 夜';
+        hint.textContent = '磁带间还亮着一盏灯。';
+      } else if (n1Done) {
+        label.textContent = '重听第 1 夜';
+        hint.textContent = '柜子里多了一盘带子。';
       } else if (n1Ready) {
         label.textContent = (n1 && n1.step !== 'power') ? '继续第 1 夜' : '进入第 1 夜';
         hint.textContent = '雾里有人在呼叫。';
@@ -3940,6 +4498,7 @@
         Sub.history = [];
         Pro.reset();
         Night1.reset();
+        Night2.reset();
         Game.enter();
         Game.refreshEntry();
       });
@@ -3984,10 +4543,54 @@
       this.inGame = true;
 
       var progress = Store.get(K.progress, null) || {};
+      if (progress.chapter === 'night2') { this.loadChapter('night2', progress); return; }
+      if (progress.chapter === 'night1') { this.loadChapter('night1', progress); return; }
+      this.loadChapter('prologue', progress);
+    },
+
+    /* 一夜结束后自动接下一夜：黑场 → 换场景 → 章节卡，不用退回主页 */
+    beginChapter: function (chapter) {
+      var progress = Store.get(K.progress, {}) || {};
+      progress.chapter = chapter;
+      Store.set(K.progress, progress);
+
+      if (!this.inGame) { this.refreshEntry(); return; }
+
+      var self = this;
+      this.fadeTo(function () {
+        $('#menu').classList.remove('is-active');
+        $('#game').classList.add('is-active');
+        self.loadChapter(chapter, progress);
+      });
+    },
+
+    loadChapter: function (chapter, progress) {
       var self = this;
 
-      /* 序章通关后进入第 1 夜 */
-      if (progress.chapter === 'night1') {
+      if (chapter === 'night2') {
+        Night2.restore(progress.night2);
+
+        setTimeout(function () {
+          Layout.apply();
+          Scene.load('night2', Night2.area);
+          Power.skip();
+          Scene.setLight('bulb', true);
+          Night2.sync();
+
+          Card.play('第 2 夜', '磁带', 'MIDNIGHT SIGNAL · NIGHT TWO', function () {
+            Night2.hintOnEnter();
+          });
+        });
+
+        progress.night = '第 2 夜 · 磁带';
+        progress.at = Date.now();
+        Store.set(K.progress, progress);
+        $('#tbNight').textContent = progress.night;
+        return;
+      }
+
+      /* 第 1 夜 */
+      if (chapter === 'night1') {
         Night1.restore(progress.night1);
 
         setTimeout(function () {
@@ -4017,6 +4620,7 @@
         return;
       }
 
+      /* 序章 */
       Pro.restore(progress.prologue);
       var resumed = Pro.introDone;
 
@@ -4083,7 +4687,10 @@
       var progress = Store.get(K.progress, null);
       if (!progress) return;
       progress.prologue = Pro.snapshot();
-      if (progress.chapter === 'night1') {
+      if (progress.chapter === 'night2') {
+        progress.night2 = Night2.snapshot();
+        progress.night = '第 2 夜 · 磁带';
+      } else if (progress.chapter === 'night1') {
         progress.night1 = Night1.snapshot();
         progress.night = '第 1 夜 · 信号';
       }
@@ -4160,9 +4767,15 @@
     Scene.init();
     Inv.init();
     Scene.onAreaChange = function () {
-      if (Scene.sceneId !== 'night1') return;
-      Night1.area = Scene.area;
-      Night1.sync();
+      if (Scene.sceneId === 'night1') {
+        Night1.area = Scene.area;
+        Night1.sync();
+        return;
+      }
+      if (Scene.sceneId === 'night2') {
+        Night2.area = Scene.area;
+        Night2.sync();
+      }
     };
     Power.init();
     Card.init();

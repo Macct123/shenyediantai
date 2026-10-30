@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="sbg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#0f1e2a"/>
+      <stop offset="0.55" stop-color="#09141d"/>
+      <stop offset="1" stop-color="#04090e"/>
+    </linearGradient>
+    <linearGradient id="stop" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#4a3a2c"/>
+      <stop offset="0.35" stop-color="#2a2018"/>
+      <stop offset="1" stop-color="#120d0a"/>
+    </linearGradient>
+    <linearGradient id="smetal" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#6d8294"/>
+      <stop offset="0.4" stop-color="#334a5b"/>
+      <stop offset="1" stop-color="#132029"/>
+    </linearGradient>
+    <linearGradient id="stape" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5b4632"/>
+      <stop offset="0.5" stop-color="#3a2c22"/>
+      <stop offset="1" stop-color="#211812"/>
+    </linearGradient>
+    <radialGradient id="sglow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd6a0" stop-opacity="0.36"/>
+      <stop offset="0.55" stop-color="#e0a45e" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="svign" cx="0.5" cy="0.46" r="0.74">
+      <stop offset="0.4" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.82"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#sbg)"/>
+  <ellipse cx="820" cy="420" rx="680" ry="380" fill="url(#sglow)" opacity="0.55"/>
+
+  <!-- 台面 -->
+  <path d="M120 640 L1480 612 L1520 900 L80 900 Z" fill="url(#stop)"/>
+  <path d="M120 640 L1480 612 L1480 636 L120 664 Z" fill="#5c4733" opacity="0.35"/>
+
+  <!-- 剪接块 -->
+  <g>
+    <path d="M470 560 L1130 540 L1150 640 L452 664 Z" fill="url(#smetal)" stroke="#4e6b7c" stroke-width="4"/>
+    <path d="M470 560 L1130 540 L1132 578 L468 598 Z" fill="#1a2833" opacity="0.85"/>
+    <!-- 磁带压在上面的槽 -->
+    <path d="M500 574 L1100 558 L1102 590 L502 606 Z" fill="url(#stape)"/>
+    <path d="M500 574 L1100 558 L1101 570 L501 586 Z" fill="#7a5c40" opacity="0.4"/>
+    <!-- 剪口 -->
+    <g stroke="#e0a45e" stroke-width="3" opacity="0.8">
+      <line x1="700" y1="560" x2="700" y2="604"/>
+      <line x1="892" y1="554" x2="892" y2="598"/>
+      <line x1="1024" y1="550" x2="1024" y2="594"/>
+    </g>
+    <!-- 对齐刻度 -->
+    <g stroke="#8ea6b6" stroke-width="2" opacity="0.5">
+      <line x1="520" y1="616" x2="1098" y2="600"/>
+      <line x1="560" y1="620" x2="560" y2="636"/>
+      <line x1="680" y1="617" x2="680" y2="633"/>
+      <line x1="800" y1="613" x2="800" y2="629"/>
+      <line x1="920" y1="610" x2="920" y2="626"/>
+      <line x1="1040" y1="606" x2="1040" y2="622"/>
+    </g>
+  </g>
+
+  <!-- 剪断的碎段 -->
+  <g>
+    <g transform="rotate(-3 420 720)">
+      <rect x="300" y="700" width="210" height="26" rx="4" fill="url(#stape)" stroke="#241a13" stroke-width="2"/>
+      <path d="M300 700 L510 700 L510 708 L300 708 Z" fill="#7a5c40" opacity="0.3"/>
+    </g>
+    <g transform="rotate(4 640 760)">
+      <rect x="540" y="748" width="180" height="24" rx="4" fill="url(#stape)" stroke="#241a13" stroke-width="2"/>
+      <path d="M540 748 L720 748 L720 756 L540 756 Z" fill="#7a5c40" opacity="0.3"/>
+    </g>
+    <g transform="rotate(-7 900 760)">
+      <rect x="820" y="742" width="150" height="24" rx="4" fill="url(#stape)" stroke="#241a13" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- 剪刀 -->
+  <g stroke="#9db6c4" stroke-width="4" fill="none" opacity="0.85">
+    <path d="M1120 690 L1290 742"/>
+    <path d="M1146 748 L1284 700"/>
+    <circle cx="1108" cy="686" r="16"/>
+    <circle cx="1150" cy="760" r="16"/>
+    <circle cx="1108" cy="686" r="6" fill="#0a141b"/>
+    <circle cx="1150" cy="760" r="6" fill="#0a141b"/>
+  </g>
+
+  <!-- 油性铅笔 -->
+  <g transform="rotate(12 1000 800)">
+    <rect x="900" y="790" width="200" height="16" rx="7" fill="#a8452f" opacity="0.9"/>
+    <rect x="1084" y="790" width="26" height="16" rx="6" fill="#c9bda2" opacity="0.8"/>
+  </g>
+
+  <!-- 胶带卷 -->
+  <g opacity="0.9">
+    <circle cx="330" cy="820" r="42" fill="#16242e" stroke="#3d5b6c" stroke-width="3"/>
+    <circle cx="330" cy="820" r="16" fill="#0a141b" stroke="#3d5b6c" stroke-width="2"/>
+    <path d="M372 820 q40 10 74 -4" stroke="#8ea6b6" stroke-width="2" fill="none" opacity="0.5"/>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#svign)"/>
+</svg>

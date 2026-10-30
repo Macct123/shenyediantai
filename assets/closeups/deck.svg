@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="dbg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#10202c"/>
+      <stop offset="0.55" stop-color="#0a1620"/>
+      <stop offset="1" stop-color="#050a10"/>
+    </linearGradient>
+    <linearGradient id="dbody" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#3c4f5e"/>
+      <stop offset="0.35" stop-color="#22323e"/>
+      <stop offset="0.75" stop-color="#131e27"/>
+      <stop offset="1" stop-color="#0a1118"/>
+    </linearGradient>
+    <linearGradient id="dmetal" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#6b8093"/>
+      <stop offset="0.4" stop-color="#33485a"/>
+      <stop offset="1" stop-color="#14212b"/>
+    </linearGradient>
+    <linearGradient id="dreel" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#2b3d4a"/>
+      <stop offset="0.6" stop-color="#16242e"/>
+      <stop offset="1" stop-color="#0a141b"/>
+    </linearGradient>
+    <radialGradient id="dglow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd39b" stop-opacity="0.42"/>
+      <stop offset="0.5" stop-color="#e0a45e" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="dvu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1d3327"/>
+      <stop offset="1" stop-color="#0a1712"/>
+    </linearGradient>
+    <radialGradient id="dvign" cx="0.5" cy="0.46" r="0.74">
+      <stop offset="0.4" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.8"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#dbg)"/>
+  <ellipse cx="800" cy="470" rx="640" ry="360" fill="url(#dglow)" opacity="0.5"/>
+
+  <!-- 机身 -->
+  <rect x="250" y="250" width="1100" height="480" rx="26" fill="url(#dbody)" stroke="#3d5b6c" stroke-width="4"/>
+  <rect x="250" y="250" width="1100" height="480" rx="26" fill="none" stroke="#080f15" stroke-width="2" opacity="0.6"/>
+  <rect x="286" y="288" width="1028" height="404" rx="14" fill="#0b141b" opacity="0.55"/>
+
+  <!-- 左盘 -->
+  <g>
+    <circle cx="530" cy="430" r="152" fill="url(#dreel)" stroke="#43616f" stroke-width="4"/>
+    <circle cx="530" cy="430" r="118" fill="#0e1a22"/>
+    <g stroke="#2f4653" stroke-width="8" opacity="0.9">
+      <line x1="530" y1="342" x2="530" y2="518"/>
+      <line x1="442" y1="430" x2="618" y2="430"/>
+      <line x1="468" y1="368" x2="592" y2="492"/>
+      <line x1="592" y1="368" x2="468" y2="492"/>
+    </g>
+    <circle cx="530" cy="430" r="40" fill="#1b2b36" stroke="#4a6a7b" stroke-width="3"/>
+    <circle cx="530" cy="430" r="12" fill="#0a1218"/>
+  </g>
+
+  <!-- 右盘 -->
+  <g>
+    <circle cx="1070" cy="430" r="126" fill="url(#dreel)" stroke="#43616f" stroke-width="4"/>
+    <circle cx="1070" cy="430" r="86" fill="#0e1a22"/>
+    <g stroke="#2f4653" stroke-width="7" opacity="0.9">
+      <line x1="1070" y1="356" x2="1070" y2="504"/>
+      <line x1="996" y1="430" x2="1144" y2="430"/>
+      <line x1="1018" y1="378" x2="1122" y2="482"/>
+      <line x1="1122" y1="378" x2="1018" y2="482"/>
+    </g>
+    <circle cx="1070" cy="430" r="32" fill="#1b2b36" stroke="#4a6a7b" stroke-width="3"/>
+    <circle cx="1070" cy="430" r="10" fill="#0a1218"/>
+  </g>
+
+  <!-- 磁带连接 -->
+  <path d="M530 560 Q700 646 1070 548" fill="none" stroke="#3a2c22" stroke-width="7" opacity="0.95"/>
+  <path d="M530 560 Q700 646 1070 548" fill="none" stroke="#6d5640" stroke-width="2" opacity="0.55"/>
+
+  <!-- 磁头组 -->
+  <g>
+    <rect x="660" y="560" width="290" height="86" rx="10" fill="url(#dmetal)" stroke="#4c6b7c" stroke-width="3"/>
+    <rect x="676" y="578" width="258" height="50" rx="6" fill="#0a141b" stroke="#2c4553" stroke-width="2"/>
+    <g fill="#8ea6b6" opacity="0.85">
+      <rect x="700" y="586" width="10" height="34"/>
+      <rect x="742" y="586" width="10" height="34"/>
+      <rect x="784" y="586" width="10" height="34"/>
+    </g>
+    <circle cx="880" cy="603" r="18" fill="#101c24" stroke="#547484" stroke-width="2"/>
+    <circle cx="880" cy="603" r="6" fill="#e0a45e" opacity="0.7"/>
+  </g>
+
+  <!-- VU 表 -->
+  <g>
+    <rect x="1130" y="300" width="150" height="96" rx="8" fill="url(#dvu)" stroke="#3f5f6d" stroke-width="3"/>
+    <path d="M1150 380 Q1205 314 1260 380" fill="none" stroke="#9db6c4" stroke-width="2" opacity="0.7"/>
+    <g stroke="#7f97a6" stroke-width="2" opacity="0.6">
+      <line x1="1162" y1="376" x2="1166" y2="364"/>
+      <line x1="1186" y1="348" x2="1190" y2="338"/>
+      <line x1="1224" y1="342" x2="1228" y2="332"/>
+      <line x1="1250" y1="360" x2="1254" y2="350"/>
+    </g>
+    <line x1="1205" y1="378" x2="1240" y2="330" stroke="#e0a45e" stroke-width="3"/>
+    <circle cx="1205" cy="378" r="5" fill="#e0a45e"/>
+  </g>
+
+  <!-- 运输按键 -->
+  <g>
+    <rect x="300" y="664" width="96" height="62" rx="8" fill="#16242e" stroke="#3f5f6d" stroke-width="3"/>
+    <rect x="418" y="664" width="96" height="62" rx="8" fill="#16242e" stroke="#3f5f6d" stroke-width="3"/>
+    <rect x="536" y="664" width="96" height="62" rx="8" fill="#16242e" stroke="#3f5f6d" stroke-width="3"/>
+    <rect x="654" y="664" width="96" height="62" rx="8" fill="#16242e" stroke="#3f5f6d" stroke-width="3"/>
+    <!-- 倒带 / 播放 / 停止 / 录音 -->
+    <path d="M372 682 L372 708 L348 695 Z" fill="#b9cede"/>
+    <path d="M372 682 L372 708 L396 695 Z" fill="#b9cede"/>
+    <path d="M490 682 L490 708 L514 695 Z" fill="#ffd9a4"/>
+    <rect x="560" y="686" width="22" height="22" fill="#b9cede"/>
+    <circle cx="702" cy="695" r="13" fill="#a8452f"/>
+  </g>
+
+  <!-- 走带计数器 -->
+  <g>
+    <rect x="800" y="664" width="230" height="62" rx="8" fill="#0b141b" stroke="#33505f" stroke-width="3"/>
+    <g fill="#e0a45e" font-family="monospace" font-size="42" opacity="0.85">
+      <text x="826" y="710">0</text>
+      <text x="874" y="710">4</text>
+      <text x="922" y="710">7</text>
+      <text x="970" y="710">2</text>
+    </g>
+  </g>
+
+  <!-- 铭牌 -->
+  <rect x="1086" y="664" width="228" height="62" rx="6" fill="#1b2b36" stroke="#3d5b6c" stroke-width="2"/>
+  <g stroke="#8ea6b6" stroke-width="2" opacity="0.45">
+    <line x1="1106" y1="686" x2="1290" y2="686"/>
+    <line x1="1106" y1="704" x2="1250" y2="704"/>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#dvign)"/>
+</svg>
