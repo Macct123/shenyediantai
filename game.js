@@ -299,7 +299,7 @@
           rainEl.addEventListener(ev, tryPlay);
         });
 
-        /* 放不出来时，先换一个查询参数绕开缓存重试，再退到程序化雨 */
+        /* 放不出来时，换一个查询参数绕开缓存再试一次 */
         function retrySource() {
           if (rainEl.__retried) return false;
           rainEl.__retried = true;
@@ -310,53 +310,16 @@
         }
 
         rainEl.addEventListener('error', function () {
-          if (!retrySource()) self.startBackupRain();
+          retrySource();
         });
 
         tryPlay();
 
         setTimeout(function () {
           if (!rainEl.paused && rainEl.readyState >= 2) return;
-          if (retrySource()) {
-            setTimeout(function () {
-              if (rainEl.paused || rainEl.readyState < 2) self.startBackupRain();
-            }, 3000);
-            return;
-          }
-          if (rainEl.paused || rainEl.readyState < 2) self.startBackupRain();
+          retrySource();
         }, 2500);
-      } catch (e) {
-        self.startBackupRain();
-      }
-    },
-
-    /* 录音放不出来时的备用雨（正常情况不会响） */
-    startBackupRain: function () {
-      if (this.backupRain) return;
-      var ctx = this.ctx;
-      if (!ctx) return;
-      if (!this.ambient) this.ambient = { out: null };
-      if (!this.ambient.out) {
-        var o = ctx.createGain();
-        o.gain.value = 0.9;
-        o.connect(this.master);
-        this.ambient.out = o;
-      }
-      var src = ctx.createBufferSource();
-      src.buffer = this.noiseBuffer(4, false);
-      src.loop = true;
-      var hp = ctx.createBiquadFilter();
-      hp.type = 'highpass';
-      hp.frequency.value = 120;
-      var lp = ctx.createBiquadFilter();
-      lp.type = 'lowpass';
-      lp.frequency.value = 900;
-      var g = ctx.createGain();
-      g.gain.value = 0;
-      src.connect(hp).connect(lp).connect(g).connect(this.ambient.out);
-      src.start();
-      g.gain.setTargetAtTime(0.28, ctx.currentTime, 1.0);
-      this.backupRain = g;
+      } catch (e) {}
     },
 
     resumeRain: function () {},
@@ -415,9 +378,6 @@
     /* 雨声电平：直接调 <audio> 的音量 */
     setRainLevel: function (level) {
       if (this.rainEl) this.rainEl.volume = Math.max(0, Math.min(1, level * 0.85));
-      if (this.backupRain && this.ctx) {
-        this.backupRain.gain.setTargetAtTime(level, this.ctx.currentTime, 0.8);
-      }
     },
 
     /* 拍频：两个正弦差一点，合出来的“嗡…嗡…”就是差频 */
