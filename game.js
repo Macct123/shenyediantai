@@ -103,9 +103,7 @@
     }
   };
 
-  var COMBOS = {
-    'brokenFuse+wire': { out: 'fuse', hint: '细铜丝绕回玻璃管里。保险丝接好了。' }
-  };
+  var COMBOS = {};
 
   var Inv = {
     el: null,
@@ -122,7 +120,13 @@
         var id = btn.getAttribute('data-item');
 
         if (self.selected && self.selected !== id) {
-          var combo = COMBOS[[self.selected, id].sort().join('+')];
+          var pair = [self.selected, id].sort().join('+');
+          if (pair === 'brokenFuse+wire') {
+            Audio.sfx('switch');
+            Sub.hint('铜线太硬，手指绕不进去。保险丝盒上有个绕线柱。', 3800);
+            return;
+          }
+          var combo = COMBOS[pair];
           if (combo) {
             var a = self.selected;
             self.items = self.items.filter(function (x) { return x !== a && x !== id; });
@@ -396,6 +400,86 @@
       }
     },
 
+    /* 拍频：两个正弦差一点，合出来的“嗡…嗡…”就是差频 */
+    beat: function (hz) {
+      var ctx = this.ctx;
+      if (!ctx || this.muted || !this.master) return;
+      if (!this.beatNode) {
+        var a = ctx.createOscillator();
+        a.type = 'sine';
+        a.frequency.value = 520;
+        var b = ctx.createOscillator();
+        b.type = 'sine';
+        b.frequency.value = 520;
+        var g = ctx.createGain();
+        g.gain.value = 0;
+        a.connect(g);
+        b.connect(g);
+        g.connect(this.master);
+        a.start();
+        b.start();
+        this.beatNode = { a: a, b: b, g: g };
+      }
+      var t = ctx.currentTime;
+      this.beatNode.b.frequency.setTargetAtTime(520 + Math.max(0.2, hz), t, 0.04);
+      this.beatNode.g.gain.setTargetAtTime(0.026, t, 0.12);
+    },
+
+    stopBeat: function () {
+      if (!this.beatNode || !this.ctx) return;
+      this.beatNode.g.gain.setTargetAtTime(0.0001, this.ctx.currentTime, 0.12);
+    },
+
+    /* 校准带：音高跟着带速走，亮度跟着磁头方位走 */
+    calTone: function (ratio, bright) {
+      var ctx = this.ctx;
+      if (!ctx || this.muted || !this.master) return;
+      if (!this.calNode) {
+        var o = ctx.createOscillator();
+        o.type = 'triangle';
+        o.frequency.value = 440;
+        var lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 2200;
+        var g = ctx.createGain();
+        g.gain.value = 0;
+        o.connect(lp);
+        lp.connect(g);
+        g.connect(this.master);
+        o.start();
+        this.calNode = { o: o, lp: lp, g: g };
+      }
+      var t = ctx.currentTime;
+      this.calNode.o.frequency.setTargetAtTime(440 * ratio, t, 0.05);
+      this.calNode.lp.frequency.setTargetAtTime(560 + bright * 38, t, 0.08);
+      this.calNode.g.gain.setTargetAtTime(0.022, t, 0.1);
+    },
+
+    stopCal: function () {
+      if (!this.calNode || !this.ctx) return;
+      this.calNode.g.gain.setTargetAtTime(0.0001, this.ctx.currentTime, 0.14);
+    },
+
+    /* 不同房间的底噪：磁带间隔音、雨更远，机器哼声更近 */
+    setRoom: function (name) {
+      var tape = name === 'tape';
+      this.room = name;
+      if (this.rainEl) this.rainEl.volume = (tape ? 0.135 : 0.24) * 0.85;
+      var ctx = this.ctx;
+      if (!ctx) return;
+      if (!this.roomHum) {
+        var osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = 49;
+        var g = ctx.createGain();
+        g.gain.value = 0.0001;
+        osc.connect(g).connect(this.master);
+        osc.start();
+        this.roomHum = g;
+      }
+      this.roomHum.gain.setTargetAtTime(tape ? 0.022 : 0.006, ctx.currentTime, 1.6);
+    },
+
     setMuted: function (v) {
       this.muted = !!v;
       if (this.ctx && this.master) {
@@ -420,10 +504,10 @@
         n.buffer = this.noiseBuffer(0.06, false);
         var f = ctx.createBiquadFilter();
         f.type = 'bandpass';
-        f.frequency.value = 1400;
+        f.frequency.value = 1350 + Math.random() * 220;
         f.Q.value = 2.4;
         var g = ctx.createGain();
-        g.gain.setValueAtTime(0.13, t);
+        g.gain.setValueAtTime(0.11 + Math.random() * 0.04, t);
         g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07);
         n.connect(f).connect(g).connect(this.master);
         n.start(t);
@@ -547,6 +631,72 @@
         return;
       }
 
+      /* 开盘机走带：电机嗡鸣 + 磁带摩擦，带一点不匀 */
+      if (name === 'reel') {
+        var motor = ctx.createOscillator();
+        motor.type = 'sawtooth';
+        motor.frequency.setValueAtTime(57, t);
+        motor.frequency.linearRampToValueAtTime(59, t + 1.4);
+        var mlp = ctx.createBiquadFilter();
+        mlp.type = 'lowpass';
+        mlp.frequency.value = 240;
+        var mg = ctx.createGain();
+        mg.gain.setValueAtTime(0.0001, t);
+        mg.gain.exponentialRampToValueAtTime(0.05, t + 0.18);
+        mg.gain.setValueAtTime(0.05, t + 1.1);
+        mg.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
+        motor.connect(mlp).connect(mg).connect(this.master);
+        motor.start(t);
+        motor.stop(t + 1.55);
+
+        var rub = ctx.createBufferSource();
+        rub.buffer = this.noiseBuffer(1.6, false);
+        var rf = ctx.createBiquadFilter();
+        rf.type = 'bandpass';
+        rf.frequency.value = 2600;
+        rf.Q.value = 0.9;
+        var rg = ctx.createGain();
+        rg.gain.setValueAtTime(0.0001, t);
+        rg.gain.exponentialRampToValueAtTime(0.022, t + 0.2);
+        rg.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
+        rub.connect(rf).connect(rg).connect(this.master);
+        rub.start(t);
+        return;
+      }
+
+      /* 按下停止键：机械回弹，比提示音更像实物 */
+      if (name === 'tapeStop') {
+        var sn = ctx.createBufferSource();
+        sn.buffer = this.noiseBuffer(0.1, true);
+        var sf = ctx.createBiquadFilter();
+        sf.type = 'lowpass';
+        sf.frequency.value = 700;
+        var sg = ctx.createGain();
+        sg.gain.setValueAtTime(0.16, t);
+        sg.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+        sn.connect(sf).connect(sg).connect(this.master);
+        sn.start(t);
+        return;
+      }
+
+      /* 铜线刮过玻璃管：细、干、带一点刺 */
+      if (name === 'wire') {
+        var wn = ctx.createBufferSource();
+        wn.buffer = this.noiseBuffer(0.18, false);
+        var wf = ctx.createBiquadFilter();
+        wf.type = 'bandpass';
+        wf.frequency.setValueAtTime(3200 + Math.random() * 900, t);
+        wf.frequency.exponentialRampToValueAtTime(1800, t + 0.16);
+        wf.Q.value = 3.2;
+        var wg = ctx.createGain();
+        wg.gain.setValueAtTime(0.0001, t);
+        wg.gain.exponentialRampToValueAtTime(0.05, t + 0.01);
+        wg.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+        wn.connect(wf).connect(wg).connect(this.master);
+        wn.start(t);
+        return;
+      }
+
       if (name === 'drawer') {
         var dn = ctx.createBufferSource();
         dn.buffer = this.noiseBuffer(0.34, false);
@@ -636,6 +786,105 @@
     // 优先 mp3（当前生成的格式），没有 mp3 再退回 wav
     EXTS: ['mp3', 'wav'],
 
+    /* 每个人说话的“机器”不一样：老周走电话线，渔夫走无线电，林慧走磁带 */
+    profile: function (id) {
+      if (/^n1_/.test(id)) {
+        return { hp: 420, lp: 2500, drive: 2.1, wow: 0.0016, flutter: 0.0006, room: 0.05, hiss: 0.035, rate: 0.97 };
+      }
+      if (/^n2_/.test(id)) {
+        return { hp: 160, lp: 4300, drive: 1.3, wow: 0.0022, flutter: 0.0007, room: 0.20, hiss: 0.012, rate: 0.962 };
+      }
+      return { hp: 300, lp: 3000, drive: 1.7, wow: 0.0010, flutter: 0.0004, room: 0.10, hiss: 0.02, rate: 0.95 };
+    },
+
+    curves: {},
+
+    /* 软削波：让声音有点旧机器的毛边，而不是干净的合成音 */
+    softCurve: function (drive) {
+      var key = 'k' + drive;
+      if (this.curves[key]) return this.curves[key];
+      var n = 1024;
+      var curve = new Float32Array(n);
+      var norm = Math.tanh(drive);
+      for (var i = 0; i < n; i++) {
+        var x = i * 2 / n - 1;
+        curve[i] = Math.tanh(x * drive) / norm;
+      }
+      this.curves[key] = curve;
+      return curve;
+    },
+
+    /* 把 <audio> 接进一条老机器链路：带通 → 削波 → 抖晃 → 房间 */
+    wire: function (a, id) {
+      var ctx = Audio.ctx;
+      // file:// 下 Web Audio 会因跨源规则静音，宁可保留干声
+      if (!ctx || !/^https?:/.test(location.protocol)) return null;
+      var src;
+      try { src = ctx.createMediaElementSource(a); } catch (e) { return null; }
+
+      var prof = this.profile(id);
+      var bus = Audio.master || ctx.destination;
+
+      var hp = ctx.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.value = prof.hp;
+
+      var lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = prof.lp;
+
+      var shaper = ctx.createWaveShaper();
+      shaper.curve = this.softCurve(prof.drive);
+      shaper.oversample = '2x';
+
+      var trim = ctx.createGain();
+      trim.gain.value = 0.72;
+
+      var delay = ctx.createDelay(0.06);
+      delay.delayTime.value = 0.012;
+
+      var wow = ctx.createOscillator();
+      wow.frequency.value = 0.61;
+      var wowAmt = ctx.createGain();
+      wowAmt.gain.value = prof.wow;
+      wow.connect(wowAmt).connect(delay.delayTime);
+      wow.start();
+
+      var flutter = ctx.createOscillator();
+      flutter.frequency.value = 6.3;
+      var flutterAmt = ctx.createGain();
+      flutterAmt.gain.value = prof.flutter;
+      flutter.connect(flutterAmt).connect(delay.delayTime);
+      flutter.start();
+
+      var out = ctx.createGain();
+      out.gain.value = 0.95;
+
+      src.connect(hp).connect(lp).connect(shaper).connect(trim).connect(delay).connect(out).connect(bus);
+
+      if (prof.room > 0.05) {
+        var conv = ctx.createConvolver();
+        conv.buffer = Audio.makeIR(0.9, 2.4);
+        var wet = ctx.createGain();
+        wet.gain.value = prof.room;
+        delay.connect(conv).connect(wet).connect(bus);
+      }
+
+      var hiss = ctx.createBufferSource();
+      hiss.buffer = Audio.noiseBuffer(2, false);
+      hiss.loop = true;
+      var hissFilter = ctx.createBiquadFilter();
+      hissFilter.type = 'bandpass';
+      hissFilter.frequency.value = prof.hp * 3.2;
+      hissFilter.Q.value = 0.7;
+      var hissGain = ctx.createGain();
+      hissGain.gain.value = 0;
+      hiss.connect(hissFilter).connect(hissGain).connect(bus);
+      hiss.start();
+
+      return { prof: prof, hiss: hissGain };
+    },
+
     init: function () {},
 
     /* 进游戏时把有配音的句子先挂进文档，避免第一次播时才开始加载 */
@@ -649,13 +898,15 @@
 
     make: function (id) {
       var self = this;
+      var prof = this.profile(id);
       var a = new window.Audio();
       a.preload = 'auto';
       a.volume = 1;
       a.__want = false;
+      a.__id = id;
       a.setAttribute('playsinline', '');
-      // 再压一点音高和速度，让老周更显年纪
-      a.playbackRate = 0.95;
+      // 语速按角色压一点：老周更显年纪，林慧更慢
+      a.playbackRate = prof.rate;
       if ('preservesPitch' in a) a.preservesPitch = false;
       else if ('mozPreservesPitch' in a) a.mozPreservesPitch = false;
 
@@ -706,6 +957,14 @@
         this.cache[id] = a;
       }
 
+      // 第一次真正开口时才接管音频图（早于用户手势时 Audio.ctx 还不存在）
+      if (!a.__unit) {
+        a.__unit = this.wire(a, id);
+        a.addEventListener('ended', function () { selfHiss(a, 0); });
+        a.addEventListener('pause', function () { selfHiss(a, 0); });
+      }
+      if (a.__unit) selfHiss(a, a.__unit.prof.hiss);
+
       a.__want = true;
       try {
         // 元数据还没到就写 currentTime，部分浏览器会抛错并跳过 play
@@ -713,6 +972,7 @@
         var p = a.play();
         if (p && p.catch) p.catch(function () {});
       } catch (e) {}
+      Sub.signal();
     },
 
     /* 浏览器拦了自动播放时，任何一次点击都补一次 */
@@ -733,9 +993,19 @@
         var a = self.cache[k];
         a.__want = false;
         try { a.pause(); } catch (e) {}
+        selfHiss(a, 0);
       });
     }
   };
+
+  /* 底噪跟着人声抬起/落下，像机器在说话前先醒了一下 */
+  function selfHiss(a, level) {
+    var ctx = Audio.ctx;
+    if (!ctx || !a || !a.__unit) return;
+    var t = ctx.currentTime;
+    a.__unit.hiss.gain.cancelScheduledValues(t);
+    a.__unit.hiss.gain.setTargetAtTime(level, t, level ? 0.05 : 0.22);
+  }
   /* ============================================================
      字幕 + 波形双通道
      ============================================================ */
@@ -813,6 +1083,17 @@
       this.show(line);
     },
 
+    /* 有人开口时，字幕条先被载波顶一下，而不是瞬间出现 */
+    signal: function () {
+      if (!this.box) return;
+      var node = this.box;
+      node.classList.remove('is-incoming');
+      void node.offsetWidth;
+      node.classList.add('is-incoming');
+      clearTimeout(this.inTimer);
+      this.inTimer = setTimeout(function () { node.classList.remove('is-incoming'); }, 780);
+    },
+
     show: function (line) {
       if (!this.box) return;
       clearTimeout(this.hideTimer);
@@ -868,8 +1149,14 @@
       }
       var ch = this.fullText.charAt(this.index++);
       this.textEl.textContent += ch;
-      var wait = 34;
-      if ('，。！？…、'.indexOf(ch) >= 0) wait = 150;
+
+      /* 打字节奏不要像节拍器：字距、标点、停连都留一点不匀 */
+      var wait = 28 + Math.random() * 16;
+      if (this.index === 1) wait = 150;
+      if ('，、'.indexOf(ch) >= 0) wait = 118 + Math.random() * 60;
+      else if ('。！？'.indexOf(ch) >= 0) wait = 230 + Math.random() * 90;
+      else if ('…—'.indexOf(ch) >= 0) wait = 190 + Math.random() * 80;
+      else if ('“”‘’'.indexOf(ch) >= 0) wait = 90;
       this.timer = setTimeout(function () { self.type(); }, wait);
     },
 
@@ -1145,7 +1432,7 @@
             {
               id: 'chart', label: '墙上海图', x: 25.0, y: 31.9,
               gate: function () { return Night1.tuned; },
-              gateHint: '先调准他的频率，才知道他在哪。',
+              gateHint: '先把他从静电里捞出来。',
               closeup: {
                 title: '海 图', widget: 'chart', art: 'assets/closeups/chart.svg',
                 overlays: [
@@ -1153,8 +1440,8 @@
                 ],
                 props: function () {
                   return {
-                    brief: Night1.chartPiece ? '把度分换成小数，再点在海图上。' : '海图的右下角被撕掉了一块。',
-                    note: '1° = 60′。细格 0.01°，粗格 0.1°。\n\n三号浮标外侧是暗礁。',
+                    brief: Night1.chartPiece ? '他报的是度分。图上标的是小数。' : '图纸的右下角空着，像被谁撕走了。',
+                    note: '细格 0.01，粗格 0.1。\n\n三号浮标外侧是暗礁，红铅笔圈过两遍。',
                     torn: !Night1.chartPiece,
                     hasPiece: Inv.has('piece'),
                     onPiece: function () { Night1.placePiece(); },
@@ -1173,7 +1460,7 @@
               id: 'calib', label: '校准记录', x: 64.7, y: 70.1,
               closeup: {
                 title: '校 准 记 录', widget: 'note', art: 'assets/closeups/calib.svg',
-                note: '一张机务卡片，压在收音机下面。\n\n旧频道 100.0 → 新刻度 93.7\n旧频道 101.5 → 新刻度 95.2\n\n下面没有写换算方法。'
+                note: '一张机务卡片，压在收音机下面。\n\n旧频道 100.0 → 新刻度 93.7\n旧频道 101.5 → 新刻度 95.2\n\n下面没有写换算方法。边角被谁的指头磨黑了。'
               }
             },
             {
@@ -1263,8 +1550,16 @@
             {
               id: 'fusebox', label: '保险丝盒', x: 44, y: 26,
               closeup: {
-                title: '保 险 丝 盒', widget: 'note', art: 'assets/closeups/fusebox.svg',
-                note: '四个槽位：总闸、照明、发射机、备用。\n\n备用槽是空的。槽底贴着一张小纸片：\n\n“2A。别拿 5A 顶。”'
+                title: '保 险 丝 盒', widget: 'fuseRepair', art: 'assets/closeups/fusebox.svg',
+                props: function () {
+                  return {
+                    hasBroken: Inv.has('brokenFuse'),
+                    hasWire: Inv.has('wire'),
+                    repaired: Night1.fuseRepaired,
+                    powered: Night1.powered,
+                    onRepair: function () { Night1.repairFuse(); }
+                  };
+                }
               }
             },
             {
@@ -1296,7 +1591,7 @@
             {
               id: 'antenna', label: '天线旋转器', x: 46, y: 62,
               gate: function () { return Night1.measured; },
-              gateHint: '先在海图上量出真方位。',
+              gateHint: '还没量出方向。',
               closeup: {
                 title: '天 线 旋 转 器', widget: 'rotator', art: 'assets/closeups/cabinet.svg',
                 props: function () {
@@ -1343,7 +1638,7 @@
                 title: '来 信',
                 widget: 'note',
                 art: 'assets/closeups/letter.svg',
-                note: '守夜的：\n\n这盘带子是小满走那年录的。他走的时候，我说了句不该说的话。带子寄到我手上时已经断了，剪开的几截我也分不清先后。\n\n后来我又补录过一次，可那次录反了——有一截是倒着的，你别怪我。\n\n补录的时候，别提他父亲。他听了会走。\n\n还有，小满怕黑。别在他面前说关灯的话。\n\n—— 林慧'
+                note: '守夜的：\n\n这盘带子是小满走那年录的。录到一半我按错了键，后来想补，越补越乱，最后剪得七零八落。寄给你的时候，我没敢再听一遍。\n\n你要是能把它接回去，就替我听听，我当年到底说了什么。\n\n补录那几句是我自己加的。有一截我怕是反的，你别怪我。\n\n小满他爸走得早。别在他面前提。\n\n孩子怕黑。夜里别跟他说关灯的事。\n\n—— 林慧'
               }
             },
             {
@@ -1353,7 +1648,7 @@
             {
               id: 'splice', label: '剪接台', x: 40, y: 72,
               gate: function () { return Night2.cutOpen; },
-              gateHint: '盒子还没开。先看看那盘带子。',
+              gateHint: '带子还封在盒子里。',
               closeup: {
                 title: '剪 接 台',
                 widget: 'tapeSplice',
@@ -1365,8 +1660,8 @@
                     rev: Night2.rev,
                     solved: Night2.spliced,
                     brief: Night2.spliced
-                      ? '接好了。磁带在等开盘机。'
-                      : '五截带子，按句意接成一条。有一截是倒着录的。',
+                      ? '接缝都平了。开盘机还空着。'
+                      : '断口很齐。先按话的口气排一遍。',
                     onSubmit: function (order, rev) { return Night2.trySplice(order, rev); }
                   };
                 }
@@ -1381,12 +1676,18 @@
                 props: function () {
                   return {
                     spliced: Night2.spliced,
+                    calibrated: Night2.calibrated,
+                    speed: Night2.speed,
+                    azimuth: Night2.azimuth,
                     listened: Night2.listened,
                     recorded: Night2.recorded,
                     choices: Night2.CHOICES,
                     brief: Night2.spliced
-                      ? (Night2.listened ? '空白还在等她一句话。' : '带子接好了，可以放了。')
+                      ? (Night2.listened
+                        ? '最后一段是白的。她在等一句话。'
+                        : (Night2.calibrated ? '接缝过了磁头，就该响了。' : '带子接上了，机器却跑调。'))
                       : '带子是断的。两个字都放不出来。',
+                    onCalibrated: function (sp, az) { Night2.calibrate(sp, az); },
                     onPlay: function () { Night2.play(); },
                     onPick: function (id) { Night2.pick(id); }
                   };
@@ -1665,6 +1966,7 @@
     lockerOpen: false,
     fuseTaken: false,
     wireTaken: false,
+    fuseRepaired: false,
     pieceTaken: false,
     rulerTaken: false,
     logRead: false,
@@ -1693,6 +1995,7 @@
       this.lockerOpen = false;
       this.fuseTaken = false;
       this.wireTaken = false;
+      this.fuseRepaired = false;
       this.pieceTaken = false;
       this.rulerTaken = false;
       this.logRead = false;
@@ -1719,6 +2022,7 @@
         lockerOpen: this.lockerOpen,
         fuseTaken: this.fuseTaken,
         wireTaken: this.wireTaken,
+        fuseRepaired: this.fuseRepaired,
         pieceTaken: this.pieceTaken,
         rulerTaken: this.rulerTaken,
         logRead: this.logRead,
@@ -1747,6 +2051,7 @@
       this.lockerOpen = !!data.lockerOpen;
       this.fuseTaken = !!data.fuseTaken;
       this.wireTaken = !!data.wireTaken;
+      this.fuseRepaired = !!data.fuseRepaired;
       this.pieceTaken = !!data.pieceTaken;
       this.rulerTaken = !!data.rulerTaken;
       this.logRead = !!data.logRead;
@@ -1755,13 +2060,18 @@
     },
 
     objective: function () {
-      if (!this.powered) return '收音机是哑的。';
+      if (!this.powered) {
+        if (this.fuseRepaired) return '保险丝接好了。拿去收音机。';
+        if (Inv.has('brokenFuse') && Inv.has('wire')) return '铜线得绕回那截玻璃管。';
+        if (Inv.has('brokenFuse') && !Inv.has('wire')) return '玻璃管是空的，还缺一截铜线。';
+        return '收音机是哑的。';
+      }
       if (!this.tuned) return '雾里有人在等一个频道。';
       if (!this.chartPiece) return '海图缺了一角。';
       if (!this.located) return '他在报坐标。';
       if (!this.measured) return '图上还没有方向。';
       if (!this.fixed) return '天线还没转过去。';
-      return '方向已发出。';
+      return '方位已锁死。';
     },
 
     sync: function () {
@@ -1792,6 +2102,19 @@
       Audio.sfx('lock');
       this.sync();
       Sub.hint('电流声回来了。旋钮有点涩。', 3000);
+    },
+
+    /* 保险丝盒：把断丝换成铜线，绕紧才算接上 */
+    repairFuse: function () {
+      if (this.fuseRepaired) return;
+      if (!Inv.has('brokenFuse') || !Inv.has('wire')) return;
+      this.fuseRepaired = true;
+      Inv.consume('brokenFuse');
+      Inv.consume('wire');
+      Inv.add('fuse');
+      Audio.sfx('lock');
+      this.sync();
+      Sub.hint('铜线绕满了。玻璃管里又有丝了。', 3600);
     },
 
     /* 海图：把撕掉的一角拼回去 */
@@ -1825,7 +2148,7 @@
       Inv.add('wire');
       Audio.sfx('paper');
       this.sync();
-      if (this.fuseTaken) Sub.hint('铜线绕得进那根烧断的玻璃管。', 3400);
+      if (this.fuseTaken) Sub.hint('铜线粗细正好，能塞进那截玻璃管。', 3400);
     },
 
     takeKey: function () {
@@ -1864,7 +2187,7 @@
         { who: '渔夫', text: '我在北纬三十四度十二分，东经一百二十九度零七分。', voice: 'n1_03' },
         { who: '渔夫', text: '船上还有人。求你，给我指个方向。', voice: 'n1_04' }
       ], function () {
-        Sub.hint('海图上印的是十进制度。1° = 60′。', 4200);
+        Sub.hint('他报的是度分。图上印的是小数。', 4200);
       });
     },
 
@@ -1910,7 +2233,7 @@
       Sub.play([
         { who: '渔夫', text: '对，就是那儿。三号浮标，我看见了。', voice: 'n1_05' }
       ], function () {
-        Sub.hint(self.measured ? '真方位 218°。别忘了磁差。' : '用桌上那把平行尺，量一下从电台到浮标的方位。', 4600);
+        Sub.hint(self.measured ? '真方位 218°。年鉴里写过磁差。' : '桌上那把平行尺，该派上用场了。', 4600);
       });
     },
 
@@ -1920,7 +2243,7 @@
       this.bearing = deg;
       this.sync();
       Audio.sfx('lock');
-      Sub.hint('量出来是真方位 ' + Math.round(deg) + '°。磁差 6°W，自己换算。', 4400);
+      Sub.hint('量出来是真方位 ' + Math.round(deg) + '°。年鉴里写过磁差。', 4400);
     },
 
     onFixed: function (b, c, f) {
@@ -1977,23 +2300,27 @@
     readLetter: false,
     cutOpen: false,
     spliced: false,
+    calibrated: false,
+    speed: 4.32,
+    azimuth: -5.5,
     listened: false,
     recorded: false,
     choice: '',
     finished: false,
     area: 'taperoom',
     order: [],
-    rev: { f3: true },
+    rev: { f3: true, f6: true },
 
     /* 托盘刻意打乱：要按句意自己排，不是照着顺序点 */
     FRAGS: [
       { id: 'f4', text: '我不该那么说。' },
+      { id: 'f6', text: '你走了以后，我学着不再问你去了哪。' },
       { id: 'f1', text: '小满，妈这盘带子，录了七遍。' },
       { id: 'f5', text: '灯我给你留着。' },
-      { id: 'f2', text: '那年冬天你走的时候，我说的是——' },
-      { id: 'f3', text: '“别再回来了”。' }
+      { id: 'f3', text: '“别再回来了”。' },
+      { id: 'f2', text: '那年冬天你走的时候，我说的是——' }
     ],
-    ORDER: ['f1', 'f2', 'f3', 'f4', 'f5'],
+    ORDER: ['f1', 'f2', 'f3', 'f4', 'f6', 'f5'],
 
     /* 补录三选：只有一句不违来信里的两条禁忌 */
     CHOICES: [
@@ -2007,13 +2334,16 @@
       this.readLetter = false;
       this.cutOpen = false;
       this.spliced = false;
+      this.calibrated = false;
+      this.speed = 4.32;
+      this.azimuth = -5.5;
       this.listened = false;
       this.recorded = false;
       this.choice = '';
       this.finished = false;
       this.area = 'taperoom';
       this.order = [];
-      this.rev = { f3: true };
+      this.rev = { f3: true, f6: true };
       Inv.clear();
     },
 
@@ -2023,13 +2353,16 @@
         readLetter: this.readLetter,
         cutOpen: this.cutOpen,
         spliced: this.spliced,
+        calibrated: this.calibrated,
+        speed: this.speed,
+        azimuth: this.azimuth,
         listened: this.listened,
         recorded: this.recorded,
         choice: this.choice,
         finished: this.finished,
         area: this.area,
         order: this.order.slice(),
-        rev: { f3: !!this.rev.f3 }
+        rev: this.revCopy()
       };
     },
 
@@ -2040,20 +2373,37 @@
       this.readLetter = !!data.readLetter;
       this.cutOpen = !!data.cutOpen;
       this.spliced = !!data.spliced;
+      this.calibrated = !!data.calibrated;
+      this.speed = typeof data.speed === 'number' ? data.speed : 4.32;
+      this.azimuth = typeof data.azimuth === 'number' ? data.azimuth : -5.5;
       this.listened = !!data.listened;
       this.recorded = !!data.recorded;
       this.choice = data.choice || '';
       this.finished = !!data.finished;
       this.area = data.area || 'taperoom';
       this.order = Array.isArray(data.order) ? data.order.slice() : [];
-      this.rev = { f3: !(data.rev && data.rev.f3 === false) };
+      this.rev = { f3: true, f6: true };
+      if (data.rev) {
+        for (var k in data.rev) {
+          if (Object.prototype.hasOwnProperty.call(data.rev, k)) this.rev[k] = !!data.rev[k];
+        }
+      }
+    },
+
+    revCopy: function () {
+      var out = {};
+      for (var k in this.rev) {
+        if (Object.prototype.hasOwnProperty.call(this.rev, k)) out[k] = !!this.rev[k];
+      }
+      return out;
     },
 
     objective: function () {
       if (this.finished) return '这一夜收进柜子了。';
       if (!this.readLetter) return '桌上压着一封信。';
       if (!this.cutOpen) return '磁带还没拆开。';
-      if (!this.spliced) return '带子断成五截。';
+      if (!this.spliced) return '带子断成六截。';
+      if (!this.calibrated) return '走带和磁头还没对准。';
       if (!this.listened) return '接好了，还没放。';
       if (!this.recorded) return '空白还等着她一句话。';
       return '这一夜收进柜子了。';
@@ -2067,7 +2417,9 @@
       } else if (!this.cutOpen) {
         Sub.hint('磁带盒上的封条是新的。', 3200);
       } else if (!this.spliced) {
-        Sub.hint('五截带子摊在剪接台上。', 3800);
+        Sub.hint('六截带子摊在剪接台上。', 3800);
+      } else if (!this.calibrated) {
+        Sub.hint('接缝平了。可机器还没校准。', 3600);
       } else if (!this.listened) {
         Sub.hint('带子接好了。开盘机在等。', 3400);
       } else {
@@ -2099,7 +2451,7 @@
       if (this.step === 'letter') this.step = 'cut';
       Audio.sfx('paper');
       this.sync();
-      Sub.hint('两条禁忌：别提他父亲；别说关灯的话。', 5200);
+      Sub.hint('信里有两处被反复描过：别提他父亲；别说关灯的话。', 5200);
     },
 
     openCase: function () {
@@ -2117,10 +2469,10 @@
       this.sync();
 
       Sub.play([
-        { who: '', text: '盒子里不是整盘带子，是五截剪断的磁带。' },
+        { who: '', text: '盒子里不是整盘带子，是六截剪断的磁带。' },
         { who: '', text: '断口很齐——是拿剪接刀切的，不是扯断的。' }
       ], function () {
-        Sub.hint('把句子接起来，才知道她到底说了什么。', 4200);
+        Sub.hint('六截带子，断口都齐。', 4200);
       });
     },
 
@@ -2159,8 +2511,19 @@
       Sub.play([
         { who: '', text: '接缝严丝合缝。磁带落回盘上。' }
       ], function () {
-        Sub.hint('把带子挂上开盘机，按播放。', 3800);
+        Sub.hint('接缝平了。开盘机还空着。', 3800);
       });
+    },
+
+    /* 开盘机：带速与磁头方位都对准，才敢把这段放出来 */
+    calibrate: function (speed, azimuth) {
+      if (this.calibrated) return;
+      this.calibrated = true;
+      this.speed = speed;
+      this.azimuth = azimuth;
+      Audio.sfx('lock');
+      this.sync();
+      Sub.hint('走带稳了。磁头擦过接缝，沙沙声没了。', 4200);
     },
 
     play: function () {
@@ -2177,7 +2540,7 @@
         self.listened = true;
         self.step = 'record';
         self.sync();
-        Sub.hint('后面还有一段空白，留给一句话。', 4600);
+        Sub.hint('最后一段是白的。她在等一句话。', 4600);
       });
     },
 
@@ -2240,11 +2603,156 @@
   var WIDGETS = {
     note: function (root, props) {
       var wrap = div('tool-block');
-      var note = p('tool-note', props.note || '');
+      var note = p('tool-note is-reading', props.note || '');
       note.style.textAlign = 'left';
       wrap.appendChild(note);
       root.appendChild(wrap);
       return { destroy: function () {} };
+    },
+
+    /* ---------- 保险丝盒：把铜线重新绕回玻璃管 ---------- */
+    fuseRepair: function (root, props) {
+      props = props || {};
+      var repaired = !!props.repaired;
+      var powered = !!props.powered;
+      var hasBroken = !!props.hasBroken;
+      var hasWire = !!props.hasWire;
+
+      var wrap = div('tool-block');
+      wrap.appendChild(p('tool-caption', '备 用 槽 · 2A'));
+      root.appendChild(wrap);
+
+      function reading(text) {
+        var n = p('tool-note is-reading', text);
+        n.style.textAlign = 'left';
+        wrap.appendChild(n);
+        return n;
+      }
+
+      if (powered || repaired) {
+        wrap.appendChild(p('chart-brief', '备用槽里插着一根接好的玻璃管。'));
+        reading('四个槽位都满了：总闸、照明、发射机、备用。\n\n玻璃管里的铜线绕得很紧，像谁在灯下坐了很久。');
+        return { destroy: function () {} };
+      }
+
+      if (!hasBroken) {
+        wrap.appendChild(p('chart-brief', '槽是空的。槽底贴着一张纸片：2A，别拿 5A 顶。'));
+        reading('抽屉里那截烧断的玻璃管，也许还能救。');
+        return { destroy: function () {} };
+      }
+
+      if (!hasWire) {
+        wrap.appendChild(p('chart-brief', '玻璃管里的丝断了。手上没有能绕的铜线。'));
+        reading('储物柜最下层，好像见过一截细铜线。');
+        return { destroy: function () {} };
+      }
+
+      wrap.appendChild(p('chart-brief', '按住铜线，绕上绕线柱。四圈，别松手。'));
+
+      var dial = div('wind-dial');
+      var ring = div('wind-ring');
+      var needle = div('wind-needle');
+      var core = div('wind-core');
+      var count = p('wind-count', '0 / 4');
+      core.appendChild(count);
+      dial.appendChild(ring);
+      dial.appendChild(needle);
+      dial.appendChild(core);
+      wrap.appendChild(dial);
+
+      var tip = p('tool-note', '绕到一半松手，线会回弹一点。');
+      tip.style.textAlign = 'left';
+      wrap.appendChild(tip);
+
+      var coilBtn = document.createElement('button');
+      coilBtn.type = 'button';
+      coilBtn.className = 'btn-ghost';
+      coilBtn.textContent = '用手指绕一圈';
+      wrap.appendChild(coilBtn);
+
+      var turns = 0;
+      var need = 4;
+      var last = null;
+      var dragging = false;
+
+      function setTurns(v) {
+        turns = Math.min(need, v);
+        ring.style.setProperty('--p', Math.round(turns / need * 100));
+        var shown = Math.round(turns * 10) / 10;
+        count.textContent = (shown % 1 === 0 ? String(shown) : shown.toFixed(1)) + ' / 4';
+      }
+
+      function finish() {
+        if (repaired) return;
+        repaired = true;
+        dial.classList.add('is-done');
+        needle.style.transform = 'translate(-50%, -100%) rotate(0deg)';
+        Audio.sfx('lock');
+        tip.textContent = '铜线绷住了。玻璃管里又有丝了。';
+        coilBtn.disabled = true;
+        if (props.onRepair) props.onRepair();
+      }
+
+      function check() {
+        if (turns >= need) finish();
+      }
+
+      function angleAt(e) {
+        var r = dial.getBoundingClientRect();
+        return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180 / Math.PI;
+      }
+
+      function onDown(e) {
+        if (dial.classList.contains('is-done')) return;
+        e.preventDefault();
+        dragging = true;
+        last = angleAt(e);
+        dial.classList.add('is-grabbing');
+        try { dial.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+
+      function onMove(e) {
+        if (!dragging || dial.classList.contains('is-done')) return;
+        var a = angleAt(e);
+        var d = a - last;
+        while (d > 180) d -= 360;
+        while (d < -180) d += 360;
+        last = a;
+        needle.style.transform = 'translate(-50%, -100%) rotate(' + a.toFixed(1) + 'deg)';
+        if (Math.abs(d) < 60) {
+          var before = Math.floor(turns);
+          setTurns(turns + Math.abs(d) / 360);
+          if (Math.floor(turns) !== before && turns < need) Audio.sfx('wire');
+          check();
+        }
+      }
+
+      function onUp() {
+        dragging = false;
+        dial.classList.remove('is-grabbing');
+      }
+
+      dial.addEventListener('pointerdown', onDown);
+      dial.addEventListener('pointermove', onMove);
+      dial.addEventListener('pointerup', onUp);
+      dial.addEventListener('pointercancel', onUp);
+
+      coilBtn.addEventListener('click', function () {
+        if (dial.classList.contains('is-done')) return;
+        setTurns(Math.floor(turns) + 1);
+        needle.style.transform = 'translate(-50%, -100%) rotate(' + (turns * 90).toFixed(1) + 'deg)';
+        Audio.sfx('wire');
+        check();
+      });
+
+      return {
+        destroy: function () {
+          dial.removeEventListener('pointerdown', onDown);
+          dial.removeEventListener('pointermove', onMove);
+          dial.removeEventListener('pointerup', onUp);
+          dial.removeEventListener('pointercancel', onUp);
+        }
+      };
     },
 
     /* ---------- 收音机：三位频率预置（算对了才通） ---------- */
@@ -2252,10 +2760,17 @@
       props = props || {};
       var solved = !!props.solved;
       var code = solved ? String(props.target || '964') : '';
+      var phase = solved ? 'done' : 'code';
+      var FINE_TARGET = 30;
+      var fine = 22;
 
       var wrap = div('tool-block');
       wrap.appendChild(p('tool-caption', '频 率 预 置 · 本 机 刻 度'));
-      wrap.appendChild(p('chart-brief', props.dead ? '指示灯不亮。' : '按换算后的频率拨三位数字。'));
+      var brief = p('chart-brief', props.dead ? '指示灯不亮。' : '键盘上只有三位数。');
+      wrap.appendChild(brief);
+      var body = div('code-body');
+      wrap.appendChild(body);
+      root.appendChild(wrap);
 
       if (props.dead) {
         var deadUnit = div('dead-unit');
@@ -2264,113 +2779,214 @@
         slot.appendChild(p('fuse-slot-label', 'FUSE · 2A'));
         if (props.hasFuse) slot.classList.add('is-ready');
         deadUnit.appendChild(slot);
-        wrap.appendChild(deadUnit);
+        body.appendChild(deadUnit);
 
         var powerBtn = document.createElement('button');
         powerBtn.type = 'button';
         powerBtn.className = 'btn-amber';
-        powerBtn.textContent = props.hasFuse ? '装入保险丝' : '缺少 2A 保险丝';
+        powerBtn.textContent = props.hasFuse ? '把保险丝按进去' : '槽是空的';
         powerBtn.disabled = !props.hasFuse;
         powerBtn.addEventListener('click', function () {
           if (!props.hasFuse) return;
           if (props.onPower) props.onPower();
           Scene.close();
         });
-        wrap.appendChild(powerBtn);
-        wrap.appendChild(p('tool-note', props.hasFuse
+        body.appendChild(powerBtn);
+        body.appendChild(p('tool-note', props.hasFuse
           ? '玻璃管卡进槽里，发出一点凉意。'
           : (props.hasBroken ? '旧玻璃管塞得进去，可里面的丝是断的。' : '保险丝座是空的。')));
-        root.appendChild(wrap);
         return { destroy: function () {} };
       }
 
-      var display = div('code-display');
-      var digits = [];
-      for (var i = 0; i < 3; i++) {
-        var d = document.createElement('span');
-        d.className = 'code-digit';
-        d.textContent = '—';
-        display.appendChild(d);
-        digits.push(d);
-        if (i === 1) {
-          var dot = document.createElement('span');
-          dot.className = 'code-dot';
-          dot.textContent = '.';
-          display.appendChild(dot);
+      function keypad(build) {
+        var display = div('code-display');
+        var digits = [];
+        for (var i = 0; i < 3; i++) {
+          var d = document.createElement('span');
+          d.className = 'code-digit';
+          d.textContent = '—';
+          display.appendChild(d);
+          digits.push(d);
+          if (i === 1) {
+            var dot = document.createElement('span');
+            dot.className = 'code-dot';
+            dot.textContent = '.';
+            display.appendChild(dot);
+          }
         }
-      }
-      wrap.appendChild(display);
+        body.appendChild(display);
 
-      var pad = div('keypad');
-      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '清', '0', '←'].forEach(function (label) {
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'key-btn' + (label === '清' || label === '←' ? ' is-util' : '');
-        b.textContent = label;
-        b.addEventListener('click', function () {
-          if (solved) return;
-          if (label === '清') code = '';
-          else if (label === '←') code = code.slice(0, -1);
-          else if (code.length < 3) code += label;
-          Audio.sfx('knob');
-          render();
+        var pad = div('keypad');
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9', '清', '0', '←'].forEach(function (label) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'key-btn' + (label === '清' || label === '←' ? ' is-util' : '');
+          b.textContent = label;
+          b.addEventListener('click', function () {
+            if (phase !== 'code') return;
+            if (label === '清') code = '';
+            else if (label === '←') code = code.slice(0, -1);
+            else if (code.length < 3) code += label;
+            Audio.sfx('knob');
+            renderDigits();
+          });
+          pad.appendChild(b);
         });
-        pad.appendChild(b);
-      });
-      wrap.appendChild(pad);
-
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'btn-amber';
-      btn.textContent = solved ? '已接通' : '接通频率';
-      if (solved) btn.disabled = true;
-      if (solved) btn.classList.add('is-done');
-      wrap.appendChild(btn);
-
-      if (props.onReplay) {
-        var replayBtn = document.createElement('button');
-        replayBtn.type = 'button';
-        replayBtn.className = 'btn-ghost tool-replay';
-        replayBtn.textContent = '重听通话';
-        replayBtn.hidden = !solved;
-        replayBtn.addEventListener('click', function () { props.onReplay(); });
-        wrap.appendChild(replayBtn);
+        body.appendChild(pad);
+        build(digits, display);
       }
 
-      var note = p('tool-note', solved ? '载波稳住了。' : '刻度盘上没有数字，只有这排按键。');
-      note.style.textAlign = 'left';
-      wrap.appendChild(note);
-
-      function render() {
-        for (var k = 0; k < 3; k++) {
+      function renderDigits() {
+        var digits = body.querySelectorAll('.code-digit');
+        for (var k = 0; k < digits.length; k++) {
           digits[k].textContent = code.charAt(k) || '—';
           digits[k].classList.toggle('is-set', !!code.charAt(k));
         }
-        display.classList.remove('is-wrong');
+        var display = body.querySelector('.code-display');
+        if (display) display.classList.remove('is-wrong');
       }
 
-      btn.addEventListener('click', function () {
-        if (solved) return;
-        if (code.length < 3) { Sub.hint('三位都拨齐再接通。', 2200); return; }
-        if (code === String(props.target)) {
-          solved = true;
-          btn.disabled = true;
-          btn.textContent = '已接通';
-          btn.classList.add('is-done');
-          Audio.sfx('lock');
-          if (replayBtn) replayBtn.hidden = false;
-          render();
-          if (props.onSolved) props.onSolved();
-        } else {
-          Audio.sfx('switch');
-          display.classList.add('is-wrong');
-          Sub.hint('只有静电。再算一遍。', 2600);
-        }
-      });
+      function replayButton() {
+        if (!props.onReplay) return;
+        var replayBtn = document.createElement('button');
+        replayBtn.type = 'button';
+        replayBtn.className = 'btn-ghost tool-replay';
+        replayBtn.textContent = '再听一遍';
+        replayBtn.hidden = phase === 'code';
+        replayBtn.addEventListener('click', function () { props.onReplay(); });
+        body.appendChild(replayBtn);
+      }
 
-      render();
-      root.appendChild(wrap);
-      return { destroy: function () {} };
+      /* 第一段：把频率预置进去 */
+      function buildCode() {
+        body.innerHTML = '';
+        brief.textContent = '键盘上只有三位数。';
+        keypad(function () {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn-amber';
+          btn.textContent = '推上载波';
+          body.appendChild(btn);
+          var note = p('tool-note', '刻度盘上没有数字，只有这排按键。');
+          note.style.textAlign = 'left';
+          body.appendChild(note);
+          replayButton();
+
+          btn.addEventListener('click', function () {
+            if (phase !== 'code') return;
+            if (code.length < 3) { Sub.hint('三位都拨齐。', 2200); return; }
+            if (code === String(props.target)) {
+              Audio.sfx('lock');
+              phase = 'fine';
+              Audio.sfx('radio');
+              buildFine();
+            } else {
+              Audio.sfx('switch');
+              var d = body.querySelector('.code-display');
+              if (d) d.classList.add('is-wrong');
+              Sub.hint('只有静电。', 2600);
+            }
+          });
+        });
+      }
+
+      /* 第二段：两个振荡器差一点，拍频归零才算真的咬住 */
+      function buildFine() {
+        body.innerHTML = '';
+        brief.textContent = '载波进来了，可还在“嗡、嗡”地打架。';
+
+        var lock = div('code-display is-locked');
+        var num = document.createElement('span');
+        num.className = 'code-digit is-set';
+        num.textContent = '96.4';
+        lock.appendChild(num);
+        body.appendChild(lock);
+
+        var meter = div('beat-meter');
+        var fill = div('beat-fill');
+        var mark = div('beat-mark');
+        meter.appendChild(fill);
+        meter.appendChild(mark);
+        body.appendChild(meter);
+
+        var readout = p('beat-readout', '差频 —');
+        body.appendChild(readout);
+
+        var range = document.createElement('input');
+        range.type = 'range';
+        range.className = 'tool-slider';
+        range.min = '0';
+        range.max = '60';
+        range.step = '0.5';
+        range.value = String(fine);
+        range.setAttribute('aria-label', '本振微调');
+        body.appendChild(range);
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-amber';
+        btn.textContent = '拍频平了就锁';
+        btn.disabled = true;
+        body.appendChild(btn);
+
+        var note = p('tool-note', '微调旋钮在你手里。耳朵比眼睛准。');
+        note.style.textAlign = 'left';
+        body.appendChild(note);
+        replayButton();
+
+        function beatOf(v) { return Math.abs(v - FINE_TARGET) * 1.5; }
+
+        function paint() {
+          var v = parseFloat(range.value);
+          var beat = beatOf(v);
+          readout.textContent = beat < 0.2 ? '差频 0.0 Hz' : '差频 ' + beat.toFixed(1) + ' Hz';
+          fill.style.width = Math.max(0, Math.min(100, 100 - beat * 9)) + '%';
+          var good = beat <= 1.2;
+          meter.classList.toggle('is-lock', good);
+          readout.classList.toggle('is-lock', good);
+          btn.disabled = !good;
+          if (good) note.textContent = '两条边带并成一条了。';
+          else if (beat < 5) note.textContent = '还在抖。再往右挪一点。';
+          else note.textContent = '啸叫盖过了人声。';
+          Audio.beat(Math.max(0.25, beat));
+        }
+
+        range.addEventListener('input', function () {
+          Audio.sfx('knob');
+          paint();
+        });
+
+        btn.addEventListener('click', function () {
+          if (phase !== 'fine') return;
+          phase = 'done';
+          Audio.stopBeat();
+          Audio.sfx('lock');
+          brief.textContent = '载波咬住了。';
+          body.innerHTML = '';
+          var doneNote = p('tool-note is-reading', '96.4 MHz。静电退到很远的地方。\n\n雾里那个人的呼吸，贴着喇叭。');
+          doneNote.style.textAlign = 'left';
+          body.appendChild(doneNote);
+          if (props.onSolved) props.onSolved();
+        });
+
+        paint();
+      }
+
+      if (solved) {
+        brief.textContent = '载波咬住了。';
+        var doneNote = p('tool-note is-reading', '96.4 MHz。静电退到很远的地方。');
+        doneNote.style.textAlign = 'left';
+        body.appendChild(doneNote);
+        replayButton();
+      } else {
+        buildCode();
+      }
+
+      return {
+        destroy: function () {
+          Audio.stopBeat();
+        }
+      };
     },
 
     /* ---------- 调频 ---------- */
@@ -2400,7 +3016,7 @@
         var powerBtn = document.createElement('button');
         powerBtn.type = 'button';
         powerBtn.className = 'btn-amber';
-        powerBtn.textContent = props.hasFuse ? '装入保险丝' : '缺少 2A 保险丝';
+        powerBtn.textContent = props.hasFuse ? '把保险丝按进去' : '槽是空的';
         powerBtn.disabled = !props.hasFuse;
         powerBtn.addEventListener('click', function () {
           if (!props.hasFuse) return;
@@ -2410,7 +3026,7 @@
         deadWrap.appendChild(powerBtn);
         deadWrap.appendChild(p('tool-note', props.hasFuse
           ? '玻璃管卡进槽里，发出一点凉意。'
-          : '保险丝座上刻着 2A。走廊的储物柜里也许有。'));
+          : '保险丝座上刻着 2A。'));
         root.appendChild(deadWrap);
         return { destroy: function () {} };
       }
@@ -2470,7 +3086,7 @@
       var lockBtn = document.createElement('button');
       lockBtn.type = 'button';
       lockBtn.className = 'btn-amber';
-      lockBtn.textContent = '锁定信号';
+      lockBtn.textContent = '咬住载波';
 
       wrap.appendChild(caption);
       wrap.appendChild(dial);
@@ -2496,7 +3112,7 @@
 
         if (locked) {
           lockBtn.disabled = true;
-          lockBtn.textContent = '已锁定';
+          lockBtn.textContent = '载波咬住了';
           lockBtn.classList.add('is-done');
         } else {
           lockBtn.disabled = s < LOCK_AT;
@@ -2526,7 +3142,7 @@
         slider.value = String(TARGET);
         render();
         lockBtn.disabled = true;
-        lockBtn.textContent = '已锁定';
+        lockBtn.textContent = '载波咬住了';
         lockBtn.classList.add('is-done');
         locked = true;
         onLocked();
@@ -2810,7 +3426,7 @@
             if (!props.hasPiece) return;
             if (props.onPiece) props.onPiece();
             torn = false;
-            brief.textContent = '把度分换成小数，再点在海图上。';
+            brief.textContent = '他报的是度分。图上标的是小数。';
             render();
           });
           body.appendChild(pieceBtn);
@@ -2830,13 +3446,13 @@
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn-amber';
-        btn.textContent = solved ? '位置已确认' : '确认坐标';
+        btn.textContent = solved ? '已经标了' : '标记在这里';
         if (solved) { btn.disabled = true; btn.classList.add('is-done'); }
         body.appendChild(btn);
 
         btn.addEventListener('click', function () {
           if (solved) return;
-          if (!picked) { Sub.hint('先在图上点出他的位置。', 2200); return; }
+          if (!picked) { Sub.hint('图钉还没落下。', 2200); return; }
           if (Math.abs(picked.lat - answer.lat) <= TOL && Math.abs(picked.lon - answer.lon) <= TOL) {
             solved = true;
             Audio.sfx('lock');
@@ -2844,7 +3460,7 @@
             render();
           } else {
             Audio.sfx('switch');
-            Sub.hint('这里没有浮标。再对一遍经纬度。', 2800);
+            Sub.hint('这里没有浮标。再对一遍。', 2800);
           }
         });
       }
@@ -2864,7 +3480,7 @@
 
       var wrap = div('tool-block');
       wrap.appendChild(p('tool-caption', '天 线 · 方 位 旋 转 器'));
-      wrap.appendChild(p('chart-brief', props.dead ? '没有电。表盘一动不动。' : '粗调每格 10°，微调每格 1°。'));
+      wrap.appendChild(p('chart-brief', props.dead ? '没有电。表盘一动不动。' : '粗调 10° · 微调 1°。'));
 
       function row(label, min, max, step, value, aria) {
         var r = div('rot-row');
@@ -2895,14 +3511,14 @@
 
       var tip = p('tool-note', props.dead
         ? '没有电。表盘一动不动。'
-        : '表盘只报当前磁方位，不会告诉你对没对上。');
+        : '表盘只报当前磁方位。');
       tip.style.textAlign = 'left';
       wrap.appendChild(tip);
 
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'btn-amber';
-      btn.textContent = solved ? '方向已发出' : '固定天线';
+      btn.textContent = solved ? '方位已锁死' : '锁死方位';
       if (solved || props.dead) {
         btn.disabled = true;
         if (solved) btn.classList.add('is-done');
@@ -2935,7 +3551,7 @@
         if (busy) return;
         if (diffOf(bearing()) > tol) {
           Audio.sfx('switch');
-          Sub.hint('耳机里还是静电。天线没对上。', 2600);
+          Sub.hint('耳机里还是静电。差一点也不行。', 2600);
           return;
         }
         busy = true;
@@ -3072,7 +3688,7 @@
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'btn-amber';
-      btn.textContent = '接入人声';
+      btn.textContent = '拉进人声';
       wrap.appendChild(btn);
 
       function clarity() {
@@ -3088,7 +3704,7 @@
         mv.textContent = c >= PASS ? '可辨' : '模糊';
         if (Pro.denoised) {
           btn.disabled = true;
-          btn.textContent = '已接入';
+          btn.textContent = '人声进来了';
           btn.classList.add('is-done');
         } else {
           btn.disabled = c < PASS;
@@ -3304,62 +3920,193 @@
       return { destroy: function () {} };
     },
 
-    /* ---------- 第 2 夜：开盘机（播放 / 补录） ---------- */
+    /* ---------- 第 2 夜：开盘机（校准 / 播放 / 补录） ---------- */
     tapeDeck: function (root, props) {
       props = props || {};
+      var SPEED_T = 4.76, SPEED_TOL = 0.05;
+      var AZ_T = 2.5, AZ_TOL = 1.0;
+      var calibrated = !!props.calibrated;
+      var speed = typeof props.speed === 'number' ? props.speed : 4.32;
+      var az = typeof props.azimuth === 'number' ? props.azimuth : -5.5;
+
       var wrap = div('tool-block');
       wrap.appendChild(p('tool-caption', '开 盘 机'));
-      wrap.appendChild(p('chart-brief', props.brief || ''));
+      var brief = p('chart-brief', props.brief || '');
+      wrap.appendChild(brief);
+      var body = div('deck-body');
+      wrap.appendChild(body);
+      root.appendChild(wrap);
 
       if (!props.spliced) {
         var dead = div('dead-unit');
         dead.appendChild(p('dead-line', '磁头压着空气。带子还没接上。'));
-        wrap.appendChild(dead);
-        root.appendChild(wrap);
+        body.appendChild(dead);
         return { destroy: function () {} };
       }
 
-      if (!props.listened) {
-        var play = document.createElement('button');
-        play.type = 'button';
-        play.className = 'btn-amber';
-        play.textContent = '播 放';
-        play.addEventListener('click', function () {
-          play.disabled = true;
-          if (props.onPlay) props.onPlay();
-        });
-        wrap.appendChild(play);
-      } else if (!props.recorded) {
-        var list = div('choices');
-        (props.choices || []).forEach(function (opt, i) {
-          var btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'choice';
-
-          var idx = document.createElement('span');
-          idx.className = 'choice-index';
-          idx.textContent = '0' + (i + 1);
-
-          var body = div('choice-body');
-          var title = document.createElement('span');
-          title.className = 'choice-title';
-          title.textContent = opt.text;
-
-          body.appendChild(title);
-          btn.appendChild(idx);
-          btn.appendChild(body);
-          btn.addEventListener('click', function () {
-            if (props.onPick) props.onPick(opt.id);
+      function buildPlay() {
+        body.innerHTML = '';
+        if (!props.listened) {
+          var play = document.createElement('button');
+          play.type = 'button';
+          play.className = 'btn-amber';
+          play.textContent = '挂上带子，播';
+          play.addEventListener('click', function () {
+            play.disabled = true;
+            Audio.sfx('reel');
+            if (props.onPlay) props.onPlay();
           });
-          list.appendChild(btn);
-        });
-        wrap.appendChild(list);
-      } else {
-        wrap.appendChild(p('dead-line', '带子录满了，卡在最后一格。'));
+          body.appendChild(play);
+          var tip = p('tool-note', '两个盘一起转起来。先出来的是一点底噪，然后才是人。');
+          tip.style.textAlign = 'left';
+          body.appendChild(tip);
+        } else if (!props.recorded) {
+          var caption = p('tool-note', '最后一段是白的。你把话筒推上去。');
+          caption.style.textAlign = 'left';
+          body.appendChild(caption);
+
+          var list = div('choices');
+          (props.choices || []).forEach(function (opt, i) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'choice';
+
+            var idx = document.createElement('span');
+            idx.className = 'choice-index';
+            idx.textContent = '0' + (i + 1);
+
+            var box = div('choice-body');
+            var title = document.createElement('span');
+            title.className = 'choice-title';
+            title.textContent = opt.text;
+
+            box.appendChild(title);
+            btn.appendChild(idx);
+            btn.appendChild(box);
+            btn.addEventListener('click', function () {
+              if (props.onPick) props.onPick(opt.id);
+            });
+            list.appendChild(btn);
+          });
+          body.appendChild(list);
+        } else {
+          body.appendChild(p('dead-line', '带子录满了，卡在最后一格。'));
+        }
       }
 
-      root.appendChild(wrap);
-      return { destroy: function () {} };
+      function buildCalib() {
+        body.innerHTML = '';
+        brief.textContent = '校准带在机器里。走带和磁头都得先调正。';
+
+        function row(label, min, max, step, val, unit, aria) {
+          var box = div('cal-row');
+
+          var head = div('cal-head');
+          var l = document.createElement('span');
+          l.className = 'cal-label';
+          l.textContent = label;
+          var v = document.createElement('span');
+          v.className = 'cal-value';
+          head.appendChild(l);
+          head.appendChild(v);
+          box.appendChild(head);
+
+          var range = document.createElement('input');
+          range.type = 'range';
+          range.className = 'tool-slider';
+          range.min = String(min);
+          range.max = String(max);
+          range.step = String(step);
+          range.value = String(val);
+          range.setAttribute('aria-label', aria);
+          box.appendChild(range);
+
+          var meter = div('cal-meter');
+          var fill = div('cal-fill');
+          meter.appendChild(fill);
+          box.appendChild(meter);
+
+          var foot = p('cal-foot', '');
+          box.appendChild(foot);
+
+          body.appendChild(box);
+          return { range: range, value: v, fill: fill, foot: foot, unit: unit };
+        }
+
+        var sRow = row('带速', 4.00, 5.60, 0.02, speed, 'cm/s', '带速微调');
+        var aRow = row('磁头方位', -10, 10, 0.5, az, '°', '磁头方位');
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-amber';
+        btn.textContent = '校准完了';
+        btn.disabled = true;
+        body.appendChild(btn);
+
+        var note = p('tool-note', '耳机里是校准带：一个单音。听音高，也听亮度。');
+        note.style.textAlign = 'left';
+        body.appendChild(note);
+
+        function paint() {
+          var sp = parseFloat(sRow.range.value);
+          var azv = parseFloat(aRow.range.value);
+
+          var sDiff = Math.abs(sp - SPEED_T);
+          var aDiff = Math.abs(azv - AZ_T);
+          var sGood = sDiff <= SPEED_TOL;
+          var aGood = aDiff <= AZ_TOL;
+
+          sRow.value.textContent = sp.toFixed(2) + ' cm/s';
+          aRow.value.textContent = (azv >= 0 ? '+' : '') + azv.toFixed(1) + '°';
+
+          sRow.fill.style.width = Math.max(0, 100 - sDiff * 180) + '%';
+          aRow.fill.style.width = Math.max(0, 100 - aDiff * 10) + '%';
+          sRow.fill.classList.toggle('is-ok', sGood);
+          aRow.fill.classList.toggle('is-ok', aGood);
+
+          sRow.foot.textContent = sGood
+            ? '走带稳了。'
+            : (sp < SPEED_T ? '声音往下掉，太慢。' : '声音往上飘，太快。');
+          aRow.foot.textContent = aGood
+            ? '高频回来了。'
+            : '高频被磁头削掉一半，像隔着一层布。';
+
+          var bright = Math.max(0, 100 - aDiff * 12);
+          Audio.calTone(sp / SPEED_T, bright);
+
+          btn.disabled = !(sGood && aGood);
+        }
+
+        sRow.range.addEventListener('input', function () {
+          Audio.sfx('knob');
+          paint();
+        });
+        aRow.range.addEventListener('input', function () {
+          Audio.sfx('knob');
+          paint();
+        });
+
+        btn.addEventListener('click', function () {
+          if (!props.onCalibrated) return;
+          calibrated = true;
+          Audio.stopCal();
+          Audio.sfx('lock');
+          props.onCalibrated(parseFloat(sRow.range.value), parseFloat(aRow.range.value));
+          brief.textContent = '走带和磁头都正了。';
+          buildPlay();
+        });
+
+        paint();
+      }
+
+      if (calibrated) buildPlay();
+      else buildCalib();
+
+      return {
+        destroy: function () {
+          Audio.stopCal();
+        }
+      };
     }
   };
 
@@ -4303,12 +5050,12 @@
 
     wrongHint: function (key) {
       if (this.step === 0) {
-        return key === 'lamp' ? '没有电，台灯不会亮。先合总闸。' : '发射机没电。先合总闸。';
+        return key === 'lamp' ? '灯丝是冷的。总闸还压着。' : '发射机没醒。先合总闸。';
       }
       if (this.step === 1) {
-        return key === 'main' ? '总闸已经合上了。' : '先开台灯，你得看得见。';
+        return key === 'main' ? '总闸已经咬住了。' : '先开灯吧，你什么也看不见。';
       }
-      return '都开着了。只差发射机。';
+      return '只差发射机那一格。';
     },
 
     press: function (key, btn) {
@@ -4329,14 +5076,14 @@
 
       if (this.step === 1) {
         Audio.sfx('breaker');
-        Sub.hint('电表走起来了。桌子左边是台灯。', 3200);
+        Sub.hint('电表开始走。桌子左边，灯罩还是暗的。', 3200);
         return;
       }
 
       if (this.step === 2) {
         Audio.sfx('switch');
         if (stage) { stage.classList.remove('is-dark'); stage.classList.add('is-lamp'); }
-        Sub.hint('灯丝亮了。最后一步，把发射机推上去。', 3200);
+        Sub.hint('灯丝红了。最后一格，发射机。', 3200);
         return;
       }
 
@@ -4345,7 +5092,7 @@
       Audio.powerOn();
       if (stage) { stage.classList.remove('is-lamp'); stage.classList.add('is-live'); }
       this.done = true;
-      Sub.hint('载波接通。今晚的频率归你了。', 3000);
+      Sub.hint('载波接通。今晚这条线，归你了。', 3000);
 
       var self = this;
       setTimeout(function () {
@@ -4571,6 +5318,7 @@
 
         setTimeout(function () {
           Layout.apply();
+          Audio.setRoom('tape');
           Scene.load('night2', Night2.area);
           Power.skip();
           Scene.setLight('bulb', true);
@@ -4594,6 +5342,7 @@
 
         setTimeout(function () {
           Layout.apply();
+          Audio.setRoom('studio');
           Scene.load('night1', Night1.area);
           Power.skip();
           Scene.setLight('beacon', Night1.finished);
@@ -4625,6 +5374,7 @@
 
       setTimeout(function () {
         Layout.apply();
+        Audio.setRoom('studio');
         Scene.load('studio');
         Pro.sync();
         Scene.setLight('beacon', Pro.finished);

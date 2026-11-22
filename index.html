@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="theme-color" content="#05080c" />
 <title>深夜电台 · Midnight Signal</title>
-<link rel="stylesheet" href="styles.css?v=20261030j" />
+<link rel="stylesheet" href="styles.css?v=20261030m" />
 </head>
 <body>
 <noscript><p class="noscript">本作需要开启 JavaScript 才能守夜。</p></noscript>
@@ -14,6 +14,13 @@
 
   <!-- 转场黑幕 -->
   <div id="fade" class="fade" aria-hidden="true"></div>
+
+  <!-- 胶片颗粒 / 暗角 / 划痕：压掉数字感 -->
+  <div id="film" class="film" aria-hidden="true">
+    <div class="film-grain"></div>
+    <div class="film-vignette"></div>
+    <div class="film-scratch"></div>
+  </div>
 
   <!-- 章节卡 -->
   <div id="chapter" class="chapter" hidden aria-hidden="true">
@@ -75,7 +82,7 @@
       </button>
     </nav>
 
-    <p class="menu-hint" id="menuHint">点击亮着的那盏灯，开始今晚的守夜</p>
+    <p class="menu-hint" id="menuHint">雨还没停。今晚轮到你守。</p>
   </section>
 
   <!-- ==================== 游戏 ==================== -->
@@ -166,7 +173,7 @@
   <div class="modal" id="modalLog" hidden role="dialog" aria-modal="true" aria-label="通话记录">
     <div class="modal-card modal-card-log">
       <h2>通话记录</h2>
-      <p class="modal-note">点一句话可以重听。坐标、频道、方位都记在这里。</p>
+      <p class="modal-note">点一句可以重听。坐标、频道、方位都记在这儿。</p>
       <div class="call-log" id="callLog"></div>
       <button class="btn-ghost modal-close" data-close="modalLog">收起记录</button>
     </div>
@@ -189,6 +196,8 @@
       <h2>制作名单</h2>
       <p class="modal-note">《深夜电台 · Midnight Signal》</p>
       <p class="modal-note">一个关于未竟心事的中继站。</p>
+      <p class="modal-note">文本、美术、声音、代码：一个人，很多个雨夜。</p>
+      <p class="modal-note">谢谢你还守着这个频率。</p>
       <button class="btn-ghost modal-close" data-close="modalCredits">关闭</button>
     </div>
   </div>
@@ -204,6 +213,6 @@
 
 </div>
 
-<script src="game.js?v=20261030k"></script>
+<script src="game.js?v=20261030m"></script>
 </body>
 </html>
