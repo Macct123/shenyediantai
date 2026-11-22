@@ -280,11 +280,12 @@
 
       var self = this;
       try {
-        var rainEl = new window.Audio('assets/audio/rain-loop.m4a?v=20261030d');
+        var rainEl = new window.Audio('assets/audio/rain-loop.m4a?v=20261122a');
         rainEl.loop = true;
         rainEl.preload = 'auto';
         rainEl.volume = 0.22;
         rainEl.muted = this.muted;
+        rainEl.setAttribute('playsinline', '');
         self.rainEl = rainEl;
 
         var tryPlay = function () {
@@ -297,12 +298,31 @@
         ['loadeddata', 'canplay', 'canplaythrough'].forEach(function (ev) {
           rainEl.addEventListener(ev, tryPlay);
         });
-        rainEl.addEventListener('error', function () { self.startBackupRain(); });
+
+        /* 放不出来时，先换一个查询参数绕开缓存重试，再退到程序化雨 */
+        function retrySource() {
+          if (rainEl.__retried) return false;
+          rainEl.__retried = true;
+          rainEl.src = 'assets/audio/rain-loop.m4a?v=20261122b';
+          rainEl.load();
+          tryPlay();
+          return true;
+        }
+
+        rainEl.addEventListener('error', function () {
+          if (!retrySource()) self.startBackupRain();
+        });
 
         tryPlay();
 
-        // 兜底：2.5 秒还没播起来，就补一层程序化雨，避免整局无声
         setTimeout(function () {
+          if (!rainEl.paused && rainEl.readyState >= 2) return;
+          if (retrySource()) {
+            setTimeout(function () {
+              if (rainEl.paused || rainEl.readyState < 2) self.startBackupRain();
+            }, 3000);
+            return;
+          }
           if (rainEl.paused || rainEl.readyState < 2) self.startBackupRain();
         }, 2500);
       } catch (e) {
@@ -768,7 +788,7 @@
      ============================================================ */
   var Voice = {
     base: 'assets/voice/',
-    ver: '?v=20261018b',
+    ver: '?v=20261122a',
     enabled: true,
     cache: {},
 
