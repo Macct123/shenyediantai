@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="bgnight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#050c15"/>
+      <stop offset="0.55" stop-color="#0a1a29"/>
+      <stop offset="1" stop-color="#03070b"/>
+    </linearGradient>
+    <linearGradient id="bgmetal" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#3c474f"/>
+      <stop offset="0.5" stop-color="#202a31"/>
+      <stop offset="1" stop-color="#0a1014"/>
+    </linearGradient>
+    <linearGradient id="bgglass" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#ffe9c4" stop-opacity="0.85"/>
+      <stop offset="0.6" stop-color="#f0b877" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0.12"/>
+    </linearGradient>
+    <radialGradient id="bgglow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff1d6" stop-opacity="0.95"/>
+      <stop offset="0.28" stop-color="#ffd79a" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgvig" cx="0.5" cy="0.45" r="0.8">
+      <stop offset="0.38" stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.78" stop-color="#000" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.9"/>
+    </radialGradient>
+    <filter id="bgblur"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="bgrough" x="-4%" y="-4%" width="108%" height="108%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.013 0.028" numOctaves="2" seed="9" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bgnight)"/>
+
+  <!-- 远处海面 -->
+  <rect x="0" y="560" width="1600" height="340" fill="#071521"/>
+  <g fill="#4f86ab" opacity="0.12">
+    <rect x="80" y="640" width="220" height="2"/>
+    <rect x="420" y="700" width="180" height="2"/>
+    <rect x="980" y="660" width="240" height="2"/>
+    <rect x="1280" y="740" width="200" height="2"/>
+  </g>
+
+  <!-- 灯室 -->
+  <g filter="url(#bgrough)">
+    <!-- 外框 -->
+    <path d="M330 640 L360 250 L1240 250 L1270 640 Z" fill="#0a1218" opacity="0.92"/>
+    <!-- 玻璃与透镜 -->
+    <path d="M382 610 L408 296 L1192 296 L1218 610 Z" fill="url(#bgglass)"/>
+    <!-- 菲涅尔环 -->
+    <g stroke="#f7d8a4" stroke-opacity="0.35" stroke-width="3">
+      <path d="M438 316 L1206 316"/>
+      <path d="M424 356 L1212 356"/>
+      <path d="M410 396 L1218 396"/>
+      <path d="M398 436 L1226 436"/>
+      <path d="M388 476 L1232 476"/>
+      <path d="M380 516 L1238 516"/>
+      <path d="M374 556 L1242 556"/>
+      <path d="M370 596 L1244 596"/>
+    </g>
+    <!-- 竖向棱 -->
+    <g stroke="#ffe6bd" stroke-opacity="0.18" stroke-width="2">
+      <path d="M560 296 L520 610"/>
+      <path d="M740 296 L716 610"/>
+      <path d="M920 296 L926 610"/>
+      <path d="M1100 296 L1136 610"/>
+    </g>
+    <!-- 灯芯 -->
+    <ellipse cx="800" cy="430" rx="78" ry="96" fill="#fff3da" opacity="0.92"/>
+    <ellipse cx="800" cy="430" rx="160" ry="180" fill="url(#bgglow)"/>
+    <path d="M800 430 L1600 300 L1600 560 Z" fill="#ffe6bd" opacity="0.06"/>
+    <path d="M800 430 L0 300 L0 560 Z" fill="#ffe6bd" opacity="0.05"/>
+
+    <!-- 框条 -->
+    <g fill="url(#bgmetal)">
+      <rect x="330" y="250" width="910" height="32" rx="4"/>
+      <rect x="330" y="610" width="940" height="40" rx="4"/>
+      <rect x="352" y="282" width="26" height="328"/>
+      <rect x="1222" y="282" width="26" height="328"/>
+      <rect x="590" y="282" width="16" height="328" opacity="0.8"/>
+      <rect x="996" y="282" width="16" height="328" opacity="0.8"/>
+    </g>
+
+    <!-- 遮光板 / 快门把手 -->
+    <g>
+      <rect x="1052" y="470" width="26" height="210" rx="4" fill="#1a242b"/>
+      <rect x="1044" y="500" width="42" height="18" rx="4" fill="#3a4750"/>
+      <circle cx="1065" cy="540" r="10" fill="#5a4524"/>
+      <path d="M1065 540 L1065 660" stroke="#8a6a42" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="1065" cy="664" r="12" fill="#8a6a42"/>
+    </g>
+
+    <!-- 铭牌 -->
+    <rect x="700" y="700" width="200" height="56" rx="3" fill="#121a1f"/>
+    <rect x="700" y="700" width="200" height="56" rx="3" fill="none" stroke="#3d4a52" stroke-width="2"/>
+    <g fill="#5d6b73" opacity="0.7">
+      <rect x="722" y="722" width="70" height="5"/>
+      <rect x="722" y="736" width="110" height="4"/>
+    </g>
+
+    <!-- 栏杆 -->
+    <g stroke="#1b2f3f" stroke-width="8">
+      <path d="M-20 812 H1620"/>
+      <path d="M120 812 V900"/>
+      <path d="M480 812 V900"/>
+      <path d="M1120 812 V900"/>
+      <path d="M1480 812 V900"/>
+    </g>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#bgvig)"/>
+
+  <g pointer-events="none" aria-hidden="true">
+    <defs>
+      <filter id="fxGrain" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="3" stitchTiles="stitch" result="n"/>
+        <feColorMatrix in="n" type="saturate" values="0"/>
+      </filter>
+    </defs>
+    <rect width="1600" height="900" filter="url(#fxGrain)" opacity="0.15" style="mix-blend-mode:overlay"/>
+  </g>
+</svg>
