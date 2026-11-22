@@ -1,0 +1,189 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="bwall" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#1a1d1f"/>
+      <stop offset="0.45" stop-color="#101416"/>
+      <stop offset="1" stop-color="#070a0b"/>
+    </linearGradient>
+    <linearGradient id="barch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0d0e"/>
+      <stop offset="0.5" stop-color="#171c1e"/>
+      <stop offset="1" stop-color="#0b0f10"/>
+    </linearGradient>
+    <linearGradient id="bwood" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#3a2a1c"/>
+      <stop offset="0.5" stop-color="#261a11"/>
+      <stop offset="1" stop-color="#140d08"/>
+    </linearGradient>
+    <linearGradient id="bmetal" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#4a5158"/>
+      <stop offset="0.5" stop-color="#252b30"/>
+      <stop offset="1" stop-color="#0d1113"/>
+    </linearGradient>
+    <linearGradient id="bpaper" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#b9a98a"/>
+      <stop offset="0.55" stop-color="#8d7d63"/>
+      <stop offset="1" stop-color="#5d5142"/>
+    </linearGradient>
+    <radialGradient id="blamp" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe6bd" stop-opacity="0.95"/>
+      <stop offset="0.22" stop-color="#f0b877" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#e0a45e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bdark" cx="0.5" cy="0.44" r="0.78">
+      <stop offset="0.34" stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.76" stop-color="#000" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.88"/>
+    </radialGradient>
+    <filter id="bblur"><feGaussianBlur stdDeviation="16"/></filter>
+    <filter id="bblurS"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="brough" x="-4%" y="-4%" width="108%" height="108%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="2" seed="11" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="10" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <pattern id="bstone" width="180" height="120" patternUnits="userSpaceOnUse">
+      <rect width="180" height="120" fill="none"/>
+      <path d="M0 118 H180 M0 58 H180 M46 58 V118 M132 0 V58 M92 58 V118" stroke="#000" stroke-opacity="0.22" stroke-width="2"/>
+      <path d="M2 116 H178 M2 56 H178" stroke="#5a6165" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- 拱顶 -->
+  <rect x="-40" y="-40" width="2000" height="1160" fill="url(#barch)"/>
+  <path d="M-40 420 Q960 -180 1960 420 L1960 0 L-40 0 Z" fill="#080b0c"/>
+  <path d="M-40 430 Q960 -150 1960 430" fill="none" stroke="#2a3033" stroke-width="10" opacity="0.5"/>
+  <path d="M-40 470 Q960 -90 1960 470" fill="none" stroke="#151a1c" stroke-width="26" opacity="0.9"/>
+  <g stroke="#2c3235" stroke-width="4" opacity="0.35">
+    <path d="M240 250 L240 400"/>
+    <path d="M560 150 L560 320"/>
+    <path d="M1360 150 L1360 320"/>
+    <path d="M1680 250 L1680 400"/>
+  </g>
+
+  <!-- 后墙 -->
+  <rect x="-40" y="380" width="2000" height="740" fill="url(#bwall)"/>
+  <rect x="-40" y="380" width="2000" height="740" fill="url(#bstone)"/>
+  <path d="M-40 700 Q300 684 660 702 Q1040 720 1380 700 Q1660 684 1960 704 L1960 724 L-40 724 Z" fill="#0a0e0f" opacity="0.7"/>
+
+  <!-- 墙上旧报纸 -->
+  <g filter="url(#brough)">
+    <g transform="translate(1210 430) rotate(-2.5)">
+      <rect width="330" height="230" fill="url(#bpaper)" opacity="0.72"/>
+      <rect x="8" y="8" width="314" height="214" fill="none" stroke="#3a2f22" stroke-width="2" opacity="0.45"/>
+      <g stroke="#2c241a" stroke-opacity="0.42" stroke-width="3">
+        <path d="M22 44 H308 M22 62 H260 M22 80 H300 M22 98 H240 M22 116 H296 M22 134 H268 M22 152 H304 M22 170 H232 M22 188 H290"/>
+      </g>
+      <path d="M250 40 Q300 120 254 208" fill="none" stroke="#8f3d2c" stroke-width="4" opacity="0.65"/>
+    </g>
+    <g transform="translate(1548 452) rotate(1.8)">
+      <rect width="286" height="206" fill="url(#bpaper)" opacity="0.55"/>
+      <g stroke="#2c241a" stroke-opacity="0.34" stroke-width="3">
+        <path d="M18 40 H268 M18 58 H214 M18 76 H258 M18 94 H198 M18 112 H250 M18 130 H228 M18 148 H262 M18 166 H186"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- 管道 -->
+  <g>
+    <path d="M-20 300 H1960" stroke="#2c3336" stroke-width="26" opacity="0.55"/>
+    <path d="M-20 292 H1960" stroke="#4a5357" stroke-width="3" opacity="0.3"/>
+    <path d="M-20 310 H1960" stroke="#05080a" stroke-width="6" opacity="0.6"/>
+    <g fill="#20272a" stroke="#0a0e10" stroke-width="3">
+      <rect x="220" y="282" width="34" height="36"/>
+      <rect x="760" y="282" width="34" height="36"/>
+      <rect x="1420" y="282" width="34" height="36"/>
+    </g>
+    <path d="M1180 300 V520 Q1180 560 1216 560 H1260" stroke="#2c3336" stroke-width="12" fill="none"/>
+  </g>
+
+  <!-- 吊灯 -->
+  <g>
+    <line x1="880" y1="60" x2="880" y2="238" stroke="#181c1e" stroke-width="5"/>
+    <path d="M838 238 H922 L906 286 H854 Z" fill="#2a2f31"/>
+    <ellipse cx="880" cy="286" rx="28" ry="9" fill="#ffe6bd" opacity="0.55"/>
+    <circle cx="880" cy="300" r="130" fill="url(#blamp)" opacity="0.5"/>
+    <path d="M880 300 L1080 760 L680 760 Z" fill="#ffe6bd" opacity="0.035"/>
+  </g>
+
+  <!-- 地面 -->
+  <rect x="-40" y="880" width="2000" height="260" fill="#0a0d0e"/>
+  <rect x="-40" y="880" width="2000" height="4" fill="#33393c" opacity="0.4"/>
+  <g stroke="#05080a" stroke-width="2" opacity="0.5">
+    <path d="M0 930 Q480 922 960 934 Q1440 946 1920 928"/>
+    <path d="M0 1000 Q520 992 1040 1004 Q1500 1016 1920 996"/>
+  </g>
+  <!-- 积水 -->
+  <ellipse cx="620" cy="1000" rx="300" ry="44" fill="#16334c" opacity="0.16" filter="url(#bblurS)"/>
+  <ellipse cx="620" cy="1000" rx="150" ry="18" fill="#7fb6d6" opacity="0.06" filter="url(#bblurS)"/>
+  <ellipse cx="1450" cy="1030" rx="260" ry="36" fill="#16334c" opacity="0.12" filter="url(#bblurS)"/>
+
+  <!-- 木桌 -->
+  <g filter="url(#brough)">
+    <rect x="470" y="742" width="720" height="26" fill="#4a3623"/>
+    <rect x="470" y="768" width="720" height="14" fill="#241810"/>
+    <g fill="#241810">
+      <rect x="510" y="782" width="20" height="150"/>
+      <rect x="1132" y="782" width="20" height="150"/>
+      <rect x="516" y="884" width="640" height="16" opacity="0.7"/>
+    </g>
+    <rect x="470" y="742" width="720" height="6" fill="#6b4f32" opacity="0.55"/>
+  </g>
+
+  <!-- 电报机 -->
+  <g>
+    <rect x="700" y="690" width="300" height="54" rx="4" fill="#12181b"/>
+    <rect x="706" y="696" width="288" height="42" rx="3" fill="url(#bmetal)"/>
+    <rect x="706" y="696" width="288" height="42" rx="3" fill="none" stroke="#3b444a" stroke-width="2"/>
+    <!-- 电键 -->
+    <path d="M760 690 L830 660 L846 664 L800 690 Z" fill="#5b4a33"/>
+    <circle cx="838" cy="657" r="10" fill="#8a6a42"/>
+    <rect x="742" y="672" width="34" height="12" rx="2" fill="#0c1113"/>
+    <!-- 纸带 -->
+    <path d="M880 686 H960 L950 700 H872 Z" fill="#c9b795" opacity="0.65"/>
+    <g fill="#2a2118" opacity="0.55">
+      <circle cx="890" cy="692" r="2"/>
+      <circle cx="904" cy="692" r="2"/>
+      <circle cx="920" cy="692" r="2"/>
+      <circle cx="940" cy="692" r="2"/>
+    </g>
+    <!-- 指示灯 -->
+    <circle cx="690" cy="706" r="7" fill="#e0a45e" opacity="0.75"/>
+    <circle cx="690" cy="706" r="30" fill="url(#blamp)" opacity="0.4"/>
+  </g>
+
+  <!-- 旧椅子 -->
+  <g filter="url(#brough)">
+    <rect x="350" y="750" width="110" height="16" fill="#3a2a1c"/>
+    <rect x="356" y="766" width="10" height="170" fill="#1d140d"/>
+    <rect x="444" y="766" width="10" height="170" fill="#1d140d"/>
+    <rect x="356" y="740" width="10" height="70" fill="#1d140d"/>
+    <rect x="300" y="800" width="60" height="9" fill="#241810" opacity="0.8"/>
+  </g>
+
+  <!-- 上行台阶 -->
+  <g>
+    <path d="M1640 1080 L1700 840 L1800 840 L1740 1080 Z" fill="#0c1012"/>
+    <path d="M1704 852 L1792 852 L1788 872 L1708 872 Z" fill="#1a2023"/>
+    <path d="M1712 884 L1786 884 L1782 904 L1716 904 Z" fill="#161c1f"/>
+    <path d="M1720 916 L1780 916 L1776 936 L1724 936 Z" fill="#121718"/>
+    <path d="M1700 828 L1800 828 L1800 840 L1700 840 Z" fill="#242a2d"/>
+    <rect x="1744" y="760" width="10" height="80" fill="#0c1012" opacity="0.8"/>
+  </g>
+
+  <!-- 暗角 -->
+  <rect x="-40" y="-40" width="2000" height="1160" fill="url(#bdark)"/>
+
+  <g pointer-events="none" aria-hidden="true">
+    <defs>
+      <filter id="fxGrain" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.87" numOctaves="3" stitchTiles="stitch" result="n"/>
+        <feColorMatrix in="n" type="saturate" values="0"/>
+      </filter>
+    </defs>
+    <rect x="0" y="0" width="1920" height="1080" filter="url(#fxGrain)" opacity="0.14" style="mix-blend-mode:overlay"/>
+    <g fill="none" stroke="#ffedd6" stroke-width="1">
+      <path d="M 134.4 129.6 L 138.2 388.8" opacity="0.05"/>
+      <path d="M 1593.6 280.8 L 1589.7 680.4" opacity="0.04"/>
+    </g>
+  </g>
+</svg>

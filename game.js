@@ -780,7 +780,10 @@
       news_01: 1, news_02: 1,
       n1_01: 1, n1_02: 1, n1_03: 1, n1_04: 1,
       n1_05: 1, n1_06: 1, n1_07: 1, n1_08: 1,
-      n2_04: 1, n2_05: 1, n2_06: 1, n2_08: 1, n2_10: 1, n2_11: 1
+      n2_04: 1, n2_05: 1, n2_06: 1, n2_08: 1, n2_10: 1, n2_11: 1,
+      n2_13: 1, n2_14: 1,
+      n3_01: 1, n3_02: 1, n3_03: 1, n3_04: 1,
+      n3_05: 1, n3_06: 1, n3_07: 1, n3_08: 1, n3_09: 1
     },
 
     // 优先 mp3（当前生成的格式），没有 mp3 再退回 wav
@@ -1721,6 +1724,58 @@
           ]
         }
       }
+    },
+
+    /* 第 3 夜《密码》：防空洞里的旧电报机 */
+    night3: {
+      night: '第 3 夜 · 密码',
+      start: 'bunker',
+      areas: {
+        bunker: {
+          room: '防 空 洞',
+          art: 'assets/bunker.svg',
+          lights: [{ id: 'bulb', x: 46, y: 27 }],
+          hotspots: [
+            {
+              id: 'telegraph', label: '电报机', x: 49, y: 64,
+              closeup: {
+                title: '电 报 机',
+                widget: 'morse',
+                art: 'assets/closeups/telegraph.svg',
+                props: function () {
+                  return {
+                    decoded: Night3.decoded,
+                    lookedUp: Night3.lookedUp,
+                    answered: Night3.answered,
+                    sequence: Night3.SEQUENCE,
+                    callsign: Night3.CALLSIGN,
+                    choices: Night3.CHOICES,
+                    onDecoded: function () { Night3.onDecoded(); },
+                    onAnswer: function (id) { return Night3.answer(id); }
+                  };
+                }
+              }
+            },
+            {
+              id: 'paper', label: '墙上的旧报纸', x: 70, y: 54,
+              gate: function () { return Night3.decoded; },
+              gateHint: '先听清他发的呼号。',
+              onOpen: function () { Night3.readPaper(); },
+              closeup: {
+                title: '旧 报 纸', widget: 'note', art: 'assets/closeups/newspaper.svg',
+                note: '《潮汐镇日报》 民国三十七年十一月廿四\n\n【航务】连日大雾。廿三日夜，潮生号载客十一人离港，至今未归。同日白鸥号渔船亦失联，后于三号浮标外寻获，船身空着。\n\n旧呼号对照：\nH X W …… 潮生号\nK L D …… 白鸥号\nC M S …… 长明号\n\n报头边上，有人用红笔把“潮生号”圈了两遍。'
+              }
+            },
+            {
+              id: 'pipe', label: '滴水的管道', x: 62, y: 30,
+              action: function () {
+                Sub.hint('水顺着管壁往下走，一滴，一滴，落在铁皮桶里。', 3200);
+              }
+            }
+          ],
+          exits: []
+        }
+      }
     }
   };
 
@@ -1849,10 +1904,10 @@
       var self = this;
       this.run([
         { who: '', text: '噪声退开，像潮水退走。', voice: 'call_01' },
-        { who: '老周', text: '……喂？还有人守着吗。', voice: 'call_02' },
-        { who: '老周', text: '我是老周。最后一班渡轮的船长。', voice: 'call_03' },
-        { who: '老周', text: '雾太厚了。我什么都看不见。', voice: 'call_04' },
-        { who: '老周', text: '能不能……把航道灯给我点亮。', voice: 'call_05' },
+        { who: '老周', text: '喂？……喂。还有人吗。', voice: 'call_02' },
+        { who: '老周', text: '老周。跑最后一班渡轮的。', voice: 'call_03' },
+        { who: '老周', text: '雾太大了。船头都看不见。', voice: 'call_04' },
+        { who: '老周', text: '你把航道灯……能给我亮一下吗。', voice: 'call_05' },
         { who: '', text: '他的声音弱下去，只剩潮水。', voice: 'call_06' }
       ], function () {
         self.setStep('respond');
@@ -1869,10 +1924,10 @@
         Scene.setLight('beacon', true);
         Audio.sfx('breaker');
         this.run([
-          { who: '', text: '你按下航道灯的总闸。', voice: 'beacon_01' },
-          { who: '', text: '远处，灯塔亮起来。', voice: 'beacon_02' },
-          { who: '老周', text: '……看见了。我看见了。', voice: 'beacon_03' },
-          { who: '老周', text: '谢谢你。这一班，我靠岸了。', voice: 'beacon_04' },
+          { who: '', text: '总闸很沉。你把它压到底。', voice: 'beacon_01' },
+          { who: '', text: '海那边，灯塔亮了。先是一点，然后整束扫过来。', voice: 'beacon_02' },
+          { who: '老周', text: '看见了。看见了！', voice: 'beacon_03' },
+          { who: '老周', text: '谢谢。这班，我靠岸了。', voice: 'beacon_04' },
           { who: '', text: '通话断了。电流声爬回来，慢慢退成雨。', voice: 'beacon_05' },
           { who: '', text: '你把这一夜收进柜子。', voice: 'beacon_06' },
           { who: '', text: '柜子最上面一格，多了一盘没有标签的磁带。', voice: 'beacon_07' },
@@ -1894,7 +1949,7 @@
       if (id === 'music') {
         this.run([
           { who: '老周', text: '不是这首。', voice: 'music_01' },
-          { who: '老周', text: '……她不爱这首。', voice: 'music_02' },
+          { who: '老周', text: '她不爱这首。换一个吧。', voice: 'music_02' },
           { who: '', text: '你重新把信号稳住。他还在那头。', voice: 'music_03' }
         ], function () {
           Sub.hint('电话的指示灯还在闪。', 2800);
@@ -1903,8 +1958,8 @@
       }
 
       this.run([
-        { who: '老周', text: '今晚不听新闻了。', voice: 'news_01' },
-        { who: '老周', text: '海里的事，新闻说不清。', voice: 'news_02' },
+        { who: '老周', text: '新闻就别念了。', voice: 'news_01' },
+        { who: '老周', text: '海里的事，广播里说不清。', voice: 'news_02' },
         { who: '', text: '你重新把信号稳住。他还在那头。', voice: 'news_03' }
       ], function () {
         Sub.hint('电话的指示灯还在闪。', 2800);
@@ -2181,11 +2236,11 @@
       this.sync();
 
       Sub.play([
-        { who: '渔夫', text: '……喂？喂！有人吗？', voice: 'n1_01' },
-        { who: '渔夫', text: '我的罗盘坏了。雾太厚，我什么都看不见。', voice: 'n1_02' },
-        { who: '渔夫', text: '我是七号渔协的，船号零三。', voice: 'n1_06' },
-        { who: '渔夫', text: '我在北纬三十四度十二分，东经一百二十九度零七分。', voice: 'n1_03' },
-        { who: '渔夫', text: '船上还有人。求你，给我指个方向。', voice: 'n1_04' }
+        { who: '渔夫', text: '喂？喂——有人吗？', voice: 'n1_01' },
+        { who: '渔夫', text: '罗盘坏了。全是雾，我什么都看不见。', voice: 'n1_02' },
+        { who: '渔夫', text: '七号渔协的，船号零三。', voice: 'n1_06' },
+        { who: '渔夫', text: '我这儿……北纬三十四度十二分，东经一百二十九度零七分。', voice: 'n1_03' },
+        { who: '渔夫', text: '船上还有人。你给我个方向就行。', voice: 'n1_04' }
       ], function () {
         Sub.hint('他报的是度分。图上印的是小数。', 4200);
       });
@@ -2196,22 +2251,22 @@
       if (!this.tuned) return [];
       if (this.fixed) {
         return [
-          { who: '渔夫', text: '……有了。灯扫过来了。', voice: 'n1_07' },
-          { who: '渔夫', text: '我看见防波堤了。谢谢你，守夜的。', voice: 'n1_08' }
+          { who: '渔夫', text: '有了。灯扫过来了。', voice: 'n1_07' },
+          { who: '渔夫', text: '防波堤看见了。谢了，守夜的。', voice: 'n1_08' }
         ];
       }
       if (this.located) {
         return [
-          { who: '渔夫', text: '我在北纬三十四度十二分，东经一百二十九度零七分。', voice: 'n1_03' },
-          { who: '渔夫', text: '对，就是那儿。三号浮标，我看见了。', voice: 'n1_05' }
+          { who: '渔夫', text: '我这儿……北纬三十四度十二分，东经一百二十九度零七分。', voice: 'n1_03' },
+          { who: '渔夫', text: '对，就那儿。三号浮标，我看见了。', voice: 'n1_05' }
         ];
       }
       return [
-        { who: '渔夫', text: '……喂？喂！有人吗？', voice: 'n1_01' },
-        { who: '渔夫', text: '我的罗盘坏了。雾太厚，我什么都看不见。', voice: 'n1_02' },
-        { who: '渔夫', text: '我是七号渔协的，船号零三。', voice: 'n1_06' },
-        { who: '渔夫', text: '我在北纬三十四度十二分，东经一百二十九度零七分。', voice: 'n1_03' },
-        { who: '渔夫', text: '船上还有人。求你，给我指个方向。', voice: 'n1_04' }
+        { who: '渔夫', text: '喂？喂——有人吗？', voice: 'n1_01' },
+        { who: '渔夫', text: '罗盘坏了。全是雾，我什么都看不见。', voice: 'n1_02' },
+        { who: '渔夫', text: '七号渔协的，船号零三。', voice: 'n1_06' },
+        { who: '渔夫', text: '我这儿……北纬三十四度十二分，东经一百二十九度零七分。', voice: 'n1_03' },
+        { who: '渔夫', text: '船上还有人。你给我个方向就行。', voice: 'n1_04' }
       ];
     },
 
@@ -2231,7 +2286,7 @@
 
       var self = this;
       Sub.play([
-        { who: '渔夫', text: '对，就是那儿。三号浮标，我看见了。', voice: 'n1_05' }
+        { who: '渔夫', text: '对，就那儿。三号浮标，我看见了。', voice: 'n1_05' }
       ], function () {
         Sub.hint(self.measured ? '真方位 218°。年鉴里写过磁差。' : '桌上那把平行尺，该派上用场了。', 4600);
       });
@@ -2259,8 +2314,8 @@
 
       var self = this;
       Sub.play([
-        { who: '渔夫', text: '……有了。灯扫过来了。', voice: 'n1_07' },
-        { who: '渔夫', text: '我看见防波堤了。谢谢你，守夜的。', voice: 'n1_08' }
+        { who: '渔夫', text: '有了。灯扫过来了。', voice: 'n1_07' },
+        { who: '渔夫', text: '防波堤看见了。谢了，守夜的。', voice: 'n1_08' }
       ], function () {
         self.finish();
       });
@@ -2316,7 +2371,7 @@
       { id: 'f4', text: '我不该那么说。' },
       { id: 'f6', text: '你走了以后，我学着不再问你去了哪。' },
       { id: 'f1', text: '小满，妈这盘带子，录了七遍。' },
-      { id: 'f5', text: '灯我给你留着。' },
+      { id: 'f5', text: '灯，我一直给你留着。' },
       { id: 'f3', text: '“别再回来了”。' },
       { id: 'f2', text: '那年冬天你走的时候，我说的是——' }
     ],
@@ -2533,9 +2588,11 @@
 
       var self = this;
       Sub.play([
-        { who: '林慧', text: '小满，妈这盘带子，录了七遍。', voice: 'n2_04' },
-        { who: '林慧', text: '那年冬天你走的时候，我说的是——“别再回来了”。', voice: 'n2_05' },
-        { who: '林慧', text: '我不该那么说。灯我给你留着。', voice: 'n2_06' }
+        { who: '林慧', text: '小满，妈这盘带子……录了七遍。', voice: 'n2_04' },
+        { who: '林慧', text: '那年冬天你走的时候，我说的是，别再回来了。', voice: 'n2_05' },
+        { who: '林慧', text: '我不该那么说。', voice: 'n2_06' },
+        { who: '林慧', text: '你走了以后，我学着不再问你去了哪。', voice: 'n2_13' },
+        { who: '林慧', text: '灯……我一直给你留着。', voice: 'n2_14' }
       ], function () {
         self.listened = true;
         self.step = 'record';
@@ -2566,8 +2623,8 @@
 
       Audio.sfx('switch');
       var wrong = id === 'father'
-        ? { who: '林慧', text: '……别提他父亲。', voice: 'n2_10' }
-        : { who: '林慧', text: '别说关灯的事。他怕黑。', voice: 'n2_11' };
+        ? { who: '林慧', text: '别提他父亲。', voice: 'n2_10' }
+        : { who: '林慧', text: '别说关灯。他怕黑。', voice: 'n2_11' };
 
       Sub.play([
         wrong,
@@ -2593,6 +2650,188 @@
       this.save();
       Game.refreshEntry();
       Sub.hint('磁带收进柜子。标签上写着一个名字：小满。', 4800);
+
+      // 不回主页：黑场自己接上第 3 夜
+      setTimeout(function () {
+        var p = Store.get(K.progress, {}) || {};
+        if (Game.inGame && p.chapter === 'night2') Game.beginChapter('night3');
+      }, 5200);
+    }
+  };
+
+  /* ============================================================
+     第 3 夜：防空洞与旧电报机
+     ============================================================ */
+  var Night3 = {
+    step: 'listen',          // listen | lookup | answer | done
+    decoded: false,
+    lookedUp: false,
+    answered: false,
+    finished: false,
+    introDone: false,
+    area: 'bunker',
+
+    CALLSIGN: ['H', 'X', 'W'],
+    /* 最后一组重复了三遍：电键卡住了，不是三个 W */
+    SEQUENCE: [
+      ['.', '.', '.', '.'],
+      ['-', '.', '.', '-'],
+      ['.', '-', '-'],
+      ['.', '-', '-'],
+      ['.', '-', '-']
+    ],
+
+    CHOICES: [
+      { id: 'chaosheng', title: '潮生号', desc: '四八年雾夜离港的那班渡轮' },
+      { id: 'baiou', title: '白鸥号', desc: '同夜失联的渔船，后来在三号浮标外找到' },
+      { id: 'changming', title: '长明号', desc: '灯塔的旧称' }
+    ],
+
+    reset: function () {
+      this.step = 'listen';
+      this.decoded = false;
+      this.lookedUp = false;
+      this.answered = false;
+      this.finished = false;
+      this.introDone = false;
+      this.area = 'bunker';
+    },
+
+    snapshot: function () {
+      return {
+        step: this.step,
+        decoded: this.decoded,
+        lookedUp: this.lookedUp,
+        answered: this.answered,
+        finished: this.finished,
+        introDone: this.introDone,
+        area: this.area
+      };
+    },
+
+    restore: function (data) {
+      this.reset();
+      if (!data) return;
+      this.step = data.step || 'listen';
+      this.decoded = !!data.decoded;
+      this.lookedUp = !!data.lookedUp;
+      this.answered = !!data.answered;
+      this.finished = !!data.finished;
+      this.introDone = !!data.introDone;
+      this.area = data.area || 'bunker';
+    },
+
+    objective: function () {
+      if (this.finished) return '这一夜收进柜子了。';
+      if (!this.decoded) return '电键在响。听清他的呼号。';
+      if (!this.lookedUp) return 'HXW。旧报纸里查得到。';
+      if (!this.answered) return '他等着你报出那艘船的名字。';
+      return '这一夜收进柜子了。';
+    },
+
+    hintOnEnter: function () {
+      if (this.finished) {
+        Sub.hint('电报机安静了。水还在滴。', 3600);
+      } else if (!this.decoded && !this.introDone) {
+        this.introDone = true;
+        this.save();
+        Sub.play([
+          { who: '电报员', text: '……有人吗。', voice: 'n3_01' },
+          { who: '电报员', text: '我在下面。防空洞。', voice: 'n3_02' },
+          { who: '电报员', text: '电键卡住了。你听好。', voice: 'n3_03' },
+          { who: '电报员', text: '呼号，三组。', voice: 'n3_04' }
+        ], function () {
+          Sub.hint('纸带不走了。只能自己听，自己查。', 4600);
+        });
+      } else if (!this.decoded) {
+        Sub.hint('防空洞比楼上冷。电报机在自己响。', 4200);
+      } else if (!this.lookedUp) {
+        Sub.hint('呼号是 HXW。墙上那叠旧报纸。', 3800);
+      } else {
+        Sub.hint('他停下来了，等你回话。', 3400);
+      }
+    },
+
+    sync: function () {
+      if (Scene.current && Scene.current.areas && Scene.area) this.area = Scene.area;
+      Scene.setObjective(this.objective());
+      Scene.renderHotspots();
+      Scene.setActive('telegraph', !this.decoded);
+      Scene.setActive('paper', this.decoded && !this.lookedUp);
+      this.save();
+    },
+
+    save: function () {
+      var progress = Store.get(K.progress, {}) || {};
+      progress.chapter = 'night3';
+      progress.night = '第 3 夜 · 密码';
+      progress.night3 = this.snapshot();
+      progress.at = Date.now();
+      Store.set(K.progress, progress);
+    },
+
+    onDecoded: function () {
+      if (this.decoded) return;
+      this.decoded = true;
+      this.step = 'lookup';
+      Audio.sfx('lock');
+      this.sync();
+      Sub.play([
+        { who: '电报员', text: '收到没有？', voice: 'n3_05' }
+      ], function () {
+        Sub.hint('呼号 HXW。墙上那叠旧报纸里查得到。', 4600);
+      });
+    },
+
+    readPaper: function () {
+      if (this.lookedUp) return;
+      this.lookedUp = true;
+      if (this.step === 'lookup') this.step = 'answer';
+      Audio.sfx('paper');
+      this.sync();
+      Sub.hint('潮生号。廿三日廿三时四十分离港。', 4600);
+    },
+
+    answer: function (id) {
+      if (this.answered) return true;
+      if (id !== 'chaosheng') {
+        Audio.sfx('switch');
+        Sub.hint('那头没有回音。只有静电。', 3000);
+        return false;
+      }
+      this.answered = true;
+      this.step = 'done';
+      this.sync();
+      if (Scene.isOpen()) Scene.close();
+
+      var self = this;
+      Sub.play([
+        { who: '电报员', text: '你还记得那艘船。', voice: 'n3_06' },
+        { who: '电报员', text: '潮生号。四八年沉的。', voice: 'n3_07' },
+        { who: '电报员', text: '我等了七十年，才等到有人回话。', voice: 'n3_08' },
+        { who: '电报员', text: '谢谢你，守夜的。', voice: 'n3_09' }
+      ], function () {
+        self.finish();
+      });
+      return true;
+    },
+
+    finish: function () {
+      if (this.finished) return;
+      this.finished = true;
+      this.sync();
+
+      var tapes = Store.get(K.tapes, []);
+      var exists = tapes.some(function (t) { return t.id === 'night3'; });
+      if (!exists) {
+        tapes.push({ id: 'night3', title: '第 3 夜 · 密码', night: '电报员 · 潮生号' });
+        Store.set(K.tapes, tapes);
+      }
+
+      Audio.sfx('open');
+      this.save();
+      Game.refreshEntry();
+      Sub.hint('电报机停了。纸带上多了一行没人认得的点划。', 5200);
     }
   };
 
@@ -4107,6 +4346,269 @@
           Audio.stopCal();
         }
       };
+    },
+
+    /* ---------- 第 3 夜：摩斯电码与旧呼号 ---------- */
+    morse: function (root, props) {
+      props = props || {};
+      var decoded = !!props.decoded;
+      var lookedUp = !!props.lookedUp;
+      var answered = !!props.answered;
+      var seq = props.sequence || [];
+      var callsign = props.callsign || [];
+      var choices = props.choices || [];
+      var timers = [];
+
+      var wrap = div('tool-block');
+      wrap.appendChild(p('tool-caption', '电 报 机 · 接 收'));
+      var brief = p('chart-brief', '');
+      wrap.appendChild(brief);
+      var body = div('morse-body');
+      wrap.appendChild(body);
+      root.appendChild(wrap);
+
+      function clearTimers() {
+        timers.forEach(clearTimeout);
+        timers = [];
+      }
+
+      function beep(dur) {
+        var ctx = Audio.ctx;
+        if (!ctx || Audio.muted || !Audio.master) return;
+        var o = ctx.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = 640;
+        var g = ctx.createGain();
+        var t = ctx.currentTime;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.06, t + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(g);
+        g.connect(Audio.master);
+        o.start(t);
+        o.stop(t + dur + 0.03);
+      }
+
+      function buildStrip() {
+        var strip = div('morse-strip');
+        seq.forEach(function (group) {
+          var gEl = div('morse-group');
+          group.forEach(function (sym) {
+            var m = document.createElement('i');
+            m.className = 'morse-mark ' + (sym === '-' ? 'morse-dash' : 'morse-dot');
+            gEl.appendChild(m);
+          });
+          strip.appendChild(gEl);
+        });
+        return strip;
+      }
+
+      function playStrip(strip) {
+        clearTimers();
+        var marks = strip.querySelectorAll('.morse-mark');
+        var t = 0;
+        for (var i = 0; i < marks.length; i++) {
+          (function (m) {
+            var dash = m.classList.contains('morse-dash');
+            var d = dash ? 340 : 120;
+            timers.push(setTimeout(function () {
+              m.classList.add('is-on');
+              beep(d / 1000);
+              timers.push(setTimeout(function () { m.classList.remove('is-on'); }, d));
+            }, t));
+            t += d + 120;
+          })(marks[i]);
+        }
+      }
+
+      function reading(text) {
+        var n = p('tool-note is-reading', text);
+        n.style.textAlign = 'left';
+        body.appendChild(n);
+        return n;
+      }
+
+      function stageDone() {
+        brief.textContent = '电键停了。';
+        reading('纸带上留着一行没人认得的点划。\n\n水还在滴。铁皮桶里已经积了半桶。');
+      }
+
+      function stageAnswer() {
+        brief.textContent = '呼号对上了。他要你报出那艘船的名字。';
+        reading('旧报纸上的红笔圈了两遍。\n\n回话的时候，只要说船名。');
+
+        var list = div('choices');
+        choices.forEach(function (opt, i) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'choice';
+
+          var idx = document.createElement('span');
+          idx.className = 'choice-index';
+          idx.textContent = '0' + (i + 1);
+
+          var box = div('choice-body');
+          var title = document.createElement('span');
+          title.className = 'choice-title';
+          title.textContent = opt.title;
+          var desc = document.createElement('span');
+          desc.className = 'choice-desc';
+          desc.textContent = opt.desc;
+          box.appendChild(title);
+          box.appendChild(desc);
+
+          btn.appendChild(idx);
+          btn.appendChild(box);
+          btn.addEventListener('click', function () {
+            var ok = props.onAnswer ? props.onAnswer(opt.id) : false;
+            if (!ok) {
+              btn.classList.add('is-wrong');
+              setTimeout(function () { btn.classList.remove('is-wrong'); }, 620);
+            }
+          });
+          list.appendChild(btn);
+        });
+        body.appendChild(list);
+      }
+
+      function stageLookup() {
+        brief.textContent = '呼号：H X W。';
+        reading('电键不响了。墙上的旧报纸被灯照着一角。\n\nHXW 是哪条船，报纸上写着。');
+      }
+
+      function stageListen() {
+        brief.textContent = '电键在响。纸带不走了，只能自己听。';
+
+        var strip = buildStrip();
+        body.appendChild(strip);
+
+        var replay = document.createElement('button');
+        replay.type = 'button';
+        replay.className = 'btn-ghost tool-replay';
+        replay.textContent = '再听一遍';
+        replay.addEventListener('click', function () { playStrip(strip); });
+        body.appendChild(replay);
+
+        var tip = p('tool-note', '一组是一封信。电键卡住了，最后一组一直在重复。');
+        tip.style.textAlign = 'left';
+        body.appendChild(tip);
+
+        body.appendChild(p('tool-caption', '摩 斯 表'));
+        var table = div('morse-table');
+        [
+          ['A', '.-'], ['B', '-...'], ['C', '-.-.'], ['D', '-..'], ['E', '.'],
+          ['F', '..-.'], ['G', '--.'], ['H', '....'], ['I', '..'], ['J', '.---'],
+          ['K', '-.-'], ['L', '.-..'], ['M', '--'], ['N', '-.'], ['O', '---'],
+          ['P', '.--.'], ['Q', '--.-'], ['R', '.-.'], ['S', '...'], ['T', '-'],
+          ['U', '..-'], ['V', '...-'], ['W', '.--'], ['X', '-..-'], ['Y', '-.--'], ['Z', '--..']
+        ].forEach(function (pair) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'morse-key';
+          var letter = document.createElement('b');
+          letter.textContent = pair[0];
+          var marks = document.createElement('span');
+          marks.textContent = pair[1].replace(/\./g, '·').replace(/-/g, '−');
+          b.appendChild(letter);
+          b.appendChild(marks);
+          b.addEventListener('click', function () { press(pair[0]); });
+          table.appendChild(b);
+        });
+        body.appendChild(table);
+
+        var slotWrap = div('morse-slots');
+        var slots = [];
+        for (var i = 0; i < callsign.length; i++) {
+          var s = div('morse-slot');
+          slotWrap.appendChild(s);
+          slots.push(s);
+        }
+        body.appendChild(slotWrap);
+
+        var typed = '';
+        var locked = false;
+
+        function paintSlots() {
+          for (var k = 0; k < slots.length; k++) {
+            slots[k].textContent = typed.charAt(k) || '';
+            slots[k].classList.remove('is-wrong');
+          }
+        }
+
+        function press(ch) {
+          if (locked || typed.length >= callsign.length) return;
+          typed += ch;
+          Audio.sfx('knob');
+          paintSlots();
+          if (typed.length === callsign.length) check();
+        }
+
+        function check() {
+          var target = callsign.join('');
+          if (typed === target) {
+            locked = true;
+            Audio.sfx('lock');
+            for (var k = 0; k < slots.length; k++) slots[k].classList.add('is-ok');
+            brief.textContent = '呼号：' + target.split('').join(' ') + '。';
+            body.innerHTML = '';
+            reading('电键停了。\n\n墙上的旧报纸被灯照着一角。去查查 HXW 是哪条船。');
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn-amber';
+            btn.textContent = '去翻旧报纸';
+            btn.addEventListener('click', function () { Scene.close(); });
+            body.appendChild(btn);
+            if (props.onDecoded) props.onDecoded();
+            return;
+          }
+
+          for (var m = 0; m < callsign.length; m++) {
+            if (typed.charAt(m) !== target.charAt(m)) slots[m].classList.add('is-wrong');
+          }
+          Audio.sfx('switch');
+          Sub.hint('不对。一组一组对，别管重复的那几组。', 3000);
+          timers.push(setTimeout(function () {
+            typed = '';
+            paintSlots();
+          }, 780));
+        }
+
+        var back = document.createElement('button');
+        back.type = 'button';
+        back.className = 'btn-ghost';
+        back.textContent = '删一个';
+        back.addEventListener('click', function () {
+          if (locked) return;
+          typed = typed.slice(0, -1);
+          paintSlots();
+        });
+        body.appendChild(back);
+
+        var reset = document.createElement('button');
+        reset.type = 'button';
+        reset.className = 'btn-ghost';
+        reset.textContent = '清空';
+        reset.addEventListener('click', function () {
+          if (locked) return;
+          typed = '';
+          paintSlots();
+        });
+        body.appendChild(reset);
+
+        paintSlots();
+        playStrip(strip);
+      }
+
+      if (answered) stageDone();
+      else if (lookedUp) stageAnswer();
+      else if (decoded) stageLookup();
+      else stageListen();
+
+      return {
+        destroy: function () {
+          clearTimers();
+        }
+      };
     }
   };
 
@@ -4670,6 +5172,22 @@
       }
 
       this.syncMute();
+
+      /* 滑块支持滚轮微调：像转机器的旋钮，而不是拖网页 */
+      document.addEventListener('wheel', function (e) {
+        var t = e.target;
+        if (!t || !t.classList || !t.classList.contains('tool-slider')) return;
+        var step = parseFloat(t.step) || 1;
+        var min = parseFloat(t.min);
+        var max = parseFloat(t.max);
+        var v = parseFloat(t.value) + (e.deltaY > 0 ? -step : step);
+        v = Math.max(min, Math.min(max, v));
+        v = Math.round(v * 1000) / 1000;
+        if (String(v) === String(t.value)) return;
+        e.preventDefault();
+        t.value = String(v);
+        t.dispatchEvent(new Event('input', { bubbles: true }));
+      }, { passive: false });
     },
 
     menuAction: function (action) {
@@ -5176,12 +5694,19 @@
       var n2 = progress && progress.night2;
       var n2Done = !!(n2 && n2.finished);
       var n2Ready = n1Done && !n2Done;
+      var n3 = progress && progress.night3;
+      var n3Done = !!(n3 && n3.finished);
+      var n3Ready = n2Done && !n3Done;
 
       if (restart) restart.hidden = !hasSave;
 
       if (status) {
         if (!hasSave) {
           status.textContent = '序章 · 空频待命';
+        } else if (n3Done) {
+          status.textContent = '第 3 夜已完成 · 收录 ' + tapes.length + ' 盘';
+        } else if (n3Ready) {
+          status.textContent = '第 3 夜 · 密码待命';
         } else if (n2Done) {
           status.textContent = '第 2 夜已完成 · 收录 ' + tapes.length + ' 盘';
         } else if (n2Ready) {
@@ -5197,9 +5722,15 @@
         }
       }
 
-      if (n2Done) {
+      if (n3Done) {
+        label.textContent = '重听第 3 夜';
+        hint.textContent = '第 4 夜还在路上。';
+      } else if (n3Ready) {
+        label.textContent = (n3 && n3.step !== 'listen') ? '继续第 3 夜' : '进入第 3 夜';
+        hint.textContent = '防空洞里的电报机还没停。';
+      } else if (n2Done) {
         label.textContent = '重听第 2 夜';
-        hint.textContent = '第 3 夜还在路上。';
+        hint.textContent = '柜子里又多了一盘带子。';
       } else if (n2Ready) {
         label.textContent = (n2 && n2.step !== 'letter') ? '继续第 2 夜' : '进入第 2 夜';
         hint.textContent = '磁带间还亮着一盏灯。';
@@ -5217,7 +5748,7 @@
         hint.textContent = '雨还没停，信号还亮着。';
       } else {
         label.textContent = '开始新游戏';
-        hint.textContent = '点击亮着的那盏灯，开始今晚的守夜';
+        hint.textContent = '雨还没停。今晚轮到你守。';
       }
     },
 
@@ -5245,6 +5776,7 @@
         Pro.reset();
         Night1.reset();
         Night2.reset();
+        Night3.reset();
         Game.enter();
         Game.refreshEntry();
       });
@@ -5289,6 +5821,7 @@
       this.inGame = true;
 
       var progress = Store.get(K.progress, null) || {};
+      if (progress.chapter === 'night3') { this.loadChapter('night3', progress); return; }
       if (progress.chapter === 'night2') { this.loadChapter('night2', progress); return; }
       if (progress.chapter === 'night1') { this.loadChapter('night1', progress); return; }
       this.loadChapter('prologue', progress);
@@ -5312,6 +5845,29 @@
 
     loadChapter: function (chapter, progress) {
       var self = this;
+
+      if (chapter === 'night3') {
+        Night3.restore(progress.night3);
+
+        setTimeout(function () {
+          Layout.apply();
+          Audio.setRoom('tape');
+          Scene.load('night3', Night3.area);
+          Power.skip();
+          Scene.setLight('bulb', true);
+          Night3.sync();
+
+          Card.play('第 3 夜', '密码', 'MIDNIGHT SIGNAL · NIGHT THREE', function () {
+            Night3.hintOnEnter();
+          });
+        });
+
+        progress.night = '第 3 夜 · 密码';
+        progress.at = Date.now();
+        Store.set(K.progress, progress);
+        $('#tbNight').textContent = progress.night;
+        return;
+      }
 
       if (chapter === 'night2') {
         Night2.restore(progress.night2);
@@ -5436,7 +5992,10 @@
       var progress = Store.get(K.progress, null);
       if (!progress) return;
       progress.prologue = Pro.snapshot();
-      if (progress.chapter === 'night2') {
+      if (progress.chapter === 'night3') {
+        progress.night3 = Night3.snapshot();
+        progress.night = '第 3 夜 · 密码';
+      } else if (progress.chapter === 'night2') {
         progress.night2 = Night2.snapshot();
         progress.night = '第 2 夜 · 磁带';
       } else if (progress.chapter === 'night1') {
@@ -5524,6 +6083,11 @@
       if (Scene.sceneId === 'night2') {
         Night2.area = Scene.area;
         Night2.sync();
+        return;
+      }
+      if (Scene.sceneId === 'night3') {
+        Night3.area = Scene.area;
+        Night3.sync();
       }
     };
     Power.init();

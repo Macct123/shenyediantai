@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="nbg" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#2a241a"/>
+      <stop offset="0.55" stop-color="#17130e"/>
+      <stop offset="1" stop-color="#0a0806"/>
+    </linearGradient>
+    <linearGradient id="npaper" x1="0" y1="0" x2="0.15" y2="1">
+      <stop offset="0" stop-color="#d8c8a6"/>
+      <stop offset="0.5" stop-color="#bda985"/>
+      <stop offset="1" stop-color="#8d7a5c"/>
+    </linearGradient>
+    <linearGradient id="npaper2" x1="0" y1="0" x2="0.1" y2="1">
+      <stop offset="0" stop-color="#c7b593"/>
+      <stop offset="0.6" stop-color="#a08c6b"/>
+      <stop offset="1" stop-color="#6f5f47"/>
+    </linearGradient>
+    <radialGradient id="nvign" cx="0.5" cy="0.45" r="0.8">
+      <stop offset="0.4" stop-color="#000" stop-opacity="0"/>
+      <stop offset="0.8" stop-color="#000" stop-opacity="0.36"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.82"/>
+    </radialGradient>
+    <filter id="nrough" x="-4%" y="-4%" width="108%" height="108%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.016 0.03" numOctaves="2" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="nshadow"><feGaussianBlur stdDeviation="18"/></filter>
+    <pattern id="nlines" width="10" height="14" patternUnits="userSpaceOnUse">
+      <rect width="10" height="14" fill="none"/>
+      <path d="M0 12 H10" stroke="#3a2f22" stroke-opacity="0.25" stroke-width="2"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#nbg)"/>
+
+  <!-- 桌面光 -->
+  <ellipse cx="820" cy="470" rx="700" ry="330" fill="#e0a45e" opacity="0.05" filter="url(#nshadow)"/>
+
+  <!-- 下面的一叠报纸 -->
+  <g filter="url(#nrough)" opacity="0.9">
+    <g transform="translate(360 250) rotate(-3.4)">
+      <rect width="880" height="520" fill="url(#npaper2)" opacity="0.7"/>
+      <rect x="0" y="0" width="880" height="520" fill="url(#nlines)" opacity="0.5"/>
+    </g>
+    <g transform="translate(330 226) rotate(-1.2)">
+      <rect width="920" height="540" fill="url(#npaper2)" opacity="0.8"/>
+      <rect x="0" y="0" width="920" height="540" fill="url(#nlines)" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- 主报纸 -->
+  <g filter="url(#nrough)">
+    <g transform="translate(300 180) rotate(1.1)">
+      <path d="M0 0 H960 L950 556 L12 566 Z" fill="url(#npaper)"/>
+      <!-- 折痕 -->
+      <path d="M0 284 L958 274" stroke="#6b5a41" stroke-width="3" opacity="0.4"/>
+      <path d="M480 0 L476 560" stroke="#6b5a41" stroke-width="2" opacity="0.25"/>
+      <!-- 报头横线 -->
+      <path d="M40 96 H910" stroke="#3a2f22" stroke-width="4" opacity="0.45"/>
+      <path d="M40 106 H910" stroke="#3a2f22" stroke-width="2" opacity="0.3"/>
+      <!-- 标题块（不用文字，交给 HTML 叠层） -->
+      <rect x="40" y="36" width="420" height="46" fill="#3a2f22" opacity="0.16"/>
+      <!-- 正文栏 -->
+      <g stroke="#3a2f22" stroke-opacity="0.4" stroke-width="3">
+        <path d="M40 140 H300 M40 160 H280 M40 180 H296 M40 200 H250 M40 220 H290 M40 240 H264"/>
+        <path d="M340 140 H610 M340 160 H580 M340 180 H600 M340 200 H552 M340 220 H592 M340 240 H570"/>
+        <path d="M650 140 H910 M650 160 H890 M650 180 H902 M650 200 H860 M650 220 H892 M650 240 H874"/>
+        <path d="M40 320 H300 M40 340 H286 M40 360 H296 M40 380 H254 M40 400 H292 M40 420 H270 M40 440 H298"/>
+        <path d="M340 320 H610 M340 340 H590 M340 360 H602 M340 380 H558 M340 400 H596 M340 420 H576 M340 440 H600"/>
+        <path d="M650 320 H910 M650 340 H886 M650 360 H900 M650 380 H862 M650 400 H894 M650 420 H878 M650 440 H906"/>
+      </g>
+      <!-- 红笔圈 -->
+      <path d="M676 300 Q820 276 892 318 Q918 360 860 392 Q760 414 688 372 Q650 332 676 300 Z"
+            fill="none" stroke="#9a3f2c" stroke-width="5" opacity="0.6"/>
+      <!-- 撕口 -->
+      <path d="M950 480 L960 556 L840 560 L872 520 L920 512 Z" fill="#17130e"/>
+    </g>
+  </g>
+
+  <!-- 压在纸上的铅笔 -->
+  <g transform="translate(1140 600) rotate(24)">
+    <rect width="300" height="16" rx="3" fill="#8a6a42"/>
+    <path d="M300 0 L332 8 L300 16 Z" fill="#3a2a1c"/>
+    <path d="M324 5 L332 8 L324 11 Z" fill="#1a120b"/>
+    <rect x="0" y="0" width="46" height="16" rx="3" fill="#a98a63"/>
+  </g>
+
+  <!-- 暗角 -->
+  <rect width="1600" height="900" fill="url(#nvign)"/>
+
+  <g pointer-events="none" aria-hidden="true">
+    <defs>
+      <filter id="fxGrain" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.86" numOctaves="3" stitchTiles="stitch" result="n"/>
+        <feColorMatrix in="n" type="saturate" values="0"/>
+      </filter>
+    </defs>
+    <rect width="1600" height="900" filter="url(#fxGrain)" opacity="0.15" style="mix-blend-mode:overlay"/>
+  </g>
+</svg>
